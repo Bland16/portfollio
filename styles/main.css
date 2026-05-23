@@ -1,0 +1,364 @@
+/* ═══════════════════════════════════════════════════════════
+   FERRIS WHEEL PORTFOLIO — main.css
+   Midnight Carnival aesthetic
+   Palette:
+     --bg:          #0d0221   deep indigo-black
+     --fog:         #1a0533   purple-dark
+     --gold:        #c9a84c   polished gold
+     --gold-worn:   #8b7536   weathered gold
+     --cream:       #f5f0e8   cabin panels
+     --ivory:       #f0e6cc   interior trim
+     --red:         #8b1a1a   velvet seats
+     --rim:         #a8c8ff   cool blue-white rim glow
+     --accent:      #00ffcc   electric mint (hover only)
+     --text:        #e8dcc8   warm off-white
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --bg:        #0d0221;
+  --fog:       #1a0533;
+  --gold:      #c9a84c;
+  --gold-worn: #8b7536;
+  --cream:     #f5f0e8;
+  --ivory:     #f0e6cc;
+  --red:       #8b1a1a;
+  --rim:       #a8c8ff;
+  --accent:    #00ffcc;
+  --text:      #e8dcc8;
+
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body:    'Lato', sans-serif;
+
+  --transition-smooth: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast:   0.2s ease;
+}
+
+/* ── RESET ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 300;
+}
+
+/* ── CANVAS CONTAINER ──────────────────────────────── */
+#canvas-container {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+#canvas-container canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ── LABEL CONTAINER (CSS3DRenderer) ───────────────── */
+#label-container {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none; /* labels don't block mouse on scene */
+}
+
+/* Individual cabin label — injected by CSS3DRenderer */
+.cabin-label {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--ivory);
+  text-shadow:
+    0 0 12px rgba(201, 168, 76, 0.8),
+    0 0 30px rgba(201, 168, 76, 0.4);
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  pointer-events: auto;
+  cursor: pointer;
+  padding: 6px 14px;
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  border-radius: 2px;
+  background: rgba(13, 2, 33, 0.5);
+  backdrop-filter: blur(4px);
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.cabin-label:hover {
+  color: var(--accent);
+  text-shadow: 0 0 20px rgba(0, 255, 204, 0.9);
+  border-color: rgba(0, 255, 204, 0.5);
+}
+
+/* ── LOADING SCREEN ────────────────────────────────── */
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+#loading-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loading-inner {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.loading-wheel {
+  font-size: 52px;
+  animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-style: italic;
+  color: var(--ivory);
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+}
+
+.loading-bar {
+  width: 240px;
+  height: 1px;
+  background: rgba(201, 168, 76, 0.2);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.loading-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--gold);
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px var(--gold);
+}
+
+/* ── HUD ELEMENTS ──────────────────────────────────── */
+.hud {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(240, 230, 204, 0.5);
+  text-align: center;
+  transition: opacity var(--transition-smooth), visibility var(--transition-smooth);
+  pointer-events: none;
+}
+
+.hud--hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.key-hints {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.key {
+  display: inline-block;
+  padding: 3px 8px;
+  border: 1px solid rgba(201, 168, 76, 0.4);
+  border-radius: 3px;
+  background: rgba(13, 2, 33, 0.6);
+  color: var(--gold);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+/* ── PROJECT DESCRIPTION PANEL ─────────────────────── */
+.panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(420px, 90vw);
+  height: 100vh;
+  z-index: 20;
+  background: rgba(13, 2, 33, 0.92);
+  backdrop-filter: blur(16px);
+  border-left: 1px solid rgba(201, 168, 76, 0.25);
+  padding: 60px 40px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  transition: transform var(--transition-smooth);
+  overflow-y: auto;
+}
+
+.panel--hidden {
+  transform: translateX(100%);
+}
+
+.panel-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  color: var(--gold);
+  width: 32px;
+  height: 32px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.panel-close:hover {
+  background: rgba(201, 168, 76, 0.1);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.panel-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--ivory);
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+  padding-bottom: 20px;
+}
+
+.panel-image {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: rgba(240, 230, 204, 0.05);
+  border: 1px solid rgba(201, 168, 76, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Star background when no image */
+.panel-image--stars {
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(168, 200, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(201, 168, 76, 0.06) 0%, transparent 50%),
+    var(--bg);
+}
+
+.panel-description {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.8;
+  color: rgba(240, 230, 204, 0.8);
+
+  /* Auto text wrap — never bleeds off screen */
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+  max-width: 100%;
+}
+
+/* ── DEV MODE PANEL ────────────────────────────────── */
+.dev-panel {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 16px;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--accent);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 220px;
+  transition: opacity var(--transition-smooth), visibility var(--transition-smooth);
+}
+
+.dev-panel--hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.dev-panel h3 {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(0, 255, 204, 0.3);
+  padding-bottom: 8px;
+}
+
+.dev-panel button {
+  background: rgba(0, 255, 204, 0.08);
+  border: 1px solid rgba(0, 255, 204, 0.4);
+  color: var(--accent);
+  padding: 6px 10px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 11px;
+  text-align: left;
+  transition: background var(--transition-fast);
+}
+
+.dev-panel button:hover {
+  background: rgba(0, 255, 204, 0.18);
+}
+
+#dev-output {
+  font-size: 10px;
+  color: rgba(0, 255, 204, 0.6);
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* ── SCROLLBAR STYLING ─────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(201, 168, 76, 0.3); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(201, 168, 76, 0.6); }

@@ -1,0 +1,568 @@
+// ═══════════════════════════════════════════════════════════
+// config.js — All user-editable content lives here
+// Add projects, rename cabins, change colors — all from this file
+// ═══════════════════════════════════════════════════════════
+
+// ── GLOBAL SCALE ────────────────────────────────────────────
+// Applied to all three GLBs uniformly.
+// Change this one value if models appear too big or small.
+export const MODEL_SCALE = 14.29
+
+// ── SEAT HEIGHT ─────────────────────────────────────────────
+// Y position of the seat surface inside the cabin (in scene units)
+// Scaled automatically — adjust the base value (0.3) if needed
+export const SEAT_Y = 0.3 * MODEL_SCALE
+
+// ── CABIN DEFINITIONS ───────────────────────────────────────
+// 6 cabins, one per section
+// attachIndex: which of the 12 wheel attach points to use (0–11)
+//              every other point = 0, 2, 4, 6, 8, 10
+export const CABINS = [
+  {
+    id: 'digital-projects',
+    label: 'Digital Projects',
+    attachIndex: 0,
+    items: [
+      {
+        "glb": "models/object-project-makeup-trey.glb",
+        "seat": "left",
+        "positionOffset": [-0.1, 0.5, 3.1],
+        "scale": 10,
+        "label": "Makeup Tray",
+        "link": null,
+        "description": "I created this makeup tray as a simple, clean solution to streamline my daily makeup routine.\n\nI designed the model in Fusion 360 and printed it on a Prusa XL in PLA at a size of approximately 18 cm × 10 cm × 4 cm.\n\nKey features include an open top and front for dual access, separated hollow ribbed sides for content visibility, and a raised base split across four interlocking pieces.",
+        "images": [{"src": "photos/makeup-trey.jpg", "date": null}],
+        "skills": ['fusion-360', 'cad', '3d-printing']
+      },
+      {
+        "glb": "models/openDots.glb",
+        "seat": "left",
+        "positionOffset": [-0.4, 0.5, 0.6],
+        "scale": 11.5,
+        "label": "OpenDots | Babson Hackathon 2026",
+        "link": "https://github.com/romanobro56/OpenDots",
+        "description": "I built the full Fusion 360 model for a digital Braille‑style display during Babson University’s 2026 five‑hour hackathon. Each body in the model was intentionally named so our code could address individual pins in real time. When a user pressed a letter on our website, a teammate’s image‑analysis algorithm recognized the character and triggered the corresponding pins in the 3D model, creating a live, interactive Braille output experience designed to support early literacy for blind children. More details are available in the linked GitHub repository.",
+        "images": [{"src": "photos/text-board.jpg", "date": null}],
+        "skills": ['fusion-360', 'cad', 'teamwork', 'problem-solving']
+      },
+       {
+        "glb": "models/tree.glb",
+        "seat": "left",
+        "positionOffset": [-0.8, 0, -2.6],
+        "scale": 0.6,
+        "label": "Tree Distance Algorithm For Pesticide Application | Boston College Engineering",
+        "link": null,
+        "description": "I built and trained a machine learning model to estimate the distance of a tree from a camera, aiming to optimize pesticide application. The training image dataset was cleaned and refined in collaboration with my partner, Michael Busa. Following the completion of our code, we delivered a presentation on our findings to the engineering department. As the research this project contributed to has not yet been published, detailed methodology and data are available upon request.",
+        "images": [],
+        "rotationY": -0.35
+      },
+      {
+        "glb": "models/tideflow.glb",
+        "seat": "right",
+        "positionOffset": [-0.3, 0, -3.1],
+        "scale": 0.3,
+        "label": "TideFlow | Personal Scheduling App",
+        "link": null,
+        "description": "I authored a 20-page design specification for TideFlow, a custom scheduling app built around machine learning. The spec defines core user flows, feature requirements, and the logic behind ML-driven schedule optimization — laying the groundwork for a future build.",
+        "images": [],
+        "rotationY": -1.55,
+        "skills": ['machine-learning', 'prompt-engineering', 'ui-design', 'problem-solving']
+      },
+      {
+        "glb": "models/chips.glb",
+        "seat": "left",
+        "positionOffset": [0.8, 0.5, 1.2],
+        "scale": 15,
+        "label": "Poker Chips for the Visually Impaired",
+        "link": null,
+        "description": "I designed these poker chips specifically for colorblind players. Since standard poker chip values rely heavily on color differentiation, I introduced four distinct values based on interior geometric cutouts. This approach preserves stackability while allowing for clear tactile and visual differentiation.\n\nI modeled the chips in Fusion 360 and 3D-printed them in PLA on a Prusa MINI, with each chip measuring 39mm in diameter and 0.5–1mm in thickness.",
+        "images": [{"src": "photos/chips.png", "date": null}],
+        "imageOffset": "50% 20%",
+        "skills": ['fusion-360', 'cad', '3d-printing', 'problem-solving']
+      }
+    ]
+  },
+
+  {
+    id: 'physical-projects',
+    label: 'Physical Projects',
+    attachIndex: 2,
+    items: [
+      {
+        "glb": "models/object-project-rfid.glb",
+        "seat": "right",
+        "positionOffset": [-0.6, 0, -4.1],
+        "scale": 1,
+        "label": "RFID Remote Authorization Lock Box | Making The Modern World 2026 Design Conference",
+        "link": null,
+        "description": "I built this lock box as a smarter alternative to my college's lost and found system for low-to-medium value items. Rather than relying on staff to manually match owners to items, the box integrates directly with the school's existing ID infrastructure. When someone is confirmed as the owner of a lost item, I designed the system to remotely authorize their student ID to unlock the box and retrieve it on their own time.\n\nThe system runs C++ firmware I wrote for an Arduino Nano, which controls a 5V solenoid lock through a MOSFET switching circuit and communicates with a 13.56MHz RC522 RFID reader over SPI. I handled the card authorization logic and hardware control timing entirely on-device. The custom electronics I wired include flyback protection, gate pull-down resistors, and multi-voltage power distribution (5V/3.3V) for reliable high-current switching.\n\nI CAD modeled and 3D-printed a thermal housing for the solenoid to ensure precise actuation alignment and protect nearby components from heat. I also fabricated the enclosure itself—a 19\" × 14\" × 5\" wooden box—using a table saw, adding full cable management and strain relief for a production-quality finish.",
+        "images": [],
+        "rotationY": -1,
+        "skills": ['cpp', 'arduino', 'circuits', 'rfid-nfc', 'soldering', 'woodworking', '3d-printing', 'fusion-360', 'problem-solving']
+      },
+      {
+        "glb": "models/object-project-arcade.glb",
+        "seat": "right",
+        "positionOffset": [0.5, 0, 0.2],
+        "scale": 2,
+        "label": "Dino Metal Rampage",
+        "link": null,
+        "description": "I engineered and fabricated a fully custom hard rock dinosaur-themed arcade cabinet, which I laser-cut with dino designs and finished with a clear acrylic back panel so the interior circuitry is visible.\n\nI powered the hardware with a Raspberry Pi 5 and an Adafruit RGB Matrix HAT, driving three 64×32 HUB75 LED panels as a single 96×64 display. I hand-wired and soldered all circuitry components, mapping seven physical buttons and a joystick directly to the software input layer while utilizing two external power supplies to handle the Pi and panels separately.\n\nI wrote the entire software stack from scratch: five games (Coloring Book, Maze, Meteorite Massacre, Cretaceous Shred: Rex's Revenge, and Blackjack), a scrolling game-select launcher, a universal high score system, and per-session coloring book storage with email delivery. I also built a custom sprite extraction tool that pulls from sprite sheets and converts them into the flat .txt format the LED matrix consumes, as well as an offline MIDI analysis pipeline for Rex's Revenge that auto-generates note charts from audio using beat tracking, onset detection, and spectral band mapping.\n\nI collaborated with Garrett Mackenzie, who constructed and spray-painted the wooden physical enclosure. I built this project for our Physical Computing Class at Boston College.",
+        "images": [],
+        "rotationY": -1.55,
+        "skills": ['python', 'raspberry-pi', 'led-matrix', 'soldering', 'laser-cutting', 'machine-learning', 'prompt-engineering', 'teamwork', 'problem-solving']
+      },
+      {
+        "glb": "models/object-project-math.glb",
+        "seat": "left",
+        "positionOffset": [0, 0, -2.9],
+        "scale": 1,
+        "label": "Portable Counting Game | Exemplary Build Award",
+        "link": null,
+        "description": "I developed a portable counting game designed for children with combined physical and cognitive impairments, purposefully sizing it to fit directly on a wheelchair tray for independent use.\n\nI designed the device to run on a rechargeable battery while retaining plug-in capabilities to ensure uninterrupted sessions. I reduced the interaction to two large buttons, making it accessible to children with limited fine motor control, and added a glass light diffuser above the indicator to soften visual feedback.\n\nI soldered and assembled the internal circuitry (a Matrix Portal connected to a HUB75 and mobile battery) and designed the logic controlling the code behind the counting game.\n\nI built this in conjunction with Garrett Mackenzie for our Physical Computing class at Boston College.",
+        "images": [],
+        "rotationY": 1.35,
+        "skills": ['circuitpython', 'led-matrix', 'soldering', 'teamwork', 'problem-solving', 'communication']
+      },
+      {
+        "glb": "models/object-project-tapn.glb",
+        "seat": "left",
+        "positionOffset": [-0.4, 0.2, 0.7],
+        "scale": 1,
+        "label": "TapN | Accelerate@Shea 2026 Cohort",
+        "link": null,
+        "description": "I co-founded TapN, an NFC-based system designed to reduce student phones to only their essential functions during class, minimizing distraction while preserving safety features.\n\nI led the hardware design through multiple iterations, building wooden physical mockups, CAD models, and 3D-printed prototypes. I also built object-oriented frameworks in Swift to optimize the tap-to-restrict user flow.\n\nBecause of our work, TapN was selected for Accelerate@Shea 2026, a competitive startup accelerator at Boston College offering equity-free funding, mentorship, and workshops with industry professionals.",
+        "images": [],
+        "skills": ['swift', 'fusion-360', 'cad', '3d-printing', 'entrepreneurship', 'leadership', 'communication', 'teamwork']
+      },
+      {
+        "glb": "models/object-project-cat-bed.glb",
+        "seat": "right",
+        "positionOffset": [-0.4, 0.8, -3.6],
+        "scale": 3,
+        "label": "Keypad-Controlled Vibrating Cat Bed | 2nd Place — Boston College Make-A-Thon 2026",
+        "link": null,
+        "description": "I designed this vibrating cat bed for deaf cats who can no longer experience music audibly, engineering it to deliver calming sensory stimulation through touch. I integrated a wired 4×4 keypad so the owner can easily adjust the bed's settings without disturbing a resting pet.\n\nI built the electronics around an Elegoo Uno paired with a CircuitPython Bluefruit, which I programmed to drive a connected speaker and amplifier via PWM signals. I wired five vibration motors through a shared common ground and power line, regulating their intensity with a MOSFET. I mapped the 4×4 keypad to give the user direct control over three functions: power on/off, vibration intensity, and playback of one of three songs, each of which I coded to be felt as rhythmic vibration through the bed's surface.",
+        "images": [],
+        "rotationY": 5.4,
+        "skills": ['arduino', 'circuitpython', 'circuits', 'pwm', 'motors', 'soldering', 'problem-solving']
+      },
+      {
+        "glb": "models/object-project-hay-bag.glb",
+        "seat": "left",
+        "positionOffset": [0.2, 0, 1.8],
+        "scale": 1,
+        "label": "Mobile Hay-Bag Shelf | Lovelane Special Needs Horseback Riding Program — Boston College Engineering Project",
+        "link": null,
+        "description": "I co-designed and constructed this mobile shelf in collaboration with the Lovelane Special Needs Horseback Riding Program to help students with disabilities independently participate in horse feeding. By holding a hay bag at a consistent two-foot height, the shelf I helped design frees the student to focus on the clasping mechanism without needing to support the bag's weight.\n\nMy team and I constructed the shelf from plywood using piano hinges, allowing it to fold down to less than a third of its original width for easy storage and transport. I contributed to adding adjustable hooks for flexible bag placement and laser-engraving horse designs on the side panels for visual detail. We ensured the final build safely supports over 25 lbs and requires no fine-motor manipulation to operate.\n\n*Built in collaboration with Karilynn Arellano, Kaitlyn Cabalu, and Burke Bessette.*",
+        "images": [],
+        "rotationY": 1.7,
+        "skills": ['woodworking', 'laser-cutting', 'hand-tools', 'teamwork', 'communication', 'problem-solving']
+      }
+    ]
+  },
+
+  {
+    id: 'events',
+    label: 'Events',
+    attachIndex: 4,
+    items: [
+      {
+        "glb": "models/openDots.glb",
+        "seat": "left",
+        "positionOffset": [-0.4, 0.5, 0.6],
+        "scale": 11.5,
+        "label": "OpenDots | Babson Hackathon 2026",
+        "link": "https://github.com/romanobro56/OpenDots",
+        "description": "I built the full Fusion 360 model for a digital Braille‑style display during Babson University’s 2026 five‑hour hackathon. Each body in the model was intentionally named so our code could address individual pins in real time. When a user pressed a letter on our website, a teammate’s image‑analysis algorithm recognized the character and triggered the corresponding pins in the 3D model, creating a live, interactive Braille output experience designed to support early literacy for blind children. More details are available in the linked GitHub repository.",
+        "images": [{"src": "photos/text-board.jpg", "date": null}],
+        "skills": ['fusion-360', 'cad', 'teamwork', 'problem-solving']
+      },
+      {
+        "glb": "models/object-project-rfid.glb",
+        "seat": "right",
+        "positionOffset": [-0.6, 0, -4.1],
+        "scale": 1,
+        "label": "RFID Remote Authorization Lock Box | Making The Modern World 2026 Design Conference",
+        "link": null,
+        "description": "I built this lock box as a smarter alternative to my college's lost and found system for low-to-medium value items. Rather than relying on staff to manually match owners to items, the box integrates directly with the school's existing ID infrastructure. When someone is confirmed as the owner of a lost item, I designed the system to remotely authorize their student ID to unlock the box and retrieve it on their own time.\n\nThe system runs C++ firmware I wrote for an Arduino Nano, which controls a 5V solenoid lock through a MOSFET switching circuit and communicates with a 13.56MHz RC522 RFID reader over SPI. I handled the card authorization logic and hardware control timing entirely on-device. The custom electronics I wired include flyback protection, gate pull-down resistors, and multi-voltage power distribution (5V/3.3V) for reliable high-current switching.\n\nI CAD modeled and 3D-printed a thermal housing for the solenoid to ensure precise actuation alignment and protect nearby components from heat. I also fabricated the enclosure itself—a 19\" × 14\" × 5\" wooden box—using a table saw, adding full cable management and strain relief for a production-quality finish.",
+        "images": [],
+        "rotationY": -1,
+        "skills": ['cpp', 'arduino', 'circuits', 'rfid-nfc', 'soldering', 'woodworking', '3d-printing', 'fusion-360', 'problem-solving']
+      },
+      {
+        "glb": "models/object-project-math.glb",
+        "seat": "left",
+        "positionOffset": [0, 0, -2.9],
+        "scale": 1,
+        "label": "Portable Counting Game | Exemplary Build Award",
+        "link": null,
+        "description": "I developed a portable counting game designed for children with combined physical and cognitive impairments, purposefully sizing it to fit directly on a wheelchair tray for independent use.\n\nI designed the device to run on a rechargeable battery while retaining plug-in capabilities to ensure uninterrupted sessions. I reduced the interaction to two large buttons, making it accessible to children with limited fine motor control, and added a glass light diffuser above the indicator to soften visual feedback.\n\nI soldered and assembled the internal circuitry (a Matrix Portal connected to a HUB75 and mobile battery) and designed the logic controlling the code behind the counting game.\n\nI built this in conjunction with Garrett Mackenzie for our Physical Computing class at Boston College.",
+        "images": [],
+        "rotationY": 1.35,
+        "skills": ['circuitpython', 'led-matrix', 'soldering', 'teamwork', 'problem-solving', 'communication']
+      },
+      {
+        "glb": "models/object-project-tapn.glb",
+        "seat": "left",
+        "positionOffset": [-0.4, 0.2, 0.7],
+        "scale": 1,
+        "label": "TapN | Accelerate@Shea 2026 Cohort",
+        "link": null,
+        "description": "I co-founded TapN, an NFC-based system designed to reduce student phones to only their essential functions during class, minimizing distraction while preserving safety features.\n\nI led the hardware design through multiple iterations, building wooden physical mockups, CAD models, and 3D-printed prototypes. I also built object-oriented frameworks in Swift to optimize the tap-to-restrict user flow.\n\nBecause of our work, TapN was selected for Accelerate@Shea 2026, a competitive startup accelerator at Boston College offering equity-free funding, mentorship, and workshops with industry professionals.",
+        "images": [],
+        "skills": ['swift', 'fusion-360', 'cad', '3d-printing', 'entrepreneurship', 'leadership', 'communication', 'teamwork']
+      },
+      {
+        "glb": "models/object-project-cat-bed.glb",
+        "seat": "right",
+        "positionOffset": [-0.4, 0.8, -3.6],
+        "scale": 3,
+        "label": "Keypad-Controlled Vibrating Cat Bed | 2nd Place — Boston College Make-A-Thon 2026",
+        "link": null,
+        "description": "I designed this vibrating cat bed for deaf cats who can no longer experience music audibly, engineering it to deliver calming sensory stimulation through touch. I integrated a wired 4×4 keypad so the owner can easily adjust the bed's settings without disturbing a resting pet.\n\nI built the electronics around an Elegoo Uno paired with a CircuitPython Bluefruit, which I programmed to drive a connected speaker and amplifier via PWM signals. I wired five vibration motors through a shared common ground and power line, regulating their intensity with a MOSFET. I mapped the 4×4 keypad to give the user direct control over three functions: power on/off, vibration intensity, and playback of one of three songs, each of which I coded to be felt as rhythmic vibration through the bed's surface.",
+        "images": [],
+        "rotationY": 5.4,
+        "skills": ['arduino', 'circuitpython', 'circuits', 'pwm', 'motors', 'soldering', 'problem-solving']
+      }
+    ]
+  },
+
+  {
+    id: 'about-me',
+    label: 'About Me',
+    attachIndex: 6,
+    items: [
+      {
+        "glb": "models/linkedIn.glb",
+        "seat": "left",
+        "positionOffset": [-0.2, -0.1, 2.4],
+        "scale": 10,
+        "label": "LinkedIn",
+        "link": "https://www.linkedin.com/in/sarah-bland-808405357/",
+        "description": null,
+        "images": [],
+        "rotationY": 0.15
+      },
+      {
+        "glb": "models/gmail.glb",
+        "seat": "left",
+        "positionOffset": [-0.1, -0.1, 1.2],
+        "scale": 10,
+        "label": "Gmail",
+        "link": "mailto:blandsa@bc.edu",
+        "description": null,
+        "images": [],
+        "rotationY": -0.2
+      },
+      {
+        "glb": "models/about-chinese.glb",
+        "seat": "right",
+        "positionOffset": [-0.9, 0, 1.6],
+        "scale": 1.5,
+        "label": "About Me: Chinese Immersion Learner",
+        "link": null,
+        "description": "I have been learning Mandarin for 15 years. I was enrolled in a Chinese immersion program through middle school, which included accelerated math and competing in Mandarin speech competitions at UMD. In high school, I wrote and performed a short play in Mandarin about cultural appropriation alongside my friend Kevin Ma — it headlined our school's Lunar New Year celebration. I later visited my pen pal in Beijing, a trip that deepened the connection the language has always given me to the world beyond my own.",
+        "images": [],
+        "rotationY": -2.1
+      },
+      {
+        "glb": "models/about-house.glb",
+        "seat": "left",
+        "positionOffset": [-1.5, 0, 1.2],
+        "scale": 0.28,
+        "label": "Where I'm Located",
+        "link": null,
+        "description": "I am originally from Maryland. My preferred work locations are New York, Los Angeles, Boston, and Washington, D.C.",
+        "images": [],
+        "rotationY": -1
+      },
+      {
+        "glb": "models/about-tv.glb",
+        "seat": "right",
+        "positionOffset": [-1.1, 0.1, -3.2],
+        "scale": 0.51,
+        "label": "About Me: Certified Cinephile",
+        "link": null,
+        "description": "I have seen over a thousand movies and wrote a screenplay at 18. Every Wednesday I watch a film with friends — a ritual I look forward to every week. Some of my favorites are 'The Half of It', 'Perfect Days', 'Scream', 'Godzilla Minus One', 'The Pig, The Snake and the Pigeon', and 'Who Framed Roger Rabbit'. On the TV side, 'Interior Chinatown' is a recent standout. Beyond film, I am a serious sports fan — football, hockey, and basketball are fixtures in my viewing life.",
+        "images": [],
+        "rotationY": -2
+      },
+      {
+        "glb": "models/about-water.glb",
+        "seat": "left",
+        "positionOffset": [0.8, 0.2, -1.6],
+        "scale": 0.5,
+        "label": "My Interests",
+        "link": null,
+        "description": "I enjoy learning about a wide variety of subjects. Some topics I maintain a strong body of knowledge in include the Flint, Michigan water crisis and community vulnerability to public health crises, entertainment engineering techniques, the long-term effects of redlining on modern housing districts, the intersection between religion and economic theory, and asylum law regulations and procedures.",
+        "images": []
+      },
+      {
+        "glb": "models/about-cooking.glb",
+        "seat": "left",
+        "positionOffset": [0.9, -1.1, -4.5],
+        "scale": 0.4,
+        "label": "About Me: Red-Meat Cooking Prodigy",
+        "link": null,
+        "description": "I can make a mean steak—and that is an understatement. I love cooking for family and friends. While I usually take requests, my favorite secret recipes include sugar fish fillet, hidden-vegetable pumpkin buns, popsicle-poached apples, and onion-tomato seared steak. Recipes are available upon request.",
+        "images": [],
+        "rotationY": -0.012
+      },
+      {
+        "glb": "models/about-boxing.glb",
+        "seat": "left",
+        "positionOffset": [-1.3, 0, 4.2],
+        "scale": 0.2,
+        "label": "About Me: Former Pre-Amateur Boxer",
+        "link": null,
+        "description": "I boxed all four years of high school and was one of two girls on a boxing team in White Flint, Maryland. My coach was an old-fashioned 'tough-love' mentor who taught me about delayed gratification, discipline, and punctuality. My favorite moment from the sport was participating in a gym-run Punch-A-Thon to help bring boxing to impoverished youth.",
+        "images": [],
+        "rotationY": 0.45
+      }
+    ]
+  },
+  
+  {
+    id: 'hobby-work',
+    label: 'The Portfolio',
+    attachIndex: 8,
+    items: [
+      {
+        "glb": "models/wheel-rails.glb",
+        "seat": "left",
+        "positionOffset": [-0.8, 1.4, 3.1],
+        "scale": 5,
+        "label": "The Ferris Wheel",
+        "link": null,
+        "description": "I love the beach. Every time I have the opportunity to visit one, I find myself transfixed by the Ferris wheels. There's a certain elegance to the architecture and lighting design that tricks the mind into seeing them fly. When it came time to build my portfolio, I thought it would be nice if I could fly, too.\n\nThe wheel and stand together contain 73 named mesh bodies. There are 12 empties that work as attachment point anchors, one per spoke. The code reads these coordinates to position each cabin precisely on the wheel.",
+        "images": [],
+        "rotationY": 2.2,
+        "skills": ['threejs', 'javascript', 'blender', 'fusion-360', 'cad', 'web-dev', 'problem-solving']
+      },
+      {
+        "glb": "models/wheel-stand.glb",
+        "seat": "left",
+        "positionOffset": [-0.8, 1.4, 3.1],
+        "scale": 5,
+        "label": null,
+        "link": null,
+        "description": null,
+        "images": [],
+        "rotationY": 2.2
+      },
+      {
+        "glb": "models/cabin.glb",
+        "seat": "right",
+        "positionOffset": [0.7, 2.5, 4],
+        "scale": 14.5,
+        "label": "The Cabin",
+        "link": null,
+        "description": "I follow the same build pipeline for every model in the scene: design in Fusion 360, export as an FBX, reposition and name all bodies in Blender, add animation empties where needed, export as a GLB, and then re-apply all base materials by mesh name prefix in Three.js.\n\nThe cabin is built from 79 individually named mesh bodies. The material system reads each name prefix and assigns the correct color in code depending on the 'vibe' (see the Vibe Switcher for more info), so every cabin in the scene actually shares one base GLB. Two animation empties drive the door swing, timed to the camera transition into the interior. There is also an empty for the seat height of the left and right seats. The code places project objects at the coordinate of the empty. In dev mode, I can manually drag, scale, position, and rotate the objects exactly where I want them to sit in the cabin relative to the seats.",
+        "images": [],
+        "rotationY": 3.8,
+        "skills": ['blender', 'fusion-360', 'cad', 'threejs', 'javascript', 'web-dev']
+      },
+      {
+        "glb": "models/booth.glb",
+        "seat": "left",
+        "positionOffset": [-0.1, 0, 0.1],
+        "scale": 9,
+        "label": "The Ticket Booth",
+        "link": null,
+        "description": "Sir's ticket stand was modeled in Fusion 360 across 36 mesh bodies. The booth provides a strong visual counterweight to the wheel and button enclosure on screen left.\n\nIt is also home to Sir Matcher. When Sir is clicked, the camera orbits to the ticket booth, locks into a fixed position, and switches its target to him.",
+        "images": [],
+        "rotationY": 1.55,
+        "skills": ['fusion-360', 'cad', 'blender']
+      },
+      {
+        "glb": "models/robot.glb",
+        "seat": "left",
+        "positionOffset": [-0.2, 0, -2.6],
+        "scale": 20.5,
+        "label": "Sir Matcher",
+        "link": null,
+        "description": "Sir Matcher was modeled in Fusion 360 across 42 mesh bodies including a top hat, monocle, clock, face, eyebrows, and glowing pupils. He is a rather dapper fellow modeled after Alfred the Butler from the Batman series, so the third vibe 'Pop Art' (inspired by Batman: Brave and the Bold) is where he feels most at home. His 30 animation empties inform his idle movements, mouse tracking, expressions, and talking animations. When speaking, his jaw moves on word boundaries via the Web Speech API onboundary event, synced to a British male voice selected from available system voices at runtime. Expression animation methods fire based on the conversation topic at the moment speech begins. He tracks the mouse cursor in real-time as visitors explore the site.\n\nThe conversation system is made up of handwritten phrases. A four-tier classification algorithm—written in pure JavaScript alongside a backend machine learning Python algorithm to learn from chat history and suggest improved responses—routes each message through exact social pre-matching, Levenshtein-based typo correction, direct keyword scoring, and topic bucket retrieval before falling back to a phrase bank scan. Unknowns are deflected with a contextual fallback and logged silently to a Google Form in the background. Question mirroring extracts the subject from common question structures and echoes it back before responding.",
+        "images": [],
+        "rotationY": -1,
+        "skills": ['threejs', 'javascript', 'web-dev', 'python', 'machine-learning', 'blender', 'fusion-360', 'cad', 'problem-solving']
+      },
+      {
+        "glb": "models/keycap_vibes.glb",
+        "seat": "right",
+        "positionOffset": [-0.3, 1.1, -4.8],
+        "scale": 2,
+        "label": "Vibe Switcher",
+        "link": null,
+        "description": "The vibe button is truly a vibe—a keyboard keycap on the front page that cycles the world's palette. There are seven themes: Aurora, Suave, Carnival, Pop Art, Blueprint, Midnight Arcade, and Pastel Dream.\n\nEach theme is a delta patch against a shared base material set. The vibe properties are specified in a config document, and the system merges them on top at each 'vibe-switch'. Every named mesh in the scene responds simultaneously.\n\nBlueprint sets each structural mesh to wireframe and activates OutlinePass, turning the scene into a technical drawing. Midnight Arcade adds scanlines and pushes bloom to maximum. Aurora runs a custom GLSL shader alongside a particle rain system.\n\nOn load, a 30-frame rAF benchmark runs alongside hardware heuristics: device memory, core count, max texture size, and mobile detection. The combined score determines how far the post-processing stack scales back on lower-end devices.",
+        "images": [],
+        "rotationY": -1.25,
+        "skills": ['threejs', 'javascript', 'web-dev', 'problem-solving']
+      },
+      {
+        "glb": "models/object-camera.glb",
+        "seat": "right",
+        "positionOffset": [
+          1,
+          0,
+          -1.9
+        ],
+        "scale": 1,
+        "label": "Camera System",
+        "link": null,
+        "description": "I built three distinct camera modes for this experience: Orbit allows for a free look around the wheel, Transit provides a smooth tween to a selected cabin, and Interior locks the view inside a cabin using a precise position offset and look target set in the config file.\n\nThere is also an Auto-Explore feature that automatically cycles through every cabin on a timer. You can press 'A' inside any cabin to activate it.",
+        "images": [],
+        "rotationY": 3
+      }
+    ]
+  },
+
+  {
+    id: 'more-stuff',
+    label: 'Coming Soon',
+    attachIndex: 10,
+    items: [
+      //Cutting board, book, screenplay, pumpkin trophies, pubkin trebuchet
+    ]
+  }
+]
+
+// ── WHEEL SETTINGS ──────────────────────────────────────────
+export const WHEEL = {
+  spinSpeed: 0.0015,
+  selectSpeedBoost: 0.08,
+  easeInDistance: 0.3,
+  totalAttachPoints: 12,
+  cabinHangOffset: [0,-0.8,0],  // how far cabin hangs below attach point
+}
+
+// ── CAMERA SETTINGS ─────────────────────────────────────────
+export const CAMERA = {
+  startPosition: [8, -104, 200],   // initial camera position
+  minDistance:    60,             // orbit min zoom
+  maxDistance:    500,            // orbit max zoom
+  interiorOffset: [0, 7, 4],      // camera offset inside cabin [x, y, z]
+  interiorLookOffset: [0, 4, -6], // where camera looks inside cabin
+  exitPosition:  [8, -104, 200],
+}
+
+// ── CABIN SWAY SETTINGS ─────────────────────────────────────
+export const SWAY = {
+  noiseScale: 0.4,            // how much noise affects sway
+  pendulumStrength: 0.6,      // how much wheel speed affects sway
+  maxAngle: 0.08,             // max sway in radians (~4.5 degrees)
+  damping: 0.92,              // how quickly sway settles
+}
+
+// ── FOG SETTINGS ────────────────────────────────────────────
+export const FOG = {
+  groundParticleCount: 800,
+  groundHeight: -7 * 14.29,    // scaled ground level
+  upperOpacity: 0.006,
+  driftSpeed: 0.004,           // faster drift to be visible at scale
+  color: '#d4c5e8',
+  spread: 40 * 14.29,          // how wide fog spreads
+}
+
+// ── LIGHTING ────────────────────────────────────────────────
+export const LIGHTS = {
+  ambientColor:    '#1a0a2e',
+  ambientIntensity: 0.4,
+
+  moonColor:       '#a8c8ff',
+  moonIntensity:   0.8,
+  moonPosition:    [-140, 280, 110],  // scaled moon position
+
+  warmFillColor:   '#ffb347',
+  warmFillIntensity: 0.3,
+  warmFillDistance: 25 * 14.29,       // point light radius
+
+  rimColor:        '#a8c8ff',
+  rimIntensity:    1.2,
+  attachLightRadius: 3 * 14.29,       // radius of attach point lights
+}
+
+// ── MATERIAL COLORS ─────────────────────────────────────────
+export const MATERIALS = {
+  // Cabin
+  cabin_body:           { color: '#f5f0e8', metalness: 0.0, roughness: 0.7 },
+  cabin_trim:           { color: '#c9a84c', metalness: 0.9, roughness: 0.2,  emissive: '#c9a84c', emissiveIntensity: 0.4 },
+  cabin_trim_window_ext:{ color: '#f5f0e8', metalness: 0.0, roughness: 0.7 },
+  cabin_trim_window_int:{ color: '#f0e6cc', metalness: 0.1, roughness: 0.6,  emissive: '#f0e6cc', emissiveIntensity: 0.08 },
+  cabin_window:         { color: '#ffffff', metalness: 0.0, roughness: 0.0,  transparent: true, opacity: 0.15 },
+  cabin_door_body:      { color: '#f5f0e8', metalness: 0.0, roughness: 0.7 },
+  cabin_door_trim:      { color: '#c9a84c', metalness: 0.9, roughness: 0.2,  emissive: '#c9a84c', emissiveIntensity: 0.4 },
+  cabin_door_trim_red:  { color: '#8b1a1a', metalness: 0.0, roughness: 0.8 },
+  cabin_door_base:      { color: '#1a1a1a', metalness: 0.2, roughness: 0.9 },
+  cabin_door_handle:    { color: '#c9a84c', metalness: 0.9, roughness: 0.2,  emissive: '#c9a84c', emissiveIntensity: 0.3 },
+  cabin_door_bar:       { color: '#8b7536', metalness: 0.7, roughness: 0.75, emissive: '#3d3218', emissiveIntensity: 0.1 },
+  cabin_seat:           { color: '#8b1a1a', metalness: 0.0, roughness: 0.9 },
+  cabin_roof:           { color: '#b8960c', metalness: 0.8, roughness: 0.3,  emissive: '#7a6408', emissiveIntensity: 0.15 },
+  cabin_floor:          { color: '#2a2a2a', metalness: 0.1, roughness: 0.95 },
+  cabin_hook:           { color: '#4a4a4a', metalness: 0.9, roughness: 0.4 },
+
+  // Wheel
+  wheel_body:           { color: '#2a2a2a', metalness: 0.9, roughness: 0.4 },
+  wheel_rim_front:      { color: '#a8c8ff', metalness: 0.6, roughness: 0.2,  emissive: '#a8c8ff', emissiveIntensity: 0.6 },
+  attach_bar:           { color: '#8b7536', metalness: 0.7, roughness: 0.75, emissive: '#3d3218', emissiveIntensity: 0.1 },
+
+  // Stand
+  stand_body:           { color: '#1a1a1a', metalness: 0.8, roughness: 0.6 },
+  stand_axle:           { color: '#1a1a1a', metalness: 0.9, roughness: 0.3 },
+
+  // Booth stripes — alternating dark metallic purple / deep maroon
+  booth_stripe_a:       { color: '#ec500d', metalness: 0.85, roughness: 0.25 }, // dark regal purple
+  booth_stripe_b:       { color: '#ffffff', metalness: 0.15, roughness: 0.75 }, // deep maroon accent
+}
+
+// ── SKILLS REGISTRY ─────────────────────────────────────────
+// Used by SkillsGallery.js to render the shooting-gallery wall.
+// Each key matches a slug used in the  skills: [...]  arrays above.
+//   label:    display name shown in the detail card
+//   category: hardware | coding | design | fabrication | soft
+//   level:    1 (beginner) → 5 (expert) — controls object size
+export const SKILLS = {
+
+  // ── Hardware & Electronics  →  tin cans ─────────────────
+  'arduino':          { label: 'Arduino',              category: 'hardware',    level: 4 },
+  'raspberry-pi':     { label: 'Raspberry Pi',         category: 'hardware',    level: 3 },
+  'soldering':        { label: 'Soldering',            category: 'hardware',    level: 4 },
+  'circuits':         { label: 'Circuit Design',       category: 'hardware',    level: 3 },
+  'rfid-nfc':         { label: 'RFID / NFC',           category: 'hardware',    level: 3 },
+  'led-matrix':       { label: 'LED Matrix',           category: 'hardware',    level: 3 },
+  'motors':           { label: 'Motors & Actuators',   category: 'hardware',    level: 3 },
+  'pwm':              { label: 'PWM Signals',          category: 'hardware',    level: 2 },
+
+  // ── Software & Code  →  milk bottles ────────────────────
+  'cpp':              { label: 'C++',                  category: 'coding',      level: 4 },
+  'python':           { label: 'Python',               category: 'coding',      level: 4 },
+  'javascript':       { label: 'JavaScript',           category: 'coding',      level: 4 },
+  'swift':            { label: 'Swift',                category: 'coding',      level: 3 },
+  'circuitpython':    { label: 'CircuitPython',        category: 'coding',      level: 3 },
+  'threejs':          { label: 'Three.js',             category: 'coding',      level: 3 },
+  'machine-learning': { label: 'Machine Learning',     category: 'coding',      level: 2 },
+  'web-dev':          { label: 'Web Dev',              category: 'coding',      level: 3 },
+  'prompt-engineering': { label: 'Prompt Engineering', category: 'coding',      level: 3 },
+
+  // ── Design & 3D  →  rubber ducks ────────────────────────
+  'fusion-360':       { label: 'Fusion 360',           category: 'design',      level: 5 },
+  'blender':          { label: 'Blender',              category: 'design',      level: 4 },
+  'cad':              { label: '3D CAD',               category: 'design',      level: 5 },
+  'ui-design':        { label: 'UI Design',            category: 'design',      level: 3 },
+
+  // ── Fabrication & Making  →  bullseye targets ───────────
+  '3d-printing':      { label: '3D Printing',          category: 'fabrication', level: 4 },
+  'woodworking':      { label: 'Woodworking',          category: 'fabrication', level: 3 },
+  'laser-cutting':    { label: 'Laser Cutting',        category: 'fabrication', level: 3 },
+  'hand-tools':       { label: 'Hand Tools',           category: 'fabrication', level: 2 },
+
+  // ── Soft Skills  →  balloons ─────────────────────────────
+  'teamwork':         { label: 'Teamwork',             category: 'soft',        level: 5 },
+  'communication':    { label: 'Communication',        category: 'soft',        level: 4 },
+  'problem-solving':  { label: 'Problem Solving',      category: 'soft',        level: 5 },
+  'entrepreneurship': { label: 'Entrepreneurship',     category: 'soft',        level: 3 },
+  'leadership':       { label: 'Leadership',           category: 'soft',        level: 3 },
+  'event-planning':   { label: 'Event Planning',       category: 'soft',        level: 3 },
+  'public-speaking':  { label: 'Public Speaking',      category: 'soft',        level: 3 },
+
+}

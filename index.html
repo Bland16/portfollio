@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio — Ferris Wheel</title>
+  <link rel="stylesheet" href="styles/main.css" />
+
+  <!-- Google Fonts: Cormorant Garamond (display) + Lato (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Lato:wght@300;400&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       THREE.JS CANVAS CONTAINER
+  ═══════════════════════════════════════════ -->
+  <div id="canvas-container"></div>
+
+  <!-- ═══════════════════════════════════════════
+       CSS3D LABEL CONTAINER (overlays canvas)
+       Labels are injected here by CSS3DRenderer
+  ═══════════════════════════════════════════ -->
+  <div id="label-container"></div>
+
+  <!-- ═══════════════════════════════════════════
+       LOADING SCREEN
+  ═══════════════════════════════════════════ -->
+  <div id="loading-screen">
+    <div class="loading-inner">
+      <div class="loading-wheel">🎡</div>
+      <p class="loading-text">Loading your world...</p>
+      <div class="loading-bar"><div class="loading-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       HUD — ORBIT MODE (always visible at start)
+  ═══════════════════════════════════════════ -->
+  <div id="hud-orbit" class="hud">
+    <p>Click a cabin to enter &nbsp;·&nbsp; Drag to orbit</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       HUD — INTERIOR MODE (shown when inside cabin)
+  ═══════════════════════════════════════════ -->
+  <div id="hud-interior" class="hud hud--hidden">
+    <div class="key-hints">
+      <span class="key">↑</span> Look up
+      <span class="key">↓</span> Look down
+      <span class="key">←</span> Turn left
+      <span class="key">→</span> Turn right
+      <span class="key">ESC</span> Exit cabin
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       HUD — INSPECT MODE (shown when object clicked)
+       Shown when a project object is clicked inside cabin
+  ═══════════════════════════════════════════ -->
+  <div id="hud-inspect" class="hud hud--hidden">
+    <div class="key-hints">
+      <span class="key">↑ ↓ ← →</span> Rotate object
+      <span class="key">ESC</span> Back to cabin
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       PROJECT DESCRIPTION PANEL
+       Slides in from right when project has no link
+  ═══════════════════════════════════════════ -->
+  <div id="project-panel" class="panel panel--hidden">
+    <button id="panel-close" class="panel-close">✕</button>
+    <h2 id="panel-title" class="panel-title"></h2>
+    <div id="panel-image" class="panel-image"></div>
+    <p id="panel-description" class="panel-description"></p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       DEV MODE CONTROLS
+       Visible only when ?dev=true in URL
+  ═══════════════════════════════════════════ -->
+  <div id="dev-panel" class="dev-panel dev-panel--hidden">
+    <h3>DEV MODE</h3>
+    <button id="dev-reroll">Reroll Object Positions</button>
+    <button id="dev-log-positions">Log Positions to Console</button>
+    <pre id="dev-output"></pre>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       IMPORTMAP — Three.js via CDN
+  ═══════════════════════════════════════════ -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <!-- Entry point -->
+  <script type="module" src="js/main.js"></script>
+
+</body>
+</html>
