@@ -1214,8 +1214,26 @@ async function _exportPDFSections(indices) {
     }
 
     for (const item of visibleItems) {
-      const bandH = 60  // mm per band
+      // Pre-compute title wrapping
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(13)
+      const titleLines = doc.splitTextToSize(item.label || 'Untitled', CW * 0.58)
+      const titleH = titleLines.length * 6
 
+      // Pre-compute description lines
+      const cleanDesc = String(item.description || (item.link ? item.link : ''))
+        .replace(/[\u2010-\u2015\u2212]/g, '-')
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/[\u201C\u201D]/g, '"')
+        .replace(/[^\x20-\x7E\n]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(9)
+      const descLines = cleanDesc ? doc.splitTextToSize(cleanDesc, CW * 0.58) : []
+
+      const bandH = Math.max(45, Math.min(160, titleH + 8 + descLines.length * 5 + 8))
       if (cursorY + bandH > PH - MARGIN) {
         doc.addPage()
         cursorY = MARGIN
@@ -1224,21 +1242,17 @@ async function _exportPDFSections(indices) {
       // Band background
       doc.setFillColor(248, 248, 248)
       doc.roundedRect(MARGIN, cursorY, CW, bandH - 2, 2, 2, 'F')
-
-      // Label
+      // Title — wrapped
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(13)
       doc.setTextColor(30, 30, 30)
-      doc.text(item.label || 'Untitled', MARGIN + 4, cursorY + 8)
-
-      // Description
-      const desc = item.description || (item.link ? item.link : '')
-      if (desc) {
+      doc.text(titleLines, MARGIN + 4, cursorY + 8)
+      // Description — all lines, no slice
+      if (cleanDesc) {
         doc.setFont('helvetica', 'normal')
         doc.setFontSize(9)
         doc.setTextColor(70, 70, 70)
-        const lines = doc.splitTextToSize(desc, CW * 0.55)
-        doc.text(lines.slice(0, 6), MARGIN + 4, cursorY + 16)
+        doc.text(descLines, MARGIN + 4, cursorY + 8 + titleH, { lineHeightFactor: 1.5 })
       }
 
       // Primary image (right third of band)
@@ -1262,37 +1276,92 @@ async function _exportPDFSections(indices) {
         } catch (_) { /* skip image on error */ }
       }
 
-      // GLB snapshot — render via shared renderer and capture
-      const entryIdx = _glbScenes.findIndex(
-        e => e && e.displayCanvas && e.scene
-      )
-      // Find the matching entry by re-indexing visible items
-      const visBandIdx = visibleItems.indexOf(item)
-      const glbEntry   = _glbScenes[visBandIdx]
-      if (glbEntry && glbEntry.scene && glbEntry.camera) {
-        try {
-          const renderer = _ensureSharedRenderer()
-          renderer.setSize(glbEntry.w, glbEntry.h, false)
-          renderer.render(glbEntry.scene, glbEntry.camera)
-          const glbData = renderer.domElement.toDataURL('image/png')
-          doc.addImage(
-            glbData, 'PNG',
-            MARGIN + 4, cursorY + 14,
-            CW * 0.28, bandH - 22,
-            undefined, 'FAST'
-          )
-        } catch (_) { /* skip */ }
-      }
-
       cursorY += bandH
     }
   }
+      // ── Skills page ──────────────────────────────────────────
+  doc.addPage()
+  let skillsY = MARGIN
 
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(22)
+  doc.setTextColor(40, 40, 40)
+  doc.text('Skills', MARGIN, skillsY + 10)
+  doc.setDrawColor(180, 180, 180)
+  doc.setLineWidth(0.4)
+  doc.line(MARGIN, skillsY + 14, PW - MARGIN, skillsY + 14)
+  skillsY += 22
+  const SKILL_CATEGORIES = [
+    { keys: ['hardware'],              label: 'Hardware & Electronics' },
+    { keys: ['coding'],                label: 'Software & Code'        },
+    { keys: ['design', 'fabrication'], label: 'Design & Making'        },
+    { keys: ['soft'],                  label: 'Soft Skills'            },
+  ]
+  const allSkills = _cfg.SKILLS || {}
+  // Pre-count projects per skill across all cabins
+  // Pre-count unique projects per skill (deduped by item label)
+  const skillProjectCount = {}
+  const seenLabels = new Set()
+  ;(_cfg.CABINS || []).forEach(cabin => {
+    ;(cabin.items || []).forEach(item => {
+      if (!Array.isArray(item.skills) || !item.label) return
+      if (seenLabels.has(item.label)) return
+      seenLabels.add(item.label)
+      item.skills.forEach(slug => {
+        skillProjectCount[slug] = (skillProjectCount[slug] || 0) + 1
+      })
+    })
+  })
+  
+  // Note
+  doc.setFont('helvetica', 'italic')
+  doc.setFontSize(9)
+  doc.setTextColor(120, 120, 120)
+  doc.text('Skills are followed by the number of listed projects in which they were used.', MARGIN, skillsY)
+  skillsY += 10
+
+  SKILL_CATEGORIES.forEach(cat => {
+    const catSkills = Object.entries(allSkills)
+      .filter(([, s]) => cat.keys.includes(s.category))
+      .sort((a, b) => b[1].level - a[1].level)
+
+    if (!catSkills.length) return
+
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(11)
+    doc.setTextColor(60, 60, 60)
+    doc.text(cat.label, MARGIN, skillsY)
+    skillsY += 7
+
+    let tagX = MARGIN
+    doc.setFontSize(8)
+
+    catSkills.forEach(([slug, skill]) => {
+      const count = skillProjectCount[slug] || 0
+      const tagLabel = `${skill.label}  (${count})`
+      const tagW = doc.getTextWidth(tagLabel) + 8
+      const tagH = 7
+
+      if (tagX + tagW > PW - MARGIN) {
+        tagX = MARGIN
+        skillsY += tagH + 2
+      }
+
+      doc.setFillColor(235, 235, 235)
+      doc.roundedRect(tagX, skillsY - 5, tagW, tagH, 1.5, 1.5, 'F')
+      doc.setTextColor(40, 40, 40)
+      doc.text(tagLabel, tagX + 4, skillsY)
+
+      tagX += tagW + 4
+    })
+
+    skillsY += 14
+  })
   // Build filename from selected section labels
   const nameSlug = indices
     .map(i => _cfg.CABINS[i]?.id || `section-${i}`)
     .join('_')
-  doc.save(`portfolio-${nameSlug}.pdf`)
+  doc.save(`Bland_Sarah_portfolio-.pdf`)
 
   if (exportBtn) {
     exportBtn.innerHTML = '<span class="ps-btn-icon">&#8659;</span> Export PDF'
@@ -1693,10 +1762,8 @@ const _CSS = /* css */`
   font-size: 12.5px;
   line-height: 1.65;
   color: #444;
-  display: -webkit-box;
-  -webkit-line-clamp: 9;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  overflow-y: auto;
+  flex: 1;
 }
 .ps-desc-empty {
   color: #ccc;
