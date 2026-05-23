@@ -269,7 +269,7 @@ export const CABINS = [
         "label": "OpenDots | Babson Hackathon 2026",
         "link": "https://github.com/romanobro56/OpenDots",
         "description": "I built the full Fusion 360 model for a digital Braille‑style display during Babson University’s 2026 five‑hour hackathon. Each body in the model was intentionally named so our code could address individual pins in real time. When a user pressed a letter on our website, a teammate’s image‑analysis algorithm recognized the character and triggered the corresponding pins in the 3D model, creating a live, interactive Braille output experience designed to support early literacy for blind children. More details are available in the linked GitHub repository.",
-        "images": [{"src": "photos/text-board.jpg", "date": null}],
+        "images": [{"src": "photos/Open-dots.jpg", "date": '04/11/2026'},{"src": "photos/open-dots-2.jpg", "date": '04/11/2026'},{"src": "photos/open-dots-3.jpg", "date": '04/11/2026'}],
         "skills": ['fusion-360', 'cad', 'teamwork', 'problem-solving']
       },
       {
@@ -280,7 +280,7 @@ export const CABINS = [
         "label": "RFID Remote Authorization Lock Box | Making The Modern World 2026 Design Conference",
         "link": null,
         "description": "I built this lock box as a smarter alternative to my college's lost and found system for low-to-medium value items. Rather than relying on staff to manually match owners to items, the box integrates directly with the school's existing ID infrastructure. When someone is confirmed as the owner of a lost item, I designed the system to remotely authorize their student ID to unlock the box and retrieve it on their own time.\n\nThe system runs C++ firmware I wrote for an Arduino Nano, which controls a 5V solenoid lock through a MOSFET switching circuit and communicates with a 13.56MHz RC522 RFID reader over SPI. I handled the card authorization logic and hardware control timing entirely on-device. The custom electronics I wired include flyback protection, gate pull-down resistors, and multi-voltage power distribution (5V/3.3V) for reliable high-current switching.\n\nI CAD modeled and 3D-printed a thermal housing for the solenoid to ensure precise actuation alignment and protect nearby components from heat. I also fabricated the enclosure itself—a 19\" × 14\" × 5\" wooden box—using a table saw, adding full cable management and strain relief for a production-quality finish.",
-        "images": [],
+        "images": [{"src": "photos/rfid-0.jpg", "date": '11/21/2025'},{"src": "photos/rfid-1.jpg", "date": '11/21/2025'},{"src": "photos/rfid-2.jpg", "date": '11/18/2025'},{"src": "photos/rfid-3.jpg", "date": '11/19/2025'}],
         "rotationY": -1,
         "skills": ['cpp', 'arduino', 'circuits', 'rfid-nfc', 'soldering', 'woodworking', '3d-printing', 'fusion-360', 'problem-solving']
       },
@@ -292,7 +292,7 @@ export const CABINS = [
         "label": "Portable Counting Game | Exemplary Build Award",
         "link": null,
         "description": "I developed a portable counting game designed for children with combined physical and cognitive impairments, purposefully sizing it to fit directly on a wheelchair tray for independent use.\n\nI designed the device to run on a rechargeable battery while retaining plug-in capabilities to ensure uninterrupted sessions. I reduced the interaction to two large buttons, making it accessible to children with limited fine motor control, and added a glass light diffuser above the indicator to soften visual feedback.\n\nI soldered and assembled the internal circuitry (a Matrix Portal connected to a HUB75 and mobile battery) and designed the logic controlling the code behind the counting game.\n\nI built this in conjunction with Garrett Mackenzie for our Physical Computing class at Boston College.",
-        "images": [],
+        "images": [{"src": "photos/math-game-1.jpg", "date": '04/29/2026'}],
         "rotationY": 1.35,
         "skills": ['circuitpython', 'led-matrix', 'soldering', 'teamwork', 'problem-solving', 'communication']
       },
@@ -304,7 +304,7 @@ export const CABINS = [
         "label": "TapN | Accelerate@Shea 2026 Cohort",
         "link": null,
         "description": "I co-founded TapN, an NFC-based system designed to reduce student phones to only their essential functions during class, minimizing distraction while preserving safety features.\n\nI led the hardware design through multiple iterations, building wooden physical mockups, CAD models, and 3D-printed prototypes. I also built object-oriented frameworks in Swift to optimize the tap-to-restrict user flow.\n\nBecause of our work, TapN was selected for Accelerate@Shea 2026, a competitive startup accelerator at Boston College offering equity-free funding, mentorship, and workshops with industry professionals.",
-        "images": [],
+        "images": [{"src": "photos/tapn-2.jpg", "date": '02/17/2026'}],
         "skills": ['swift', 'fusion-360', 'cad', '3d-printing', 'entrepreneurship', 'leadership', 'communication', 'teamwork']
       },
       {
@@ -315,7 +315,7 @@ export const CABINS = [
         "label": "Keypad-Controlled Vibrating Cat Bed | 2nd Place — Boston College Make-A-Thon 2026",
         "link": null,
         "description": "I designed this vibrating cat bed for deaf cats who can no longer experience music audibly, engineering it to deliver calming sensory stimulation through touch. I integrated a wired 4×4 keypad so the owner can easily adjust the bed's settings without disturbing a resting pet.\n\nI built the electronics around an Elegoo Uno paired with a CircuitPython Bluefruit, which I programmed to drive a connected speaker and amplifier via PWM signals. I wired five vibration motors through a shared common ground and power line, regulating their intensity with a MOSFET. I mapped the 4×4 keypad to give the user direct control over three functions: power on/off, vibration intensity, and playback of one of three songs, each of which I coded to be felt as rhythmic vibration through the bed's surface.",
-        "images": [],
+        "images": [{"src": "photos/cat-bed-0.jpg", "date": '03/21/2026'},{"src": "photos/cat-bed-1.jpg", "date": '03/22/2026'},{"src": "photos/cat-bed-2.jpg", "date": '03/22/2026'},{"src": "photos/cat-bed-3.jpg", "date": '03/22/2026'},{"src": "photos/cat-bed-4.jpg", "date": '03/21/2026'}],
         "rotationY": 5.4,
         "skills": ['arduino', 'circuitpython', 'circuits', 'pwm', 'motors', 'soldering', 'problem-solving']
       }

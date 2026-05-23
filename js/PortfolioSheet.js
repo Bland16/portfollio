@@ -44,6 +44,7 @@ let _overlay         = null   // root DOM node
 let _activeTabIndex  = 0
 let _glbScenes       = []     // { scene, camera, _model, displayCanvas, w, h }[]
 let _fullscreenState = null   // { animId, renderer, keyDown, keyUp, bandIndex }
+let _imgFullscreenEl = null   // <div> for image lightbox, or null
 let _pdfLibsLoaded   = false
 
 // ── Shared WebGL renderer state ───────────────────────────────────────────────
@@ -349,16 +350,19 @@ function _buildBand(item, bandIndex, total, tabIndex) {
   band.appendChild(colGlb)
 
   // ── Column: Description / Link ────────────────────────────────────────────
+  const isPortfolioTab = _cfg.CABINS[tabIndex]?.id === 'hobby-work'
   const colDesc = document.createElement('div')
-  colDesc.className = 'ps-col ps-col--desc'
+  colDesc.className = 'ps-col ps-col--desc' + (isPortfolioTab ? ' ps-col--desc-wide' : '')
   colDesc.appendChild(_buildDescColumn(item, tabIndex))
   band.appendChild(colDesc)
 
-  // ── Column: Photo carousel ────────────────────────────────────────────────
-  const colPhoto = document.createElement('div')
-  colPhoto.className = 'ps-col ps-col--photo'
-  colPhoto.appendChild(_buildCarousel(item, tabIndex))
-  band.appendChild(colPhoto)
+  // ── Column: Photo carousel (skipped for The Portfolio tab) ────────────────
+  if (!isPortfolioTab) {
+    const colPhoto = document.createElement('div')
+    colPhoto.className = 'ps-col ps-col--photo'
+    colPhoto.appendChild(_buildCarousel(item, tabIndex))
+    band.appendChild(colPhoto)
+  }
 
   return band
 }
@@ -656,6 +660,14 @@ function _buildCarousel(item, tabIndex) {
 
   frame.appendChild(img)
 
+  // Tap image to open fullscreen lightbox
+  frame.style.cursor = 'zoom-in'
+  frame.setAttribute('title', 'Click to enlarge')
+  frame.addEventListener('click', (e) => {
+    if (e.target.classList.contains('ps-carousel-arrow')) return
+    _openCarouselFullscreen(images, current, item)
+  })
+
   // Arrows (only if multiple images)
   if (images.length > 1) {
     const prevBtn = document.createElement('button')
@@ -696,6 +708,26 @@ function _buildCarousel(item, tabIndex) {
   dateEl.style.color = _tabColorDark(tabIndex)
   wrap.appendChild(dateEl)
 
+  return wrap
+}
+
+// ── GLB Screenshot Placeholder ────────────────────────────────────────────────
+// Digital Projects only. Replace this entire function body when you have the
+// GLB capture code — the returned element drops straight into ps-col--photo.
+// TODO: call your screenshot utility here and render the resulting <img>.
+
+function _buildGlbScreenshotTodo(item, tabIndex) {
+  const wrap = document.createElement('div')
+  wrap.className = 'ps-carousel-wrap ps-glb-screenshot-todo'
+
+  const inner = document.createElement('div')
+  inner.className = 'ps-glb-todo-inner'
+  inner.innerHTML = `
+    <span class="ps-glb-todo-icon">📷</span>
+    <span class="ps-glb-todo-label">GLB Screenshot</span>
+    <span class="ps-glb-todo-sub">TODO: integrate capture</span>
+  `
+  wrap.appendChild(inner)
   return wrap
 }
 
@@ -1013,16 +1045,104 @@ function _switchTab(index) {
   }, 160)
 }
 
+// ─── IMAGE CAROUSEL FULLSCREEN ────────────────────────────────────────────────
+
+function _openCarouselFullscreen(images, startIdx, item) {
+  if (_imgFullscreenEl) _closeCarouselFullscreen()
+
+  let current = startIdx
+
+  const el = document.createElement('div')
+  el.className = 'ps-img-fullscreen'
+
+  const img = document.createElement('img')
+  img.className = 'ps-img-fullscreen-img'
+  img.src = images[current].src
+  img.alt = item.label || ''
+
+  const dateEl = document.createElement('div')
+  dateEl.className = 'ps-img-fullscreen-date'
+  dateEl.textContent = images[current].date || ''
+
+  const navigate = (delta) => {
+    if (images.length < 2) return
+    current = (current + delta + images.length) % images.length
+    img.style.opacity = '0'
+    setTimeout(() => {
+      img.src = images[current].src
+      dateEl.textContent = images[current].date || ''
+      img.style.opacity = '1'
+    }, 130)
+  }
+  // Expose navigate so _handleKeyDown can call it
+  el._navigate = navigate
+
+  const closeBtn = document.createElement('button')
+  closeBtn.className = 'ps-img-fullscreen-close'
+  closeBtn.innerHTML = '&#10005;'
+  closeBtn.setAttribute('aria-label', 'Close image')
+  closeBtn.addEventListener('click', (e) => { e.stopPropagation(); _closeCarouselFullscreen() })
+
+  const hint = document.createElement('div')
+  hint.className = 'ps-img-fullscreen-hint'
+  hint.textContent = images.length > 1
+    ? '← → to navigate  •  ESC to close'
+    : 'ESC to close'
+
+  el.appendChild(img)
+  el.appendChild(closeBtn)
+  el.appendChild(dateEl)
+  el.appendChild(hint)
+
+  if (images.length > 1) {
+    const prevBtn = document.createElement('button')
+    prevBtn.className = 'ps-img-fullscreen-arrow ps-img-fullscreen-arrow--prev'
+    prevBtn.innerHTML = '&#8592;'
+    prevBtn.setAttribute('aria-label', 'Previous image')
+    prevBtn.addEventListener('click', (e) => { e.stopPropagation(); navigate(-1) })
+
+    const nextBtn = document.createElement('button')
+    nextBtn.className = 'ps-img-fullscreen-arrow ps-img-fullscreen-arrow--next'
+    nextBtn.innerHTML = '&#8594;'
+    nextBtn.setAttribute('aria-label', 'Next image')
+    nextBtn.addEventListener('click', (e) => { e.stopPropagation(); navigate(1) })
+
+    el.appendChild(prevBtn)
+    el.appendChild(nextBtn)
+  }
+
+  // Backdrop click to close
+  el.addEventListener('click', (e) => { if (e.target === el) _closeCarouselFullscreen() })
+
+  _imgFullscreenEl = el
+  _overlay.querySelector('.ps-holder').appendChild(el)
+  requestAnimationFrame(() => el.classList.add('ps-img-fullscreen--visible'))
+}
+
+function _closeCarouselFullscreen() {
+  if (!_imgFullscreenEl) return
+  _imgFullscreenEl.classList.remove('ps-img-fullscreen--visible')
+  const el = _imgFullscreenEl
+  _imgFullscreenEl = null
+  setTimeout(() => el.remove(), 220)
+}
+
 // ─── KEYBOARD ────────────────────────────────────────────────────────────────
 
 function _handleKeyDown(e) {
   if (!_overlay) return
   if (e.key === 'Escape') {
-    if (_fullscreenState) {
+    if (_imgFullscreenEl) {
+      _closeCarouselFullscreen()
+    } else if (_fullscreenState) {
       _closeFullscreen(_fullscreenState.bandIndex)
     } else {
       _closeOverlay()
     }
+  }
+  if (_imgFullscreenEl) {
+    if (e.key === 'ArrowLeft')  _imgFullscreenEl._navigate(-1)
+    if (e.key === 'ArrowRight') _imgFullscreenEl._navigate(1)
   }
 }
 
@@ -1038,6 +1158,7 @@ function _closeOverlay() {
 
 function _destroyOverlay() {
   _destroyGlbScenes()
+  if (_imgFullscreenEl) { _imgFullscreenEl.remove(); _imgFullscreenEl = null }
   document.removeEventListener('keydown', _handleKeyDown)
   if (_overlay && _overlay.parentNode) _overlay.parentNode.removeChild(_overlay)
   _overlay = null
@@ -1256,6 +1377,10 @@ async function _exportPDFSections(indices) {
       }
 
       // Primary image (right third of band)
+      // TODO: For the Digital Projects section, replace `images` below with your
+      // GLB screenshot capture result (a dataURL). The addImage call is already
+      // wired — just swap the source.
+      const isDigitalProjectsBand = cabin.id === 'digital-projects'
       const images = Array.isArray(item.images) && item.images.length
         ? item.images
         : item.image ? [{ src: item.image, date: null }] : []
@@ -1274,6 +1399,24 @@ async function _exportPDFSections(indices) {
             doc.text(images[0].date, imgX, cursorY + 4 + imgH + 3)
           }
         } catch (_) { /* skip image on error */ }
+      }
+
+      // ── GLB screenshot — The Portfolio tab only ───────────────────────────
+      if (cabin.id === 'hobby-work') {
+        const visBandIdx = visibleItems.indexOf(item)
+        const glbEntry   = _glbScenes[visBandIdx]
+        if (glbEntry && glbEntry.scene && glbEntry.camera) {
+          try {
+            const renderer = _ensureSharedRenderer()
+            renderer.setSize(glbEntry.w, glbEntry.h, false)
+            renderer.render(glbEntry.scene, glbEntry.camera)
+            const glbData = renderer.domElement.toDataURL('image/png')
+            const imgX = MARGIN + CW * 0.62
+            const imgW = CW * 0.36
+            const imgH = bandH - 10
+            doc.addImage(glbData, 'PNG', imgX, cursorY + 4, imgW, imgH, undefined, 'FAST')
+          } catch (_) { /* skip on error */ }
+        }
       }
 
       cursorY += bandH
@@ -1743,6 +1886,9 @@ const _CSS = /* css */`
   padding: 20px 18px;
   align-items: flex-start;
 }
+.ps-col--desc-wide {
+  flex: 2;
+}
 .ps-desc-wrap {
   width: 100%;
   display: flex;
@@ -2005,6 +2151,135 @@ const _CSS = /* css */`
 .ps-pdf-cancel:hover {
   background: #f0ece4;
   color: #444;
+}
+
+/* ── Image carousel fullscreen lightbox ──────────────────────────────────── */
+.ps-img-fullscreen {
+  position: absolute;
+  inset: 0;
+  z-index: 300;
+  background: rgba(0, 0, 0, 0.0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+  transition: background 0.22s ease;
+}
+.ps-img-fullscreen--visible {
+  background: rgba(0, 0, 0, 0.92);
+}
+.ps-img-fullscreen-img {
+  max-width: 88%;
+  max-height: 82%;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.55);
+  transition: opacity 0.13s ease;
+  cursor: default;
+  opacity: 1;
+}
+.ps-img-fullscreen-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(255,255,255,0.28);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  z-index: 1;
+}
+.ps-img-fullscreen-close:hover { background: rgba(255,255,255,0.28); }
+.ps-img-fullscreen-date {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,0.5);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.ps-img-fullscreen-hint {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,0.3);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.ps-img-fullscreen-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  background: rgba(255,255,255,0.10);
+  border: 1.5px solid rgba(255,255,255,0.22);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  z-index: 1;
+}
+.ps-img-fullscreen-arrow:hover { background: rgba(255,255,255,0.25); }
+.ps-img-fullscreen-arrow--prev { left: 18px; }
+.ps-img-fullscreen-arrow--next { right: 18px; }
+
+/* ── GLB Screenshot TODO placeholder (Digital Projects right column) ─────── */
+.ps-glb-screenshot-todo {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(0,0,0,0.025) 0px,
+    rgba(0,0,0,0.025) 6px,
+    transparent 6px,
+    transparent 14px
+  ) !important;
+  border: 2px dashed rgba(0,0,0,0.18) !important;
+  border-radius: 6px;
+  margin: 12px 8px;
+}
+.ps-glb-todo-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  opacity: 0.45;
+  user-select: none;
+}
+.ps-glb-todo-icon { font-size: 30px; line-height: 1; }
+.ps-glb-todo-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  letter-spacing: 0.03em;
+}
+.ps-glb-todo-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  color: #888;
+  font-style: italic;
 }
 
 /* ── Print / PDF overrides ───────────────────────────────────────────────── */
