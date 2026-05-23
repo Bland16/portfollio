@@ -19,6 +19,100 @@ export const SEAT_Y = 0.3 * MODEL_SCALE
 //              every other point = 0, 2, 4, 6, 8, 10
 export const CABINS = [
   {
+    id: 'about-me',
+    label: 'About Me',
+    attachIndex: 6,
+    items: [
+      {
+        "glb": "models/linkedIn.glb",
+        "seat": "left",
+        "positionOffset": [-0.2, -0.1, 2.4],
+        "scale": 10,
+        "label": "LinkedIn",
+        "link": "https://www.linkedin.com/in/sarah-bland-808405357/",
+        "description": null,
+        "images": [],
+        "rotationY": 0.15
+      },
+      {
+        "glb": "models/gmail.glb",
+        "seat": "left",
+        "positionOffset": [-0.1, -0.1, 1.2],
+        "scale": 10,
+        "label": "Gmail",
+        "link": "mailto:blandsa@bc.edu",
+        "description": null,
+        "images": [],
+        "rotationY": -0.2
+      },
+      {
+        "glb": "models/about-chinese.glb",
+        "seat": "right",
+        "positionOffset": [-0.9, 0, 1.6],
+        "scale": 1.5,
+        "label": "About Me: Chinese Immersion Learner",
+        "link": null,
+        "description": "I have been learning Mandarin for 15 years. I was enrolled in a Chinese immersion program through middle school, which included accelerated math and competing in Mandarin speech competitions at UMD. In high school, I wrote and performed a short play in Mandarin about cultural appropriation alongside my friend Kevin Ma — it headlined our school's Lunar New Year celebration. I later visited my pen pal in Beijing, a trip that deepened the connection the language has always given me to the world beyond my own.",
+        "images": [],
+        "rotationY": -2.1
+      },
+      {
+        "glb": "models/about-house.glb",
+        "seat": "left",
+        "positionOffset": [-1.5, 0, 1.2],
+        "scale": 0.28,
+        "label": "Where I'm Located",
+        "link": null,
+        "description": "I am originally from Maryland. My preferred work locations are New York, Los Angeles, Boston, and Washington, D.C.",
+        "images": [],
+        "rotationY": -1
+      },
+      {
+        "glb": "models/about-tv.glb",
+        "seat": "right",
+        "positionOffset": [-1.1, 0.1, -3.2],
+        "scale": 0.51,
+        "label": "About Me: Certified Cinephile",
+        "link": null,
+        "description": "I have seen over a thousand movies and wrote a screenplay at 18. Every Wednesday I watch a film with friends — a ritual I look forward to every week. Some of my favorites are 'The Half of It', 'Perfect Days', 'Scream', 'Godzilla Minus One', 'The Pig, The Snake and the Pigeon', and 'Who Framed Roger Rabbit'. On the TV side, 'Interior Chinatown' is a recent standout. Beyond film, I am a serious sports fan — football, hockey, and basketball are fixtures in my viewing life.",
+        "images": [{"src": "photos/movies-1.jpg", "date": '04/04/2026'}],
+        "rotationY": -2
+      },
+      {
+        "glb": "models/about-water.glb",
+        "seat": "left",
+        "positionOffset": [0.8, 0.2, -1.6],
+        "scale": 0.5,
+        "label": "My Interests",
+        "link": null,
+        "description": "I enjoy learning about a wide variety of subjects. Some topics I maintain a strong body of knowledge in include the Flint, Michigan water crisis and community vulnerability to public health crises, entertainment engineering techniques, the long-term effects of redlining on modern housing districts, the intersection between religion and economic theory, and asylum law regulations and procedures.",
+        "images": []
+      },
+      {
+        "glb": "models/about-cooking.glb",
+        "seat": "left",
+        "positionOffset": [0.9, -1.1, -4.5],
+        "scale": 0.4,
+        "label": "About Me: Red-Meat Cooking Prodigy",
+        "link": null,
+        "description": "I can make a mean steak—and that is an understatement. I love cooking for family and friends. While I usually take requests, my favorite secret recipes include sugar fish fillet, hidden-vegetable pumpkin buns, popsicle-poached apples, and onion-tomato seared steak. Recipes are available upon request.",
+        "images": [{"src": "photos/cooking-0.jpg", "date": null},{"src": "photos/cooking-1.jpg", "date": null}],
+        "rotationY": -0.012
+      },
+      {
+        "glb": "models/about-boxing.glb",
+        "seat": "left",
+        "positionOffset": [-1.3, 0, 4.2],
+        "scale": 0.2,
+        "label": "About Me: Former Pre-Amateur Boxer",
+        "link": null,
+        "description": "I boxed all four years of high school and was one of two girls on a boxing team in White Flint, Maryland. My coach was an old-fashioned 'tough-love' mentor who taught me about delayed gratification, discipline, and punctuality. My favorite moment from the sport was participating in a gym-run Punch-A-Thon to help bring boxing to impoverished youth.",
+        "images": [],
+        "rotationY": 0.45
+      }
+    ]
+  },
+  {
     id: 'digital-projects',
     label: 'Digital Projects',
     attachIndex: 0,
@@ -31,7 +125,7 @@ export const CABINS = [
         "label": "Makeup Tray",
         "link": null,
         "description": "I created this makeup tray as a simple, clean solution to streamline my daily makeup routine.\n\nI designed the model in Fusion 360 and printed it on a Prusa XL in PLA at a size of approximately 18 cm × 10 cm × 4 cm.\n\nKey features include an open top and front for dual access, separated hollow ribbed sides for content visibility, and a raised base split across four interlocking pieces.",
-        "images": [{"src": "photos/makeup-trey.jpg", "date": null}],
+        "images": [{"src": "photos/makeup-trey-1.jpg", "date": '02/18/2026'}],
         "skills": ['fusion-360', 'cad', '3d-printing']
       },
       {
@@ -42,7 +136,7 @@ export const CABINS = [
         "label": "OpenDots | Babson Hackathon 2026",
         "link": "https://github.com/romanobro56/OpenDots",
         "description": "I built the full Fusion 360 model for a digital Braille‑style display during Babson University’s 2026 five‑hour hackathon. Each body in the model was intentionally named so our code could address individual pins in real time. When a user pressed a letter on our website, a teammate’s image‑analysis algorithm recognized the character and triggered the corresponding pins in the 3D model, creating a live, interactive Braille output experience designed to support early literacy for blind children. More details are available in the linked GitHub repository.",
-        "images": [{"src": "photos/text-board.jpg", "date": null}],
+        "images": [{"src": "photos/Open-dots.jpg", "date": '04/11/2026'},{"src": "photos/open-dots-2.jpg", "date": '04/11/2026'},{"src": "photos/open-dots-3.jpg", "date": '04/11/2026'}],
         "skills": ['fusion-360', 'cad', 'teamwork', 'problem-solving']
       },
        {
@@ -53,7 +147,7 @@ export const CABINS = [
         "label": "Tree Distance Algorithm For Pesticide Application | Boston College Engineering",
         "link": null,
         "description": "I built and trained a machine learning model to estimate the distance of a tree from a camera, aiming to optimize pesticide application. The training image dataset was cleaned and refined in collaboration with my partner, Michael Busa. Following the completion of our code, we delivered a presentation on our findings to the engineering department. As the research this project contributed to has not yet been published, detailed methodology and data are available upon request.",
-        "images": [],
+        "images": [{"src": "photos/tree-distance-1.jpg", "date": '03/31/2026'}],
         "rotationY": -0.35
       },
       {
@@ -64,7 +158,7 @@ export const CABINS = [
         "label": "TideFlow | Personal Scheduling App",
         "link": null,
         "description": "I authored a 20-page design specification for TideFlow, a custom scheduling app built around machine learning. The spec defines core user flows, feature requirements, and the logic behind ML-driven schedule optimization — laying the groundwork for a future build.",
-        "images": [],
+        "images": [{"src": "photos/tideflow-1.jpg", "date": '05/23/2026'}, {"src": "photos/tideflow-2.jpg", "date": '05/23/2026'},{"src": "photos/tideflow-3.jpg", "date": '05/23/2026'},{"src": "photos/tideflow-4.jpg", "date": '05/23/2026'}],
         "rotationY": -1.55,
         "skills": ['machine-learning', 'prompt-engineering', 'ui-design', 'problem-solving']
       },
@@ -76,7 +170,7 @@ export const CABINS = [
         "label": "Poker Chips for the Visually Impaired",
         "link": null,
         "description": "I designed these poker chips specifically for colorblind players. Since standard poker chip values rely heavily on color differentiation, I introduced four distinct values based on interior geometric cutouts. This approach preserves stackability while allowing for clear tactile and visual differentiation.\n\nI modeled the chips in Fusion 360 and 3D-printed them in PLA on a Prusa MINI, with each chip measuring 39mm in diameter and 0.5–1mm in thickness.",
-        "images": [{"src": "photos/chips.png", "date": null}],
+        "images": [{"src": "photos/chips-1.jpg", "date": '03/10/2026'}],
         "imageOffset": "50% 20%",
         "skills": ['fusion-360', 'cad', '3d-printing', 'problem-solving']
       }
@@ -96,7 +190,7 @@ export const CABINS = [
         "label": "RFID Remote Authorization Lock Box | Making The Modern World 2026 Design Conference",
         "link": null,
         "description": "I built this lock box as a smarter alternative to my college's lost and found system for low-to-medium value items. Rather than relying on staff to manually match owners to items, the box integrates directly with the school's existing ID infrastructure. When someone is confirmed as the owner of a lost item, I designed the system to remotely authorize their student ID to unlock the box and retrieve it on their own time.\n\nThe system runs C++ firmware I wrote for an Arduino Nano, which controls a 5V solenoid lock through a MOSFET switching circuit and communicates with a 13.56MHz RC522 RFID reader over SPI. I handled the card authorization logic and hardware control timing entirely on-device. The custom electronics I wired include flyback protection, gate pull-down resistors, and multi-voltage power distribution (5V/3.3V) for reliable high-current switching.\n\nI CAD modeled and 3D-printed a thermal housing for the solenoid to ensure precise actuation alignment and protect nearby components from heat. I also fabricated the enclosure itself—a 19\" × 14\" × 5\" wooden box—using a table saw, adding full cable management and strain relief for a production-quality finish.",
-        "images": [],
+        "images": [{"src": "photos/rfid-0.jpg", "date": '11/21/2025'},{"src": "photos/rfid-1.jpg", "date": '11/21/2025'},{"src": "photos/rfid-2.jpg", "date": '11/18/2025'},{"src": "photos/rfid-3.jpg", "date": '11/19/2025'}],
         "rotationY": -1,
         "skills": ['cpp', 'arduino', 'circuits', 'rfid-nfc', 'soldering', 'woodworking', '3d-printing', 'fusion-360', 'problem-solving']
       },
@@ -108,7 +202,7 @@ export const CABINS = [
         "label": "Dino Metal Rampage",
         "link": null,
         "description": "I engineered and fabricated a fully custom hard rock dinosaur-themed arcade cabinet, which I laser-cut with dino designs and finished with a clear acrylic back panel so the interior circuitry is visible.\n\nI powered the hardware with a Raspberry Pi 5 and an Adafruit RGB Matrix HAT, driving three 64×32 HUB75 LED panels as a single 96×64 display. I hand-wired and soldered all circuitry components, mapping seven physical buttons and a joystick directly to the software input layer while utilizing two external power supplies to handle the Pi and panels separately.\n\nI wrote the entire software stack from scratch: five games (Coloring Book, Maze, Meteorite Massacre, Cretaceous Shred: Rex's Revenge, and Blackjack), a scrolling game-select launcher, a universal high score system, and per-session coloring book storage with email delivery. I also built a custom sprite extraction tool that pulls from sprite sheets and converts them into the flat .txt format the LED matrix consumes, as well as an offline MIDI analysis pipeline for Rex's Revenge that auto-generates note charts from audio using beat tracking, onset detection, and spectral band mapping.\n\nI collaborated with Garrett Mackenzie, who constructed and spray-painted the wooden physical enclosure. I built this project for our Physical Computing Class at Boston College.",
-        "images": [],
+        "images": [{"src": "photos/arcade-1.jpg", "date": '05/10/2026'},{"src": "photos/arcade-2.jpg", "date": '04/13/2026'},{"src": "photos/arcade-3.jpg", "date": '04/9/2026'}],
         "rotationY": -1.55,
         "skills": ['python', 'raspberry-pi', 'led-matrix', 'soldering', 'laser-cutting', 'machine-learning', 'prompt-engineering', 'teamwork', 'problem-solving']
       },
@@ -120,7 +214,7 @@ export const CABINS = [
         "label": "Portable Counting Game | Exemplary Build Award",
         "link": null,
         "description": "I developed a portable counting game designed for children with combined physical and cognitive impairments, purposefully sizing it to fit directly on a wheelchair tray for independent use.\n\nI designed the device to run on a rechargeable battery while retaining plug-in capabilities to ensure uninterrupted sessions. I reduced the interaction to two large buttons, making it accessible to children with limited fine motor control, and added a glass light diffuser above the indicator to soften visual feedback.\n\nI soldered and assembled the internal circuitry (a Matrix Portal connected to a HUB75 and mobile battery) and designed the logic controlling the code behind the counting game.\n\nI built this in conjunction with Garrett Mackenzie for our Physical Computing class at Boston College.",
-        "images": [],
+        "images": [{"src": "photos/math-game-1.jpg", "date": '04/29/2026'}],
         "rotationY": 1.35,
         "skills": ['circuitpython', 'led-matrix', 'soldering', 'teamwork', 'problem-solving', 'communication']
       },
@@ -132,7 +226,7 @@ export const CABINS = [
         "label": "TapN | Accelerate@Shea 2026 Cohort",
         "link": null,
         "description": "I co-founded TapN, an NFC-based system designed to reduce student phones to only their essential functions during class, minimizing distraction while preserving safety features.\n\nI led the hardware design through multiple iterations, building wooden physical mockups, CAD models, and 3D-printed prototypes. I also built object-oriented frameworks in Swift to optimize the tap-to-restrict user flow.\n\nBecause of our work, TapN was selected for Accelerate@Shea 2026, a competitive startup accelerator at Boston College offering equity-free funding, mentorship, and workshops with industry professionals.",
-        "images": [],
+        "images": [{"src": "photos/tapn-2.jpg", "date": '02/17/2026'}],
         "skills": ['swift', 'fusion-360', 'cad', '3d-printing', 'entrepreneurship', 'leadership', 'communication', 'teamwork']
       },
       {
@@ -143,7 +237,7 @@ export const CABINS = [
         "label": "Keypad-Controlled Vibrating Cat Bed | 2nd Place — Boston College Make-A-Thon 2026",
         "link": null,
         "description": "I designed this vibrating cat bed for deaf cats who can no longer experience music audibly, engineering it to deliver calming sensory stimulation through touch. I integrated a wired 4×4 keypad so the owner can easily adjust the bed's settings without disturbing a resting pet.\n\nI built the electronics around an Elegoo Uno paired with a CircuitPython Bluefruit, which I programmed to drive a connected speaker and amplifier via PWM signals. I wired five vibration motors through a shared common ground and power line, regulating their intensity with a MOSFET. I mapped the 4×4 keypad to give the user direct control over three functions: power on/off, vibration intensity, and playback of one of three songs, each of which I coded to be felt as rhythmic vibration through the bed's surface.",
-        "images": [],
+        "images": [{"src": "photos/cat-bed-0.jpg", "date": '03/21/2026'},{"src": "photos/cat-bed-1.jpg", "date": '03/22/2026'},{"src": "photos/cat-bed-2.jpg", "date": '03/22/2026'},{"src": "photos/cat-bed-3.jpg", "date": '03/22/2026'},{"src": "photos/cat-bed-4.jpg", "date": '03/21/2026'}],
         "rotationY": 5.4,
         "skills": ['arduino', 'circuitpython', 'circuits', 'pwm', 'motors', 'soldering', 'problem-solving']
       },
@@ -155,7 +249,7 @@ export const CABINS = [
         "label": "Mobile Hay-Bag Shelf | Lovelane Special Needs Horseback Riding Program — Boston College Engineering Project",
         "link": null,
         "description": "I co-designed and constructed this mobile shelf in collaboration with the Lovelane Special Needs Horseback Riding Program to help students with disabilities independently participate in horse feeding. By holding a hay bag at a consistent two-foot height, the shelf I helped design frees the student to focus on the clasping mechanism without needing to support the bag's weight.\n\nMy team and I constructed the shelf from plywood using piano hinges, allowing it to fold down to less than a third of its original width for easy storage and transport. I contributed to adding adjustable hooks for flexible bag placement and laser-engraving horse designs on the side panels for visual detail. We ensured the final build safely supports over 25 lbs and requires no fine-motor manipulation to operate.\n\n*Built in collaboration with Karilynn Arellano, Kaitlyn Cabalu, and Burke Bessette.*",
-        "images": [],
+        "images": [{"src": "photos/hay-bag-1.jpg", "date": '05/01/2026'},{"src": "photos/hay-bag-2.jpg", "date": '04/29/2026'}],
         "rotationY": 1.7,
         "skills": ['woodworking', 'laser-cutting', 'hand-tools', 'teamwork', 'communication', 'problem-solving']
       }
@@ -224,101 +318,6 @@ export const CABINS = [
         "images": [],
         "rotationY": 5.4,
         "skills": ['arduino', 'circuitpython', 'circuits', 'pwm', 'motors', 'soldering', 'problem-solving']
-      }
-    ]
-  },
-
-  {
-    id: 'about-me',
-    label: 'About Me',
-    attachIndex: 6,
-    items: [
-      {
-        "glb": "models/linkedIn.glb",
-        "seat": "left",
-        "positionOffset": [-0.2, -0.1, 2.4],
-        "scale": 10,
-        "label": "LinkedIn",
-        "link": "https://www.linkedin.com/in/sarah-bland-808405357/",
-        "description": null,
-        "images": [],
-        "rotationY": 0.15
-      },
-      {
-        "glb": "models/gmail.glb",
-        "seat": "left",
-        "positionOffset": [-0.1, -0.1, 1.2],
-        "scale": 10,
-        "label": "Gmail",
-        "link": "mailto:blandsa@bc.edu",
-        "description": null,
-        "images": [],
-        "rotationY": -0.2
-      },
-      {
-        "glb": "models/about-chinese.glb",
-        "seat": "right",
-        "positionOffset": [-0.9, 0, 1.6],
-        "scale": 1.5,
-        "label": "About Me: Chinese Immersion Learner",
-        "link": null,
-        "description": "I have been learning Mandarin for 15 years. I was enrolled in a Chinese immersion program through middle school, which included accelerated math and competing in Mandarin speech competitions at UMD. In high school, I wrote and performed a short play in Mandarin about cultural appropriation alongside my friend Kevin Ma — it headlined our school's Lunar New Year celebration. I later visited my pen pal in Beijing, a trip that deepened the connection the language has always given me to the world beyond my own.",
-        "images": [],
-        "rotationY": -2.1
-      },
-      {
-        "glb": "models/about-house.glb",
-        "seat": "left",
-        "positionOffset": [-1.5, 0, 1.2],
-        "scale": 0.28,
-        "label": "Where I'm Located",
-        "link": null,
-        "description": "I am originally from Maryland. My preferred work locations are New York, Los Angeles, Boston, and Washington, D.C.",
-        "images": [],
-        "rotationY": -1
-      },
-      {
-        "glb": "models/about-tv.glb",
-        "seat": "right",
-        "positionOffset": [-1.1, 0.1, -3.2],
-        "scale": 0.51,
-        "label": "About Me: Certified Cinephile",
-        "link": null,
-        "description": "I have seen over a thousand movies and wrote a screenplay at 18. Every Wednesday I watch a film with friends — a ritual I look forward to every week. Some of my favorites are 'The Half of It', 'Perfect Days', 'Scream', 'Godzilla Minus One', 'The Pig, The Snake and the Pigeon', and 'Who Framed Roger Rabbit'. On the TV side, 'Interior Chinatown' is a recent standout. Beyond film, I am a serious sports fan — football, hockey, and basketball are fixtures in my viewing life.",
-        "images": [],
-        "rotationY": -2
-      },
-      {
-        "glb": "models/about-water.glb",
-        "seat": "left",
-        "positionOffset": [0.8, 0.2, -1.6],
-        "scale": 0.5,
-        "label": "My Interests",
-        "link": null,
-        "description": "I enjoy learning about a wide variety of subjects. Some topics I maintain a strong body of knowledge in include the Flint, Michigan water crisis and community vulnerability to public health crises, entertainment engineering techniques, the long-term effects of redlining on modern housing districts, the intersection between religion and economic theory, and asylum law regulations and procedures.",
-        "images": []
-      },
-      {
-        "glb": "models/about-cooking.glb",
-        "seat": "left",
-        "positionOffset": [0.9, -1.1, -4.5],
-        "scale": 0.4,
-        "label": "About Me: Red-Meat Cooking Prodigy",
-        "link": null,
-        "description": "I can make a mean steak—and that is an understatement. I love cooking for family and friends. While I usually take requests, my favorite secret recipes include sugar fish fillet, hidden-vegetable pumpkin buns, popsicle-poached apples, and onion-tomato seared steak. Recipes are available upon request.",
-        "images": [],
-        "rotationY": -0.012
-      },
-      {
-        "glb": "models/about-boxing.glb",
-        "seat": "left",
-        "positionOffset": [-1.3, 0, 4.2],
-        "scale": 0.2,
-        "label": "About Me: Former Pre-Amateur Boxer",
-        "link": null,
-        "description": "I boxed all four years of high school and was one of two girls on a boxing team in White Flint, Maryland. My coach was an old-fashioned 'tough-love' mentor who taught me about delayed gratification, discipline, and punctuality. My favorite moment from the sport was participating in a gym-run Punch-A-Thon to help bring boxing to impoverished youth.",
-        "images": [],
-        "rotationY": 0.45
       }
     ]
   },
