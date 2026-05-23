@@ -83,9 +83,11 @@ export class InspectSystem {
     this._panelTitle.textContent = config.label || ''
     this._panelDesc.textContent  = config.description || ''
     this._panelImage.innerHTML   = ''
-    if (config.image) {
+    const imageSrc = config.image || (Array.isArray(config.images) && config.images.length ? config.images[0].src : null)
+
+    if (imageSrc) {
       const img = document.createElement('img')
-      img.src   = config.image
+      img.src   = imageSrc
       img.alt   = config.label
       img.style.width          = '100%'
       img.style.height         = '100%'
