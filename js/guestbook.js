@@ -619,47 +619,22 @@ function initDoodleCanvas(canvas) {
 // FORM SUBMISSION — hidden iframe trick, no page redirect
 // ─────────────────────────────────────────────────────────────
 
-function submitToGoogleForms({ name, email, message, doodle }) {
-  return new Promise((resolve) => {
-    const iframe = document.createElement('iframe')
-    iframe.name  = 'gb-submit-target'
-    iframe.style.display = 'none'
-    document.body.appendChild(iframe)
+async function submitToGoogleForms({ name, email, message, doodle }) {
+  const formData = new FormData()
+  formData.append(FORM_FIELDS.name,    name)
+  formData.append(FORM_FIELDS.email,   email)
+  formData.append(FORM_FIELDS.message, message)
+  formData.append(FORM_FIELDS.doodle,  doodle || '')
 
-    const form = document.createElement('form')
-    form.method = 'POST'
-    form.action = FORM_ACTION
-    form.target = 'gb-submit-target'
-    form.style.display = 'none'
-
-    const fields = {
-      [FORM_FIELDS.name]:    name,
-      [FORM_FIELDS.email]:   email,
-      [FORM_FIELDS.message]: message,
-      [FORM_FIELDS.doodle]:  doodle || '',
-    }
-
-    Object.entries(fields).forEach(([key, val]) => {
-      const input = document.createElement('input')
-      input.type  = 'hidden'
-      input.name  = key
-      input.value = val
-      form.appendChild(input)
+  try {
+    await fetch(FORM_ACTION, {
+      method: 'POST',
+      mode:   'no-cors', // opaque response is expected — not an error
+      body:   formData,
     })
-
-    document.body.appendChild(form)
-    iframe.onload = () => {
-      setTimeout(() => {
-        iframe.remove()
-        form.remove()
-        resolve(true)
-      }, 200)
-    }
-    form.submit()
-
-    // Fallback resolve in case onload doesn't fire (CORS policy on Google's end)
-    setTimeout(() => resolve(true), 2500)
-  })
+  } catch (err) {
+    console.warn('Guestbook submission failed:', err)
+  }
 }
 
 

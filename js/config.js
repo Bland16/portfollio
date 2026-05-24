@@ -469,6 +469,7 @@ export const CABINS = [
       //Cutting board, book, screenplay, pumpkin trophies, pubkin trebuchet
     ]
   }
+  
 ]
 
 // ── WHEEL SETTINGS ──────────────────────────────────────────
@@ -608,5 +609,17 @@ export const SKILLS = {
   'leadership':       { label: 'Leadership',           category: 'soft',        level: 3 },
   'event-planning':   { label: 'Event Planning',       category: 'soft',        level: 3 },
   'public-speaking':  { label: 'Public Speaking',      category: 'soft',        level: 3 },
+
+}
+export const ABOUT_ME = {
+  photo: 'photos/headshot.jpg',
+  bio: [
+    // Paragraph 1 — professional intro
+    "I am a rising sophomore in Boston College's 2029 Human Centered Engineering cohort. My past work experience includes computational biology at Rockefeller University, writing affidavits for U.S. asylum applicants, and front-end software development. I would like to join an engineering firm after graduating from Boston College, attend law school, and return to work as in-house counsel. I am particularly interested in working in an innovative field with limited legal precedent. ",
+    // Paragraph 2 — mission and context  
+    ''
+    //'Your second paragraph here. What drives you, where you\'re headed, the thread that connects your work.',
+  ],
+  education: "Boston College Freshman",
 
 }

@@ -18,7 +18,7 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { getVibeInfo } from './vibes.js'
-import { SKILLS as _CONFIG_SKILLS, COVER as _CONFIG_COVER } from './config.js'
+import { SKILLS as _CONFIG_SKILLS, COVER as _CONFIG_COVER, ABOUT_ME as _CONFIG_ABOUT_ME } from './config.js'
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
@@ -37,7 +37,8 @@ const TAB_HUE_SHIFTS = [0, 28, 55, 82, 110, 138]
 let _cfg = {
   CABINS:        [],
   SKILLS:        _CONFIG_SKILLS,
-  COVER:         _CONFIG_COVER ?? {},
+  COVER:         _CONFIG_COVER   ?? {},
+  ABOUT_ME:      _CONFIG_ABOUT_ME ?? {},
   getActiveVibe: () => 'suave',
 }
 
@@ -1353,6 +1354,37 @@ function _showPdfSectionPicker() {
   _overlay.querySelector('.ps-holder').appendChild(picker)
 }
 
+// ─── GLB PRE-LOADER ───────────────────────────────────────────────────────────
+// Ensures the hobby-work tab's GLB models are fully loaded before PDF export
+// reads them. Without this, _glbScenesByTab is empty whenever the user hasn't
+// visited that tab first, so all snapshots are silently skipped.
+
+async function _ensureHobbyWorkScenesLoaded(tabIndex, cabin) {
+  const itemsNeedingGlb = (cabin.items || []).filter(
+    item => item.label != null && !_isContactItem(item) && item.glb
+  )
+  if (!itemsNeedingGlb.length) return
+
+  // Already fully loaded — nothing to do
+  const existing = _glbScenesByTab[tabIndex] || []
+  if (itemsNeedingGlb.every((_, i) => existing[i]?._model != null)) return
+
+  // Render the tab to trigger GLB loading (reuses the existing ps-page element)
+  _renderPage(tabIndex)
+
+  // Poll every 250 ms until all _model refs are populated, or 20 s elapses
+  await new Promise(resolve => {
+    const deadline = Date.now() + 20_000
+    function poll() {
+      const scenes = _glbScenesByTab[tabIndex] || []
+      const done   = itemsNeedingGlb.every((_, i) => scenes[i]?._model != null)
+      if (done || Date.now() > deadline) return resolve()
+      setTimeout(poll, 250)
+    }
+    setTimeout(poll, 500)   // give GLTFLoader a head-start before first check
+  })
+}
+
 // ─── PDF EXPORT ───────────────────────────────────────────────────────────────
 
 /**
@@ -1368,121 +1400,223 @@ async function _exportPDFSections({ indices, selectedSkills }) {
 
   await _loadPdfLibs()
 
+  // ── Pre-load hobby-work GLB scenes before any PDF page is written ─────────
+  // Must run after _loadPdfLibs so the shared renderer is available.
+  const _hwIdx = _cfg.CABINS.findIndex(c => c.id === 'hobby-work')
+  if (_hwIdx !== -1 && indices.includes(_hwIdx)) {
+    await _ensureHobbyWorkScenesLoaded(_hwIdx, _cfg.CABINS[_hwIdx])
+  }
+
   const { jsPDF } = window.jspdf
 
   const doc    = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const PW     = 210
   const PH     = 297
-  const MARGIN = 12
+  const MARGIN = 20
   const CW     = PW - MARGIN * 2
-  let   first  = true
+  const TC     = [184, 92, 69]   // terracotta rgb
 
-  // ── Cover page (always included, auto-rendered from config) ───────────────
-  {
-    first = false
+  let pageNum = 0
 
-    doc.setFillColor(250, 248, 244)
-    doc.rect(0, 0, PW, PH, 'F')
+  // ── Shared helpers ────────────────────────────────────────────────────────
+  const _bg = () => { doc.setFillColor(250, 248, 244); doc.rect(0, 0, PW, PH, 'F') }
 
-    // Name
-    const nameText = _cfg.COVER?.name || 'Portfolio'
+  const _pageNum = () => {
+    const label = `— ${pageNum} —`
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(8)
+    doc.setTextColor(...TC)
+    doc.text(label, (PW - doc.getTextWidth(label)) / 2, PH - 8)
+  }
+
+  const _sectionHeader = (label, y) => {
     doc.setFont('helvetica', 'bold')
-    doc.setFontSize(36)
-    doc.setTextColor(30, 30, 30)
-    doc.text(nameText, (PW - doc.getTextWidth(nameText)) / 2, 90)
+    doc.setFontSize(22)
+    doc.setTextColor(26, 26, 26)
+    doc.text(label, MARGIN, y + 10)
+    doc.setDrawColor(...TC)
+    doc.setLineWidth(0.8)
+    doc.line(MARGIN, y + 14, PW - MARGIN, y + 14)
+    return y + 24
+  }
 
-    // Tagline
-    const tagText = _cfg.COVER?.tagline || ''
-    if (tagText) {
-      doc.setFont('helvetica', 'normal')
-      doc.setFontSize(14)
-      doc.setTextColor(90, 90, 90)
-      doc.text(tagText, (PW - doc.getTextWidth(tagText)) / 2, 102)
-    }
+  const _cleanText = str => String(str || '')
+    .replace(/[\u2010-\u2015\u2212]/g, '-')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[^\x20-\xFF\n]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
 
-    // Rule
-    doc.setDrawColor(180, 170, 150)
-    doc.setLineWidth(0.5)
-    doc.line(MARGIN + 20, 110, PW - MARGIN - 20, 110)
+  // ── Cover page ────────────────────────────────────────────────────────────
+  pageNum++
+  _bg()
 
-    // Contact links — pulled from About Me items, no new info added
-    let contactY = 120
-    const aboutCabin = _cfg.CABINS.find(c => c.id === 'about-me')
-    if (aboutCabin) {
-      ;(aboutCabin.items || []).filter(_isContactItem).forEach(item => {
-        const icon    = item.link?.includes('linkedin') ? '▸ LinkedIn:'
-                      : item.link?.includes('mailto')   ? '▸ Email:'
-                      : item.link?.includes('github')   ? '▸ GitHub:'
-                      : '▸'
-        const display = (item.link || '').replace('mailto:', '')
-        doc.setFont('helvetica', 'normal')
-        doc.setFontSize(10)
-        doc.setTextColor(70, 70, 70)
-        const line = `${icon}  ${display}`
-        doc.text(line, (PW - doc.getTextWidth(line)) / 2, contactY)
-        contactY += 8
-      })
-    }
+  let y = 72
 
-    // Skills chips — show selected skills if filter active, else top 10 by level
-    const skillsToShow = (() => {
-      const all = _cfg.SKILLS || {}
-      if (selectedSkills.size > 0) {
-        return [...selectedSkills].map(slug => all[slug]?.label).filter(Boolean)
-      }
-      return Object.entries(all)
-        .sort((a, b) => b[1].level - a[1].level)
-        .slice(0, 10)
-        .map(([, s]) => s.label)
-    })()
+  // Name
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(34)
+  doc.setTextColor(26, 26, 26)
+  const nameText = _cfg.COVER?.name || 'Portfolio'
+  doc.text(nameText, (PW - doc.getTextWidth(nameText)) / 2, y)
+  y += 10
 
-    if (skillsToShow.length) {
-      const skillsLabelY = Math.max(contactY + 14, 150)
+  // Tagline
+  const tagText = _cfg.COVER?.tagline || ''
+  if (tagText) {
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(12)
+    doc.setTextColor(120, 120, 120)
+    doc.text(tagText, (PW - doc.getTextWidth(tagText)) / 2, y)
+    y += 8
+  }
+
+  // Terracotta rule
+  doc.setDrawColor(...TC)
+  doc.setLineWidth(0.8)
+  doc.line(MARGIN + 24, y + 2, PW - MARGIN - 24, y + 2)
+  y += 12
+
+  // Contact links
+  const aboutCabin = _cfg.CABINS.find(c => c.id === 'about-me')
+  if (aboutCabin) {
+    ;(aboutCabin.items || []).filter(_isContactItem).forEach(item => {
+      const icon    = item.link?.includes('linkedin') ? '▸ LinkedIn'
+                    : item.link?.includes('mailto')   ? '▸ Email'
+                    : item.link?.includes('github')   ? '▸ GitHub'
+                    : '▸'
+      const display = (item.link || '').replace('mailto:', '')
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(9)
-      doc.setTextColor(120, 110, 90)
-      const hdrLabel = selectedSkills.size > 0 ? 'HIGHLIGHTED SKILLS' : 'SKILLS'
-      doc.text(hdrLabel, (PW - doc.getTextWidth(hdrLabel)) / 2, skillsLabelY)
-
+      doc.setTextColor(...TC)
+      const iconW = doc.getTextWidth(icon + '  ')
+      const full  = icon + '  ' + display
+      const fullW = doc.getTextWidth(full)
+      const startX = (PW - fullW) / 2
+      doc.text(icon + '  ', startX, y)
       doc.setFont('helvetica', 'normal')
-      doc.setFontSize(8.5)
-      doc.setTextColor(50, 50, 50)
-      const chipPadX = 5, chipPadY = 2.5, chipH = 7, chipGap = 4, rowGap = 5
-      const chipWidths = skillsToShow.map(l => doc.getTextWidth(l) + chipPadX * 2)
-      const maxRowW    = CW - 20
-      const rows = []
-      let row = [], rowW = 0
-      chipWidths.forEach((w, idx) => {
-        if (rowW + w + (row.length > 0 ? chipGap : 0) > maxRowW && row.length) {
-          rows.push(row); row = []; rowW = 0
-        }
-        row.push({ label: skillsToShow[idx], w })
-        rowW += w + (row.length > 1 ? chipGap : 0)
-      })
-      if (row.length) rows.push(row)
-
-      let chipY = skillsLabelY + 7
-      rows.forEach(rowItems => {
-        const totalW = rowItems.reduce((s, c, i) => s + c.w + (i > 0 ? chipGap : 0), 0)
-        let chipX = (PW - totalW) / 2
-        rowItems.forEach(({ label, w }) => {
-          doc.setFillColor(235, 232, 224)
-          doc.roundedRect(chipX, chipY - chipPadY, w, chipH, 2, 2, 'F')
-          doc.setTextColor(50, 50, 50)
-          doc.text(label, chipX + chipPadX, chipY + chipPadY - 0.5)
-          chipX += w + chipGap
-        })
-        chipY += chipH + rowGap
-      })
-    }
-
-    // Date — bottom centre
-    const dateText = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-    doc.setFont('helvetica', 'italic')
-    doc.setFontSize(9)
-    doc.setTextColor(160, 155, 140)
-    doc.text(dateText, (PW - doc.getTextWidth(dateText)) / 2, PH - MARGIN - 6)
+      doc.setTextColor(60, 60, 60)
+      doc.text(display, startX + iconW, y)
+      y += 7
+    })
   }
+  y += 6
+
+  // Skills
+  const skillsToShow = (() => {
+    const all = _cfg.SKILLS || {}
+    if (selectedSkills.size > 0)
+      return [...selectedSkills].map(s => all[s]?.label).filter(Boolean)
+    return Object.entries(all)
+      .sort((a, b) => b[1].level - a[1].level)
+      .slice(0, 10)
+      .map(([, s]) => s.label)
+  })()
+
+  if (skillsToShow.length) {
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(8)
+    doc.setTextColor(...TC)
+    const hdrLabel = selectedSkills.size > 0 ? 'HIGHLIGHTED SKILLS' : 'SKILLS'
+    doc.text(hdrLabel, (PW - doc.getTextWidth(hdrLabel)) / 2, y)
+    y += 8
+
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(8.5)
+    const chipPadX = 5, chipPadY = 2.5, chipH = 7, chipGap = 5, rowGap = 5
+    const chipWidths = skillsToShow.map(l => doc.getTextWidth(l) + chipPadX * 2)
+    const maxRowW = CW - 20
+    const rows = []
+    let row = [], rowW = 0
+    chipWidths.forEach((w, idx) => {
+      if (rowW + w + (row.length ? chipGap : 0) > maxRowW && row.length) {
+        rows.push(row); row = []; rowW = 0
+      }
+      row.push({ label: skillsToShow[idx], w })
+      rowW += w + (row.length > 1 ? chipGap : 0)
+    })
+    if (row.length) rows.push(row)
+
+    rows.forEach(rowItems => {
+      const totalW = rowItems.reduce((s, c, i) => s + c.w + (i ? chipGap : 0), 0)
+      let chipX = (PW - totalW) / 2
+      rowItems.forEach(({ label, w }) => {
+        doc.setDrawColor(...TC)
+        doc.setLineWidth(0.5)
+        doc.roundedRect(chipX, y - chipPadY, w, chipH, 2, 2, 'S')
+        doc.setTextColor(...TC)
+        doc.text(label, chipX + chipPadX, y + chipPadY - 0.5)
+        chipX += w + chipGap
+      })
+      y += chipH + rowGap
+    })
+  }
+
+  // Date bottom-right
+  const dateText = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+  doc.setFont('helvetica', 'italic')
+  doc.setFontSize(8.5)
+  doc.setTextColor(...TC)
+  doc.text(dateText, PW - MARGIN - doc.getTextWidth(dateText), PH - 18)
+  _pageNum()
+
+  // ── About Me page ─────────────────────────────────────────────────────────
+  doc.addPage(); pageNum++; _bg()
+  let ay = MARGIN
+  ay = _sectionHeader('About Me', ay)
+
+  // Photo
+  const photoSrc  = _cfg.ABOUT_ME?.photo
+  const photoW    = 58
+  const photoH    = 72
+  const photoX    = MARGIN
+  const textX     = MARGIN + photoW + 10
+  const textW     = CW - photoW - 10
+
+  if (photoSrc) {
+    try {
+      const photoData = await _loadImageBase64(photoSrc)
+      if (photoData) doc.addImage(photoData, 'JPEG', photoX, ay, photoW, photoH, undefined, 'FAST')
+    } catch (_) {
+      // Draw placeholder box if photo fails
+      doc.setFillColor(42, 46, 53)
+      doc.roundedRect(photoX, ay, photoW, photoH, 2, 2, 'F')
+    }
+  } else {
+    doc.setFillColor(42, 46, 53)
+    doc.roundedRect(photoX, ay, photoW, photoH, 2, 2, 'F')
+  }
+
+  // Name + school
+  let ty = ay
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(14)
+  doc.setTextColor(26, 26, 26)
+  doc.text(_cfg.COVER?.name || '', textX, ty + 7)
+  ty += 12
+
+  if (_cfg.ABOUT_ME?.education) {
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(8)
+    doc.setTextColor(...TC)
+    doc.text(_cfg.ABOUT_ME.education.toUpperCase(), textX, ty)
+    ty += 9
+  }
+
+  // Bio paragraphs — auto-wrapped
+  const bioParagraphs = Array.isArray(_cfg.ABOUT_ME?.bio) ? _cfg.ABOUT_ME.bio : []
+  bioParagraphs.forEach(para => {
+    if (!para) return
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9.5)
+    doc.setTextColor(55, 55, 55)
+    const lines = doc.splitTextToSize(_cleanText(para), textW)
+    doc.text(lines, textX, ty, { lineHeightFactor: 1.55 })
+    ty += lines.length * 5.5 + 6
+  })
+
+  _pageNum()
 
   // ── Per-section pages ─────────────────────────────────────────────────────
   for (const tabIndex of indices) {
@@ -1502,22 +1636,10 @@ async function _exportPDFSections({ indices, selectedSkills }) {
       item => item.label !== null && item.label !== undefined && _isContactItem(item)
     )
 
-    if (!first) doc.addPage()
-    first = false
-
+    doc.addPage(); pageNum++; _bg()
     let cursorY = MARGIN
+    cursorY = _sectionHeader(cabin.label, cursorY)
 
-    // Section header
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(22)
-    doc.setTextColor(40, 40, 40)
-    doc.text(cabin.label, MARGIN, cursorY + 10)
-    doc.setDrawColor(180, 180, 180)
-    doc.setLineWidth(0.4)
-    doc.line(MARGIN, cursorY + 14, PW - MARGIN, cursorY + 14)
-    cursorY += 22
-
-    // Contact items — compact lines
     if (contactItems.length) {
       contactItems.forEach(item => {
         doc.setFont('helvetica', 'normal')
@@ -1534,56 +1656,48 @@ async function _exportPDFSections({ indices, selectedSkills }) {
       doc.setFontSize(11)
       doc.setTextColor(120, 120, 120)
       doc.text('No projects in this section yet.', MARGIN, cursorY)
+      _pageNum()
       continue
     }
 
     for (const item of visibleItems) {
-      // Pre-compute title wrapping
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(13)
       const titleLines = doc.splitTextToSize(item.label || 'Untitled', CW * 0.58)
       const titleH = titleLines.length * 6
 
-      // Pre-compute description lines
-      const cleanDesc = String(item.description || (item.link ? item.link : ''))
-        .replace(/[\u2010-\u2015\u2212]/g, '-')
-        .replace(/[\u2018\u2019]/g, "'")
-        .replace(/[\u201C\u201D]/g, '"')
-        .replace(/[^\x20-\xFF\n]/g, '')
-        .replace(/\s+/g, ' ')
-        .trim()
-
+      const cleanDesc = _cleanText(item.description || (item.link ?? ''))
       doc.setFont('helvetica', 'normal')
       doc.setFontSize(9)
       const descLines = cleanDesc ? doc.splitTextToSize(cleanDesc, CW * 0.58) : []
 
-      const bandH = Math.max(45, Math.min(160, titleH + 8 + descLines.length * 5 + 8))
-      if (cursorY + bandH > PH - MARGIN) {
-        doc.addPage()
+      const bandH = Math.max(45, Math.min(160, titleH + 8 + descLines.length * 5.2 + 10))
+
+      if (cursorY + bandH > PH - 18) {
+        _pageNum()
+        doc.addPage(); pageNum++; _bg()
         cursorY = MARGIN
       }
 
-      // Band background
-      doc.setFillColor(248, 248, 248)
+      // Card background — #f2f0eb
+      doc.setFillColor(242, 240, 235)
       doc.roundedRect(MARGIN, cursorY, CW, bandH - 2, 2, 2, 'F')
-      // Title — wrapped
+
+      // Title
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(13)
-      doc.setTextColor(30, 30, 30)
-      doc.text(titleLines, MARGIN + 4, cursorY + 8)
-      // Description — all lines, no slice
+      doc.setTextColor(26, 26, 26)
+      doc.text(titleLines, MARGIN + 5, cursorY + 8)
+
+      // Description
       if (cleanDesc) {
         doc.setFont('helvetica', 'normal')
         doc.setFontSize(9)
         doc.setTextColor(70, 70, 70)
-        doc.text(descLines, MARGIN + 4, cursorY + 8 + titleH, { lineHeightFactor: 1.5 })
+        doc.text(descLines, MARGIN + 5, cursorY + 8 + titleH, { lineHeightFactor: 1.55 })
       }
 
-      // Primary image (right third of band)
-      // TODO: For the Digital Projects section, replace `images` below with your
-      // GLB screenshot capture result (a dataURL). The addImage call is already
-      // wired — just swap the source.
-      const isDigitalProjectsBand = cabin.id === 'digital-projects'
+      // Primary image + date (date anchored below image, clamped inside card)
       const images = Array.isArray(item.images) && item.images.length
         ? item.images
         : item.image ? [{ src: item.image, date: null }] : []
@@ -1597,27 +1711,22 @@ async function _exportPDFSections({ indices, selectedSkills }) {
           doc.addImage(imgData, 'JPEG', imgX, cursorY + 4, imgW, imgH, undefined, 'FAST')
           if (images[0].date) {
             doc.setFont('helvetica', 'italic')
-            doc.setFontSize(7)
-            doc.setTextColor(120, 120, 120)
-            doc.text(images[0].date, imgX, cursorY + 4 + imgH + 3)
+            doc.setFontSize(8)
+            doc.setTextColor(...TC)
+            const dateY = Math.min(cursorY + 4 + imgH + 5, cursorY + bandH - 3)
+            doc.text(images[0].date, imgX, dateY)
           }
-        } catch (_) { /* skip image on error */ }
+        } catch (_) { /* skip */ }
       }
 
-      // ── GLB screenshot — The Portfolio tab only ───────────────────────────
+      // GLB screenshot — The Portfolio tab only
       if (cabin.id === 'hobby-work') {
         const visBandIdx = visibleItems.indexOf(item)
-        // Use _glbScenesByTab so the correct tab's scenes are used regardless of
-        // which tab happens to be active on screen during export.
         const glbEntry   = (_glbScenesByTab[tabIndex] || [])[visBandIdx]
         if (glbEntry && glbEntry.scene && glbEntry.camera) {
           try {
             const renderer = _ensureSharedRenderer()
-            // Seat-aware rotation: left-seat models face inward in the 3D scene,
-            // so negate rotationY to mirror them toward the viewer for the PDF.
-            const pdfRotY = item.seat === 'left'
-              ? -(item.rotationY ?? 0)
-              :  (item.rotationY ?? 0)
+            const pdfRotY  = item.seat === 'left' ? -(item.rotationY ?? 0) : (item.rotationY ?? 0)
             let savedRotX, savedRotY
             if (glbEntry._model) {
               savedRotX = glbEntry._model.rotation.x
@@ -1634,28 +1743,29 @@ async function _exportPDFSections({ indices, selectedSkills }) {
             }
             const imgX  = MARGIN + CW * 0.62
             const imgW  = CW * 0.36
-            const nativeAspect = glbEntry.h > 0 ? glbEntry.w / glbEntry.h : 1
-            const imgH  = Math.min(bandH - 10, imgW / nativeAspect)
+            const imgH  = Math.min(bandH - 10, imgW / (glbEntry.h > 0 ? glbEntry.w / glbEntry.h : 1))
             doc.addImage(glbData, 'PNG', imgX, cursorY + 4, imgW, imgH, undefined, 'FAST')
-          } catch (_) { /* skip on error */ }
+          } catch (_) { /* skip */ }
         }
       }
 
       cursorY += bandH
     }
-  }
-      // ── Skills page ──────────────────────────────────────────
-  doc.addPage()
-  let skillsY = MARGIN
 
-  doc.setFont('helvetica', 'bold')
-  doc.setFontSize(22)
-  doc.setTextColor(40, 40, 40)
-  doc.text('Skills', MARGIN, skillsY + 10)
-  doc.setDrawColor(180, 180, 180)
-  doc.setLineWidth(0.4)
-  doc.line(MARGIN, skillsY + 14, PW - MARGIN, skillsY + 14)
-  skillsY += 22
+    _pageNum()
+  }
+
+  // ── Skills page ───────────────────────────────────────────────────────────
+  doc.addPage(); pageNum++; _bg()
+  let skillsY = MARGIN
+  skillsY = _sectionHeader('Skills', skillsY)
+
+  doc.setFont('helvetica', 'italic')
+  doc.setFontSize(9)
+  doc.setTextColor(140, 135, 128)
+  doc.text('Skills are followed by the number of listed projects in which they were used.', MARGIN, skillsY)
+  skillsY += 10
+
   const SKILL_CATEGORIES = [
     { keys: ['hardware'],              label: 'Hardware & Electronics' },
     { keys: ['coding'],                label: 'Software & Code'        },
@@ -1663,8 +1773,7 @@ async function _exportPDFSections({ indices, selectedSkills }) {
     { keys: ['soft'],                  label: 'Soft Skills'            },
   ]
   const allSkills = _cfg.SKILLS || {}
-  // Pre-count projects per skill across all cabins
-  // Pre-count unique projects per skill (deduped by item label)
+
   const skillProjectCount = {}
   const seenLabels = new Set()
   ;(_cfg.CABINS || []).forEach(cabin => {
@@ -1677,59 +1786,61 @@ async function _exportPDFSections({ indices, selectedSkills }) {
       })
     })
   })
-  
-  // Note
-  doc.setFont('helvetica', 'italic')
-  doc.setFontSize(9)
-  doc.setTextColor(120, 120, 120)
-  doc.text('Skills are followed by the number of listed projects in which they were used.', MARGIN, skillsY)
-  skillsY += 10
 
   SKILL_CATEGORIES.forEach(cat => {
     const catSkills = Object.entries(allSkills)
       .filter(([, s]) => cat.keys.includes(s.category))
       .sort((a, b) => b[1].level - a[1].level)
-
     if (!catSkills.length) return
 
+    // Category label — terracotta uppercase
     doc.setFont('helvetica', 'bold')
-    doc.setFontSize(11)
-    doc.setTextColor(60, 60, 60)
-    doc.text(cat.label, MARGIN, skillsY)
-    skillsY += 7
+    doc.setFontSize(8.5)
+    doc.setTextColor(...TC)
+    doc.text(cat.label.toUpperCase(), MARGIN, skillsY)
+    skillsY += 6
 
     let tagX = MARGIN
-    doc.setFontSize(8)
+    doc.setFontSize(8.5)
 
     catSkills.forEach(([slug, skill]) => {
-      const count = skillProjectCount[slug] || 0
+      const count    = skillProjectCount[slug] || 0
       const tagLabel = `${skill.label}  (${count})`
-      const tagW = doc.getTextWidth(tagLabel) + 8
-      const tagH = 7
+      doc.setFont('helvetica', 'bold')
+      const nameW = doc.getTextWidth(skill.label)
+      doc.setFont('helvetica', 'normal')
+      const countW = doc.getTextWidth(`  (${count})`)
+      const tagW   = nameW + countW + 10
+      const tagH   = 7
 
-      if (tagX + tagW > PW - MARGIN) {
-        tagX = MARGIN
-        skillsY += tagH + 2
-      }
+      if (tagX + tagW > PW - MARGIN) { tagX = MARGIN; skillsY += tagH + 3 }
 
-      doc.setFillColor(235, 235, 235)
-      doc.roundedRect(tagX, skillsY - 5, tagW, tagH, 1.5, 1.5, 'F')
-      doc.setTextColor(40, 40, 40)
-      doc.text(tagLabel, tagX + 4, skillsY)
+      // Chip — outlined terracotta
+      doc.setDrawColor(...TC)
+      doc.setLineWidth(0.4)
+      doc.roundedRect(tagX, skillsY - 5, tagW, tagH, 1.5, 1.5, 'S')
 
-      tagX += tagW + 4
+      // Skill name bold, count normal
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(26, 26, 26)
+      doc.text(skill.label, tagX + 5, skillsY)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(140, 135, 128)
+      doc.text(`  (${count})`, tagX + 5 + nameW, skillsY)
+
+      tagX += tagW + 5
     })
 
-    skillsY += 14
+    skillsY += 16
   })
-  // Build filename from selected section labels
-  const nameSlug = indices
-    .map(i => _cfg.CABINS[i]?.id || `section-${i}`)
-    .join('_')
-  doc.save(`Bland_Sarah_portfolio-.pdf`)
+
+  _pageNum()
+
+  // ── Save ──────────────────────────────────────────────────────────────────
+  doc.save('Bland_Sarah_portfolio.pdf')
 
   if (exportBtn) {
-    exportBtn.innerHTML = '<span class="ps-btn-icon">&#8659;</span> Export PDF'
+    exportBtn.innerHTML = '<span class="ps-btn-icon">&#8659;</span> Export'
     exportBtn.disabled  = false
   }
 }
@@ -1770,6 +1881,23 @@ function _loadImageWithInfo(src) {
       resolve({ dataUrl: c.toDataURL('image/jpeg', 0.85), w: img.naturalWidth, h: img.naturalHeight })
     }
     img.onerror = reject
+    img.src = src
+  })
+}
+
+// Simpler variant — returns base64 data URL or null on failure (used for headshot)
+function _loadImageBase64(src) {
+  return new Promise(resolve => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const c = document.createElement('canvas')
+      c.width  = img.naturalWidth
+      c.height = img.naturalHeight
+      c.getContext('2d').drawImage(img, 0, 0)
+      resolve(c.toDataURL('image/jpeg', 0.9))
+    }
+    img.onerror = () => resolve(null)
     img.src = src
   })
 }
@@ -2322,7 +2450,7 @@ const _CSS = /* css */`
   display: flex;
   flex-direction: column;
 }
-/* ── PDF Picker: 3-stage header ──────────────────────────────────────────── */
+/* ── PDF Picker: header ──────────────────────────────────────────────────── */
 .ps-pdf-picker-hdr {
   display: flex;
   flex-direction: column;
@@ -2348,73 +2476,9 @@ const _CSS = /* css */`
   transition: background 0.15s, color 0.15s;
 }
 .ps-pdf-picker-close:hover { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
-.ps-pdf-picker-steps {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 2px;
-}
-.ps-pdf-step {
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: 0.03em;
-  color: #bbb;
-  padding: 3px 8px;
-  border-radius: 4px;
-  background: rgba(0,0,0,0.04);
-}
-.ps-pdf-step--active { color: #1a1a1a; background: rgba(0,0,0,0.09); font-weight: 700; }
-.ps-pdf-step--done   { color: #999; text-decoration: line-through; }
-/* ── Stage body ──────────────────────────────────────────────────────────── */
-.ps-pdf-stage-body {
-  max-height: 52vh;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-/* ── Cover page fields ───────────────────────────────────────────────────── */
-.ps-pdf-toggle-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  color: #1a1a1a;
-  user-select: none;
-}
-.ps-pdf-toggle-row input[type=checkbox] { width: 15px; height: 15px; cursor: pointer; }
-.ps-pdf-fields { display: flex; flex-direction: column; gap: 9px; transition: opacity 0.15s; }
-.ps-pdf-field-row { display: flex; flex-direction: column; gap: 3px; }
-.ps-pdf-field-label {
-  font-size: 10.5px; font-weight: 600; color: #888;
-  letter-spacing: 0.05em; text-transform: uppercase;
-}
-.ps-pdf-field-input {
-  font-family: 'DM Sans', sans-serif; font-size: 13px;
-  padding: 6px 10px; border: 1.5px solid #d6d0c6;
-  border-radius: 6px; background: #faf8f3; color: #1a1a1a;
-  outline: none; transition: border-color 0.15s;
-}
-.ps-pdf-field-input:focus { border-color: #999; }
 /* ── Skills filter ───────────────────────────────────────────────────────── */
-.ps-pdf-skill-cat { display: flex; flex-direction: column; gap: 7px; }
-.ps-pdf-skill-cat-title {
-  display: flex; align-items: center; justify-content: space-between;
-  font-size: 10.5px; font-weight: 700; color: #555;
-  letter-spacing: 0.04em; text-transform: uppercase;
-  border-bottom: 1px solid rgba(0,0,0,0.08); padding-bottom: 4px;
-}
-.ps-pdf-skill-cat-actions { font-size: 10px; font-weight: 400; color: #aaa; text-transform: none; letter-spacing: 0; }
-.ps-pdf-skill-cat-actions button {
-  background: none; border: none; padding: 0; cursor: pointer;
-  color: #999; font-size: 10px; font-family: 'DM Sans', sans-serif; transition: color 0.15s;
-}
-.ps-pdf-skill-cat-actions button:hover { color: #333; }
 .ps-pdf-skill-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.ps-pdf-skill-grid--picker { margin-bottom: 4px; }
 .ps-pdf-skill-chip {
   display: inline-flex; align-items: center; gap: 5px;
   padding: 4px 10px 4px 8px; border: 1.5px solid #d6d0c6;
@@ -2426,7 +2490,7 @@ const _CSS = /* css */`
 .ps-pdf-skill-chip input[type=checkbox] { display: none; }
 .ps-pdf-skill-chip--on { background: #2a2a2a; border-color: #2a2a2a; color: #fff; }
 .ps-pdf-skill-chip:hover:not(.ps-pdf-skill-chip--on) { border-color: #999; background: rgba(0,0,0,0.05); }
-/* ── Legacy/shared picker sub ────────────────────────────────────────────── */
+/* ── Picker sub ──────────────────────────────────────────────────────────── */
 .ps-pdf-picker-title {
   margin: 0;
   font-family: 'DM Serif Display', Georgia, serif;
