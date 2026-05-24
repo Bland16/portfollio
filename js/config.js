@@ -50,11 +50,42 @@ export const CABINS = [
         "seat": "right",
         "positionOffset": [-0.9, 0, 1.6],
         "scale": 1.5,
-        "label": "About Me: Chinese Immersion Learner",
+        "label": "Chinese Immersion Learner",
         "link": null,
         "description": "I have been learning Mandarin for 15 years. I was enrolled in a Chinese immersion program through middle school, which included accelerated math and competing in Mandarin speech competitions at UMD. In high school, I wrote and performed a short play in Mandarin about cultural appropriation alongside my friend Kevin Ma — it headlined our school's Lunar New Year celebration. I later visited my pen pal in Beijing, a trip that deepened the connection the language has always given me to the world beyond my own.",
         "images": [],
         "rotationY": -2.1
+      },
+      {
+        "glb": "models/gingerbread.glb",
+        "seat": "right",
+        "positionOffset": [
+          1.1,
+          0,
+          -0.5
+        ],
+        "scale": 1,
+        "label": "MakeBC Officer",
+        "link": null,
+        "description": "My freshman year, I was the freshmen representitive of MakeBC, a make and design club at Boston College. Through the club, I have (successfully) completed an egg drop challege off a 7 story building, launched a pumpkin 40 some odd feet, and of course made a gingerbread house.",
+        "images": [],
+        "rotationY": -1.8
+      },
+      {
+              
+        "glb": "models/cup.glb",
+        "seat": "right",
+        "positionOffset": [
+          -0.3,
+          2.6,
+          -3
+        ],
+        "scale": 0.1,
+        "label": "Society Of Women Engineers at Boston College Co-director of Community Service",
+        "link": null,
+        "description": "I attened the National SWE Conference of 2025 in New Orleans with my fellow female engineers. It was an incredible experience. I want to work towards bringing engineering to impovershed women, especially those who may be older and who don't neccearily have access to as many education opprotunities as those who don't have to balance enrichment with adult responsibilites.",
+        "images": [],
+        "rotationY": -2.3
       },
       {
         "glb": "models/about-house.glb",
@@ -72,7 +103,7 @@ export const CABINS = [
         "seat": "right",
         "positionOffset": [-1.1, 0.1, -3.2],
         "scale": 0.51,
-        "label": "About Me: Certified Cinephile",
+        "label": "Certified Cinephile",
         "link": null,
         "description": "I have seen over a thousand movies and wrote a screenplay at 18. Every Wednesday I watch a film with friends — a ritual I look forward to every week. Some of my favorites are 'The Half of It', 'Perfect Days', 'Scream', 'Godzilla Minus One', 'The Pig, The Snake and the Pigeon', and 'Who Framed Roger Rabbit'. On the TV side, 'Interior Chinatown' is a recent standout. Beyond film, I am a serious sports fan — football, hockey, and basketball are fixtures in my viewing life.",
         "images": [{"src": "photos/movies-1.jpg", "date": '04/04/2026'}],
@@ -93,7 +124,7 @@ export const CABINS = [
         "seat": "left",
         "positionOffset": [0.9, -1.1, -4.5],
         "scale": 0.4,
-        "label": "About Me: Red-Meat Cooking Prodigy",
+        "label": "Red-Meat Cooking Prodigy",
         "link": null,
         "description": "I can make a mean steak—and that is an understatement. I love cooking for family and friends. While I usually take requests, my favorite secret recipes include sugar fish fillet, hidden-vegetable pumpkin buns, popsicle-poached apples, and onion-tomato seared steak. Recipes are available upon request.",
         "images": [{"src": "photos/cooking-0.jpg", "date": null},{"src": "photos/cooking-1.jpg", "date": null}],
@@ -104,7 +135,7 @@ export const CABINS = [
         "seat": "left",
         "positionOffset": [-1.3, 0, 4.2],
         "scale": 0.2,
-        "label": "About Me: Former Pre-Amateur Boxer",
+        "label": "Former Pre-Amateur Boxer",
         "link": null,
         "description": "I boxed all four years of high school and was one of two girls on a boxing team in White Flint, Maryland. My coach was an old-fashioned 'tough-love' mentor who taught me about delayed gratification, discipline, and punctuality. My favorite moment from the sport was participating in a gym-run Punch-A-Thon to help bring boxing to impoverished youth.",
         "images": [],
@@ -159,7 +190,7 @@ export const CABINS = [
         "link": null,
         "description": "I authored a 20-page design specification for TideFlow, a custom scheduling app built around machine learning. The spec defines core user flows, feature requirements, and the logic behind ML-driven schedule optimization — laying the groundwork for a future build.",
         "images": [{"src": "photos/tideflow-1.jpg", "date": '05/23/2026'}, {"src": "photos/tideflow-2.jpg", "date": '05/23/2026'},{"src": "photos/tideflow-3.jpg", "date": '05/23/2026'},{"src": "photos/tideflow-4.jpg", "date": '05/23/2026'}],
-        "rotationY": -1.55,
+        "rotationY": -2.55,
         "skills": ['machine-learning', 'prompt-engineering', 'ui-design', 'problem-solving']
       },
       {
