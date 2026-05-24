@@ -13,6 +13,16 @@ export const MODEL_SCALE = 14.29
 // Scaled automatically — adjust the base value (0.3) if needed
 export const SEAT_Y = 0.3 * MODEL_SCALE
 
+// ── COVER PAGE ──────────────────────────────────────────────
+// Used only in the locally-generated PDF — not rendered on the live site.
+// Contact links (LinkedIn, email) are pulled automatically from your
+// About Me items below, so no need to duplicate them here.
+// ⚠️  Public repo: avoid phone numbers or personal emails.
+export const COVER = {
+  name:    'Sarah Bland',                        // ← replace
+  tagline: 'Engineer · Designer · Builder',   // ← your tagline
+}
+
 // ── CABIN DEFINITIONS ───────────────────────────────────────
 // 6 cabins, one per section
 // attachIndex: which of the 12 wheel attach points to use (0–11)
@@ -54,7 +64,8 @@ export const CABINS = [
         "link": null,
         "description": "I have been learning Mandarin for 15 years. I was enrolled in a Chinese immersion program through middle school, which included accelerated math and competing in Mandarin speech competitions at UMD. In high school, I wrote and performed a short play in Mandarin about cultural appropriation alongside my friend Kevin Ma — it headlined our school's Lunar New Year celebration. I later visited my pen pal in Beijing, a trip that deepened the connection the language has always given me to the world beyond my own.",
         "images": [],
-        "rotationY": -2.1
+        "rotationY": -2.1,
+        "skills": ['communication', 'public-speaking']
       },
       {
         "glb": "models/gingerbread.glb",
@@ -69,7 +80,8 @@ export const CABINS = [
         "link": null,
         "description": "My freshman year, I was the freshmen representitive of MakeBC, a make and design club at Boston College. Through the club, I have (successfully) completed an egg drop challege off a 7 story building, launched a pumpkin 40 some odd feet, and of course made a gingerbread house.",
         "images": [],
-        "rotationY": -1.8
+        "rotationY": -1.8,
+        "skills": ['teamwork', 'problem-solving', 'event-planning']
       },
       {
               
@@ -85,7 +97,8 @@ export const CABINS = [
         "link": null,
         "description": "I attened the National SWE Conference of 2025 in New Orleans with my fellow female engineers. It was an incredible experience. I want to work towards bringing engineering to impovershed women, especially those who may be older and who don't neccearily have access to as many education opprotunities as those who don't have to balance enrichment with adult responsibilites.",
         "images": [],
-        "rotationY": -2.3
+        "rotationY": -2.3,
+        "skills": ['leadership', 'event-planning', 'teamwork', 'communication', 'public-speaking']
       },
       {
         "glb": "models/about-house.glb",
@@ -179,7 +192,8 @@ export const CABINS = [
         "link": null,
         "description": "I built and trained a machine learning model to estimate the distance of a tree from a camera, aiming to optimize pesticide application. The training image dataset was cleaned and refined in collaboration with my partner, Michael Busa. Following the completion of our code, we delivered a presentation on our findings to the engineering department. As the research this project contributed to has not yet been published, detailed methodology and data are available upon request.",
         "images": [{"src": "photos/tree-distance-1.jpg", "date": '03/31/2026'}],
-        "rotationY": -0.35
+        "rotationY": -0.35,
+        "skills": ['python', 'machine-learning', 'teamwork', 'communication', 'public-speaking', 'problem-solving']
       },
       {
         "glb": "models/tideflow.glb",

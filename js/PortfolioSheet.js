@@ -18,7 +18,7 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { getVibeInfo } from './vibes.js'
-import { SKILLS as _CONFIG_SKILLS } from './config.js'
+import { SKILLS as _CONFIG_SKILLS, COVER as _CONFIG_COVER } from './config.js'
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
@@ -37,12 +37,14 @@ const TAB_HUE_SHIFTS = [0, 28, 55, 82, 110, 138]
 let _cfg = {
   CABINS:        [],
   SKILLS:        _CONFIG_SKILLS,
+  COVER:         _CONFIG_COVER ?? {},
   getActiveVibe: () => 'suave',
 }
 
 let _overlay         = null   // root DOM node
 let _activeTabIndex  = 0
-let _glbScenes       = []     // { scene, camera, _model, displayCanvas, w, h }[]
+let _glbScenes       = []     // { scene, camera, _model, displayCanvas, w, h }[] — current tab only
+let _glbScenesByTab  = {}     // { [tabIndex]: entry[] } — persists across tab switches for PDF use
 let _fullscreenState = null   // { animId, renderer, keyDown, keyUp, bandIndex }
 let _imgFullscreenEl = null   // <div> for image lightbox, or null
 let _pdfLibsLoaded   = false
@@ -345,7 +347,7 @@ function _buildBand(item, bandIndex, total, tabIndex) {
   // ── Column: GLB viewer ────────────────────────────────────────────────────
   const colGlb = document.createElement('div')
   colGlb.className = 'ps-col ps-col--glb'
-  const glbWrap = _buildGlbViewer(item, bandIndex)
+  const glbWrap = _buildGlbViewer(item, bandIndex, tabIndex)
   colGlb.appendChild(glbWrap)
   band.appendChild(colGlb)
 
@@ -373,7 +375,7 @@ function _buildBand(item, bandIndex, total, tabIndex) {
 // This keeps the total WebGL context count to 1 (+ 1 temporary for fullscreen),
 // preventing the browser from evicting the main scene's context.
 
-function _buildGlbViewer(item, bandIndex) {
+function _buildGlbViewer(item, bandIndex, tabIndex) {
   const wrap = document.createElement('div')
   wrap.className = 'ps-glb-wrap'
 
@@ -401,6 +403,13 @@ function _buildGlbViewer(item, bandIndex) {
     animId:  null,
   }
   _glbScenes[bandIndex] = entry
+  // Only store tab-keyed scenes for The Portfolio tab (hobby-work) — the only
+  // tab that uses GLB screenshots in the PDF. Digital Projects and all others
+  // must never be written here.
+  if (_cfg.CABINS[tabIndex]?.id === 'hobby-work') {
+    if (!_glbScenesByTab[tabIndex]) _glbScenesByTab[tabIndex] = []
+    _glbScenesByTab[tabIndex][bandIndex] = entry
+  }
 
   // Defer layout read until after the flex container has been measured.
   // setTimeout(100) is more reliable than a single rAF for flex children.
@@ -1158,6 +1167,7 @@ function _closeOverlay() {
 
 function _destroyOverlay() {
   _destroyGlbScenes()
+  _glbScenesByTab = {}
   if (_imgFullscreenEl) { _imgFullscreenEl.remove(); _imgFullscreenEl = null }
   document.removeEventListener('keydown', _handleKeyDown)
   if (_overlay && _overlay.parentNode) _overlay.parentNode.removeChild(_overlay)
@@ -1187,79 +1197,158 @@ function _destroyGlbScenes() {
 // ─── PDF SECTION PICKER ───────────────────────────────────────────────────────
 
 function _showPdfSectionPicker() {
-  // Remove any existing picker
   const existing = _overlay.querySelector('.ps-pdf-picker')
   if (existing) existing.remove()
 
+  const selectedSkills   = new Set()
+  const selectedSections = new Set()
+
+  // ── Which sections have content given current skill filter ────────────────
+  // Always excludes the 'events' cabin.
+  function _matchingSections() {
+    return _cfg.CABINS
+      .map((cabin, i) => {
+        if (cabin.id === 'events') return null
+        const projectItems = (cabin.items || []).filter(
+          item => item.label !== null && item.label !== undefined && !_isContactItem(item)
+        )
+        // Contact-only sections (About Me) always pass through
+        if (!projectItems.length) {
+          const hasContact = (cabin.items || []).some(_isContactItem)
+          return hasContact ? { cabinIndex: i, cabin, count: 0 } : null
+        }
+        if (selectedSkills.size === 0) return { cabinIndex: i, cabin, count: projectItems.length }
+        const matchCount = projectItems.filter(item =>
+          Array.isArray(item.skills) && item.skills.some(s => selectedSkills.has(s))
+        ).length
+        return matchCount > 0 ? { cabinIndex: i, cabin, count: matchCount } : null
+      })
+      .filter(Boolean)
+  }
+
+  // ── DOM scaffold ──────────────────────────────────────────────────────────
   const picker = document.createElement('div')
   picker.className = 'ps-pdf-picker'
+  picker.addEventListener('click', e => { if (e.target === picker) picker.remove() })
 
   const inner = document.createElement('div')
   inner.className = 'ps-pdf-picker-inner'
+  picker.appendChild(inner)
+
+  // ── Header ────────────────────────────────────────────────────────────────
+  const hdr = document.createElement('div')
+  hdr.className = 'ps-pdf-picker-hdr'
 
   const title = document.createElement('h4')
-  title.className = 'ps-pdf-picker-title'
+  title.className   = 'ps-pdf-picker-title'
   title.textContent = 'Export to PDF'
 
-  const sub = document.createElement('p')
-  sub.className = 'ps-pdf-picker-sub'
-  sub.textContent = 'Choose which sections to include:'
+  const closeBtn = document.createElement('button')
+  closeBtn.className = 'ps-pdf-picker-close'
+  closeBtn.innerHTML = '&#10005;'
+  closeBtn.addEventListener('click', () => picker.remove())
+
+  hdr.appendChild(title)
+  hdr.appendChild(closeBtn)
+  inner.appendChild(hdr)
+
+  // ── Skills filter (optional context) ──────────────────────────────────────
+  const skillSub = document.createElement('p')
+  skillSub.className   = 'ps-pdf-picker-sub'
+  skillSub.textContent = 'Filter by role (optional):'
+  inner.appendChild(skillSub)
+
+  const skillsWrap = document.createElement('div')
+  skillsWrap.className = 'ps-pdf-skill-grid ps-pdf-skill-grid--picker'
+  inner.appendChild(skillsWrap)
+
+  const allSkills = _cfg.SKILLS || {}
+  Object.entries(allSkills)
+    .sort((a, b) => b[1].level - a[1].level)
+    .forEach(([slug, skill]) => {
+      const chip = document.createElement('label')
+      chip.className = 'ps-pdf-skill-chip'
+
+      const chk = document.createElement('input')
+      chk.type    = 'checkbox'
+      chk.checked = false
+      chk.addEventListener('change', () => {
+        if (chk.checked) selectedSkills.add(slug)
+        else             selectedSkills.delete(slug)
+        chip.classList.toggle('ps-pdf-skill-chip--on', chk.checked)
+        _refreshSections()
+      })
+
+      chip.appendChild(chk)
+      chip.appendChild(document.createTextNode(skill.label))
+      skillsWrap.appendChild(chip)
+    })
+
+  // ── Section list (live-updated by skill filter) ───────────────────────────
+  const sectionSub = document.createElement('p')
+  sectionSub.className   = 'ps-pdf-picker-sub'
+  sectionSub.textContent = 'Sections:'
+  inner.appendChild(sectionSub)
 
   const checksWrap = document.createElement('div')
   checksWrap.className = 'ps-pdf-picker-checks'
+  inner.appendChild(checksWrap)
 
-  _cfg.CABINS.forEach((cabin, i) => {
-    const hasContent = (cabin.items || []).some(
-      item => item.label !== null && item.label !== undefined
-    )
-    const label = document.createElement('label')
-    label.className = 'ps-pdf-check-label'
+  function _refreshSections() {
+    checksWrap.innerHTML = ''
+    selectedSections.clear()
 
-    const check = document.createElement('input')
-    check.type    = 'checkbox'
-    check.value   = String(i)
-    check.checked = hasContent   // pre-tick sections that have content
-    check.id      = `ps-pdf-check-${i}`
+    const matched = _matchingSections()
 
-    const span = document.createElement('span')
-    span.textContent = cabin.label
-    if (!hasContent) span.style.opacity = '0.45'
+    _cfg.CABINS.forEach((cabin, i) => {
+      if (cabin.id === 'events') return
+      const match = matched.find(m => m.cabinIndex === i)
 
-    label.appendChild(check)
-    label.appendChild(span)
-    checksWrap.appendChild(label)
-  })
+      const label = document.createElement('label')
+      label.className = 'ps-pdf-check-label'
 
+      const check = document.createElement('input')
+      check.type     = 'checkbox'
+      check.value    = String(i)
+      check.checked  = !!match
+      check.disabled = !match
+      if (match) selectedSections.add(i)
+
+      check.addEventListener('change', () => {
+        if (check.checked) selectedSections.add(i)
+        else               selectedSections.delete(i)
+      })
+
+      const span = document.createElement('span')
+      span.textContent = match
+        ? `${cabin.label}${match.count > 0 ? ` (${match.count})` : ''}`
+        : `${cabin.label} — no matches`
+      if (!match) span.style.opacity = '0.38'
+
+      label.appendChild(check)
+      label.appendChild(span)
+      checksWrap.appendChild(label)
+    })
+  }
+
+  _refreshSections()
+
+  // ── Export button ─────────────────────────────────────────────────────────
   const actions = document.createElement('div')
   actions.className = 'ps-pdf-picker-actions'
 
-  const confirmBtn = document.createElement('button')
-  confirmBtn.className = 'ps-btn-export'
-  confirmBtn.innerHTML = '<span class="ps-btn-icon">&#8659;</span> Export'
-  confirmBtn.addEventListener('click', () => {
-    const checked = checksWrap.querySelectorAll('input[type=checkbox]:checked')
-    const indices = Array.from(checked).map(c => parseInt(c.value))
+  const exportBtn = document.createElement('button')
+  exportBtn.className = 'ps-btn-export'
+  exportBtn.innerHTML = '<span class="ps-btn-icon">&#8659;</span> Export'
+  exportBtn.addEventListener('click', () => {
+    const indices = Array.from(selectedSections).sort((a, b) => a - b)
     if (!indices.length) return
     picker.remove()
-    _exportPDFSections(indices)
+    _exportPDFSections({ indices, selectedSkills })
   })
 
-  const cancelBtn = document.createElement('button')
-  cancelBtn.className = 'ps-pdf-cancel'
-  cancelBtn.textContent = 'Cancel'
-  cancelBtn.addEventListener('click', () => picker.remove())
-
-  actions.appendChild(confirmBtn)
-  actions.appendChild(cancelBtn)
-
-  inner.appendChild(title)
-  inner.appendChild(sub)
-  inner.appendChild(checksWrap)
+  actions.appendChild(exportBtn)
   inner.appendChild(actions)
-  picker.appendChild(inner)
-
-  // Click outside picker = cancel
-  picker.addEventListener('click', e => { if (e.target === picker) picker.remove() })
 
   _overlay.querySelector('.ps-holder').appendChild(picker)
 }
@@ -1268,9 +1357,9 @@ function _showPdfSectionPicker() {
 
 /**
  * Export one combined PDF covering the requested cabin indices.
- * @param {number[]} indices — which CABINS to include, in order
+ * @param {{ indices: number[], selectedSkills: Set<string> }} opts
  */
-async function _exportPDFSections(indices) {
+async function _exportPDFSections({ indices, selectedSkills }) {
   const exportBtn = _overlay.querySelector('.ps-btn-export')
   if (exportBtn) {
     exportBtn.textContent = 'Generating…'
@@ -1288,13 +1377,127 @@ async function _exportPDFSections(indices) {
   const CW     = PW - MARGIN * 2
   let   first  = true
 
+  // ── Cover page (always included, auto-rendered from config) ───────────────
+  {
+    first = false
+
+    doc.setFillColor(250, 248, 244)
+    doc.rect(0, 0, PW, PH, 'F')
+
+    // Name
+    const nameText = _cfg.COVER?.name || 'Portfolio'
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(36)
+    doc.setTextColor(30, 30, 30)
+    doc.text(nameText, (PW - doc.getTextWidth(nameText)) / 2, 90)
+
+    // Tagline
+    const tagText = _cfg.COVER?.tagline || ''
+    if (tagText) {
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(14)
+      doc.setTextColor(90, 90, 90)
+      doc.text(tagText, (PW - doc.getTextWidth(tagText)) / 2, 102)
+    }
+
+    // Rule
+    doc.setDrawColor(180, 170, 150)
+    doc.setLineWidth(0.5)
+    doc.line(MARGIN + 20, 110, PW - MARGIN - 20, 110)
+
+    // Contact links — pulled from About Me items, no new info added
+    let contactY = 120
+    const aboutCabin = _cfg.CABINS.find(c => c.id === 'about-me')
+    if (aboutCabin) {
+      ;(aboutCabin.items || []).filter(_isContactItem).forEach(item => {
+        const icon    = item.link?.includes('linkedin') ? '▸ LinkedIn:'
+                      : item.link?.includes('mailto')   ? '▸ Email:'
+                      : item.link?.includes('github')   ? '▸ GitHub:'
+                      : '▸'
+        const display = (item.link || '').replace('mailto:', '')
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(10)
+        doc.setTextColor(70, 70, 70)
+        const line = `${icon}  ${display}`
+        doc.text(line, (PW - doc.getTextWidth(line)) / 2, contactY)
+        contactY += 8
+      })
+    }
+
+    // Skills chips — show selected skills if filter active, else top 10 by level
+    const skillsToShow = (() => {
+      const all = _cfg.SKILLS || {}
+      if (selectedSkills.size > 0) {
+        return [...selectedSkills].map(slug => all[slug]?.label).filter(Boolean)
+      }
+      return Object.entries(all)
+        .sort((a, b) => b[1].level - a[1].level)
+        .slice(0, 10)
+        .map(([, s]) => s.label)
+    })()
+
+    if (skillsToShow.length) {
+      const skillsLabelY = Math.max(contactY + 14, 150)
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(9)
+      doc.setTextColor(120, 110, 90)
+      const hdrLabel = selectedSkills.size > 0 ? 'HIGHLIGHTED SKILLS' : 'SKILLS'
+      doc.text(hdrLabel, (PW - doc.getTextWidth(hdrLabel)) / 2, skillsLabelY)
+
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(8.5)
+      doc.setTextColor(50, 50, 50)
+      const chipPadX = 5, chipPadY = 2.5, chipH = 7, chipGap = 4, rowGap = 5
+      const chipWidths = skillsToShow.map(l => doc.getTextWidth(l) + chipPadX * 2)
+      const maxRowW    = CW - 20
+      const rows = []
+      let row = [], rowW = 0
+      chipWidths.forEach((w, idx) => {
+        if (rowW + w + (row.length > 0 ? chipGap : 0) > maxRowW && row.length) {
+          rows.push(row); row = []; rowW = 0
+        }
+        row.push({ label: skillsToShow[idx], w })
+        rowW += w + (row.length > 1 ? chipGap : 0)
+      })
+      if (row.length) rows.push(row)
+
+      let chipY = skillsLabelY + 7
+      rows.forEach(rowItems => {
+        const totalW = rowItems.reduce((s, c, i) => s + c.w + (i > 0 ? chipGap : 0), 0)
+        let chipX = (PW - totalW) / 2
+        rowItems.forEach(({ label, w }) => {
+          doc.setFillColor(235, 232, 224)
+          doc.roundedRect(chipX, chipY - chipPadY, w, chipH, 2, 2, 'F')
+          doc.setTextColor(50, 50, 50)
+          doc.text(label, chipX + chipPadX, chipY + chipPadY - 0.5)
+          chipX += w + chipGap
+        })
+        chipY += chipH + rowGap
+      })
+    }
+
+    // Date — bottom centre
+    const dateText = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    doc.setFont('helvetica', 'italic')
+    doc.setFontSize(9)
+    doc.setTextColor(160, 155, 140)
+    doc.text(dateText, (PW - doc.getTextWidth(dateText)) / 2, PH - MARGIN - 6)
+  }
+
+  // ── Per-section pages ─────────────────────────────────────────────────────
   for (const tabIndex of indices) {
     const cabin = _cfg.CABINS[tabIndex]
     if (!cabin) continue
 
-    const visibleItems = (cabin.items || []).filter(
+    const allProjectItems = (cabin.items || []).filter(
       item => item.label !== null && item.label !== undefined && !_isContactItem(item)
     )
+    const visibleItems = selectedSkills.size === 0
+      ? allProjectItems
+      : allProjectItems.filter(item =>
+          Array.isArray(item.skills) && item.skills.some(s => selectedSkills.has(s))
+        )
+
     const contactItems = (cabin.items || []).filter(
       item => item.label !== null && item.label !== undefined && _isContactItem(item)
     )
@@ -1346,7 +1549,7 @@ async function _exportPDFSections(indices) {
         .replace(/[\u2010-\u2015\u2212]/g, '-')
         .replace(/[\u2018\u2019]/g, "'")
         .replace(/[\u201C\u201D]/g, '"')
-        .replace(/[^\x20-\x7E\n]/g, '')
+        .replace(/[^\x20-\xFF\n]/g, '')
         .replace(/\s+/g, ' ')
         .trim()
 
@@ -1387,10 +1590,10 @@ async function _exportPDFSections(indices) {
 
       if (images.length) {
         try {
-          const imgData = await _loadImageAsDataUrl(images[0].src)
+          const { dataUrl: imgData, w: iw, h: ih } = await _loadImageWithInfo(images[0].src)
           const imgX = MARGIN + CW * 0.62
           const imgW = CW * 0.36
-          const imgH = bandH - 10
+          const imgH = Math.min(bandH - 10, imgW * (ih / iw))
           doc.addImage(imgData, 'JPEG', imgX, cursorY + 4, imgW, imgH, undefined, 'FAST')
           if (images[0].date) {
             doc.setFont('helvetica', 'italic')
@@ -1404,16 +1607,35 @@ async function _exportPDFSections(indices) {
       // ── GLB screenshot — The Portfolio tab only ───────────────────────────
       if (cabin.id === 'hobby-work') {
         const visBandIdx = visibleItems.indexOf(item)
-        const glbEntry   = _glbScenes[visBandIdx]
+        // Use _glbScenesByTab so the correct tab's scenes are used regardless of
+        // which tab happens to be active on screen during export.
+        const glbEntry   = (_glbScenesByTab[tabIndex] || [])[visBandIdx]
         if (glbEntry && glbEntry.scene && glbEntry.camera) {
           try {
             const renderer = _ensureSharedRenderer()
+            // Seat-aware rotation: left-seat models face inward in the 3D scene,
+            // so negate rotationY to mirror them toward the viewer for the PDF.
+            const pdfRotY = item.seat === 'left'
+              ? -(item.rotationY ?? 0)
+              :  (item.rotationY ?? 0)
+            let savedRotX, savedRotY
+            if (glbEntry._model) {
+              savedRotX = glbEntry._model.rotation.x
+              savedRotY = glbEntry._model.rotation.y
+              glbEntry._model.rotation.x = 0
+              glbEntry._model.rotation.y = pdfRotY
+            }
             renderer.setSize(glbEntry.w, glbEntry.h, false)
             renderer.render(glbEntry.scene, glbEntry.camera)
             const glbData = renderer.domElement.toDataURL('image/png')
-            const imgX = MARGIN + CW * 0.62
-            const imgW = CW * 0.36
-            const imgH = bandH - 10
+            if (glbEntry._model) {
+              glbEntry._model.rotation.x = savedRotX
+              glbEntry._model.rotation.y = savedRotY
+            }
+            const imgX  = MARGIN + CW * 0.62
+            const imgW  = CW * 0.36
+            const nativeAspect = glbEntry.h > 0 ? glbEntry.w / glbEntry.h : 1
+            const imgH  = Math.min(bandH - 10, imgW / nativeAspect)
             doc.addImage(glbData, 'PNG', imgX, cursorY + 4, imgW, imgH, undefined, 'FAST')
           } catch (_) { /* skip on error */ }
         }
@@ -1533,6 +1755,10 @@ function _loadScript(src) {
 }
 
 function _loadImageAsDataUrl(src) {
+  return _loadImageWithInfo(src).then(r => r.dataUrl)
+}
+
+function _loadImageWithInfo(src) {
   return new Promise((resolve, reject) => {
     const img = new Image()
     img.crossOrigin = 'anonymous'
@@ -1541,7 +1767,7 @@ function _loadImageAsDataUrl(src) {
       c.width  = img.naturalWidth
       c.height = img.naturalHeight
       c.getContext('2d').drawImage(img, 0, 0)
-      resolve(c.toDataURL('image/jpeg', 0.85))
+      resolve({ dataUrl: c.toDataURL('image/jpeg', 0.85), w: img.naturalWidth, h: img.naturalHeight })
     }
     img.onerror = reject
     img.src = src
@@ -2088,20 +2314,126 @@ const _CSS = /* css */`
 .ps-pdf-picker-inner {
   background: #faf8f3;
   border-radius: 12px;
-  padding: 28px 32px 24px;
-  min-width: 280px;
-  max-width: 380px;
+  padding: 24px 28px 22px;
+  min-width: 320px;
+  max-width: 440px;
+  width: 90vw;
   box-shadow: 0 16px 48px rgba(0,0,0,0.35);
   display: flex;
   flex-direction: column;
-  gap: 14px;
 }
+/* ── PDF Picker: 3-stage header ──────────────────────────────────────────── */
+.ps-pdf-picker-hdr {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+  position: relative;
+}
+.ps-pdf-picker-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: 1.5px solid #d6d0c6;
+  border-radius: 50%;
+  color: #888;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.ps-pdf-picker-close:hover { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+.ps-pdf-picker-steps {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+.ps-pdf-step {
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: #bbb;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.04);
+}
+.ps-pdf-step--active { color: #1a1a1a; background: rgba(0,0,0,0.09); font-weight: 700; }
+.ps-pdf-step--done   { color: #999; text-decoration: line-through; }
+/* ── Stage body ──────────────────────────────────────────────────────────── */
+.ps-pdf-stage-body {
+  max-height: 52vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+/* ── Cover page fields ───────────────────────────────────────────────────── */
+.ps-pdf-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+  user-select: none;
+}
+.ps-pdf-toggle-row input[type=checkbox] { width: 15px; height: 15px; cursor: pointer; }
+.ps-pdf-fields { display: flex; flex-direction: column; gap: 9px; transition: opacity 0.15s; }
+.ps-pdf-field-row { display: flex; flex-direction: column; gap: 3px; }
+.ps-pdf-field-label {
+  font-size: 10.5px; font-weight: 600; color: #888;
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.ps-pdf-field-input {
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  padding: 6px 10px; border: 1.5px solid #d6d0c6;
+  border-radius: 6px; background: #faf8f3; color: #1a1a1a;
+  outline: none; transition: border-color 0.15s;
+}
+.ps-pdf-field-input:focus { border-color: #999; }
+/* ── Skills filter ───────────────────────────────────────────────────────── */
+.ps-pdf-skill-cat { display: flex; flex-direction: column; gap: 7px; }
+.ps-pdf-skill-cat-title {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 10.5px; font-weight: 700; color: #555;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  border-bottom: 1px solid rgba(0,0,0,0.08); padding-bottom: 4px;
+}
+.ps-pdf-skill-cat-actions { font-size: 10px; font-weight: 400; color: #aaa; text-transform: none; letter-spacing: 0; }
+.ps-pdf-skill-cat-actions button {
+  background: none; border: none; padding: 0; cursor: pointer;
+  color: #999; font-size: 10px; font-family: 'DM Sans', sans-serif; transition: color 0.15s;
+}
+.ps-pdf-skill-cat-actions button:hover { color: #333; }
+.ps-pdf-skill-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.ps-pdf-skill-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px 4px 8px; border: 1.5px solid #d6d0c6;
+  border-radius: 20px; background: #faf8f3;
+  font-size: 11.5px; cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  color: #555; user-select: none;
+}
+.ps-pdf-skill-chip input[type=checkbox] { display: none; }
+.ps-pdf-skill-chip--on { background: #2a2a2a; border-color: #2a2a2a; color: #fff; }
+.ps-pdf-skill-chip:hover:not(.ps-pdf-skill-chip--on) { border-color: #999; background: rgba(0,0,0,0.05); }
+/* ── Legacy/shared picker sub ────────────────────────────────────────────── */
 .ps-pdf-picker-title {
   margin: 0;
   font-family: 'DM Serif Display', Georgia, serif;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 400;
   color: #1a1a1a;
+  padding-right: 28px;
 }
 .ps-pdf-picker-sub {
   margin: 0;
