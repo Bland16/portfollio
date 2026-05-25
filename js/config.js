@@ -65,7 +65,7 @@ export const CABINS = [
         "description": "I have been learning Mandarin for 15 years. I was enrolled in a Chinese immersion program through middle school, which included accelerated math and competing in Mandarin speech competitions at UMD. In high school, I wrote and performed a short play in Mandarin about cultural appropriation alongside my friend Kevin Ma — it headlined our school's Lunar New Year celebration. I later visited my pen pal in Beijing, a trip that deepened the connection the language has always given me to the world beyond my own.",
         "images": [],
         "rotationY": -2.1,
-        "skills": ['communication', 'public-speaking']
+        "skills": ['communication', 'public-speaking','teamwork']
       },
       {
         "glb": "models/gingerbread.glb",
@@ -78,10 +78,10 @@ export const CABINS = [
         "scale": 1,
         "label": "MakeBC Officer",
         "link": null,
-        "description": "My freshman year, I was the freshmen representitive of MakeBC, a make and design club at Boston College. Through the club, I have (successfully) completed an egg drop challege off a 7 story building, launched a pumpkin 40 some odd feet, and of course made a gingerbread house.",
+        "description": "As an officer for MakeBC, Boston College's premier make and design club, I help scale our club and execute event management and preperation. For instance, this year, I built metal pumpkin trophies for our Punkin' Chunkin' event, organized inventory management for our annual Make-A-Thon, and grew our member base by over 30%. Additionally, I provided tool assistance, photography, and general set-up/clean-up for our annual programming. As a club member, I (successfully) completed an egg drop off a 7 story building, launched a pumpkin 40 some odd feet, and won second place in our independently judged 24-hour Make-A-Thon.",
         "images": [],
         "rotationY": -1.8,
-        "skills": ['teamwork', 'problem-solving', 'event-planning']
+        "skills": ['teamwork', 'problem-solving', 'event-planning','communication']
       },
       {
               
@@ -95,10 +95,10 @@ export const CABINS = [
         "scale": 0.1,
         "label": "Society Of Women Engineers at Boston College Co-director of Community Service",
         "link": null,
-        "description": "I attened the National SWE Conference of 2025 in New Orleans with my fellow female engineers. It was an incredible experience. I want to work towards bringing engineering to impovershed women, especially those who may be older and who don't neccearily have access to as many education opprotunities as those who don't have to balance enrichment with adult responsibilites.",
+        "description": "As Co‑director of Community Service for SWE, I have coordinated early planning for our 2026–2027 outreach initiatives, including researching nearby organizations that work to increase access for women returning to STEM education. This year, I attended the National SWE Conference of 2025 in New Orleans. While there, I was fortunate to hear about the initiatives being put in place by female engineers across the globe, and I was especially interested in the recent push in assistive technology and custom prostheses. It was an incredible experience, and I took back concrete solutions for enhanced career readiness from industry professionals that our chapter is already integrating into our preparations for next year’s conference.",
         "images": [],
         "rotationY": -2.3,
-        "skills": ['leadership', 'event-planning', 'teamwork', 'communication', 'public-speaking']
+        "skills": ['leadership', 'event-planning', 'teamwork', 'communication']
       },
       {
         "glb": "models/about-house.glb",
@@ -168,7 +168,7 @@ export const CABINS = [
         "scale": 10,
         "label": "Makeup Tray",
         "link": null,
-        "description": "I created this makeup tray as a simple, clean solution to streamline my daily makeup routine.\n\nI designed the model in Fusion 360 and printed it on a Prusa XL in PLA at a size of approximately 18 cm × 10 cm × 4 cm.\n\nKey features include an open top and front for dual access, separated hollow ribbed sides for content visibility, and a raised base split across four interlocking pieces.",
+        "description": "I created this makeup tray as a simple, clean solution to streamline my daily makeup routine. This tray removed a step from my day of opening and sifting through a makeup bag for what I needed. Before it was implemented, I was using a paper plate for the same purpose, but I decided a tray would allow for ease of use, more space, and aesthetic improvement. I designed the model in Fusion 360 and printed it on a Prusa XL in PLA at a size of approximately 18 cm × 10 cm × 4 cm. Key features include an open top and front for dual access, separated hollow, ribbed sides for content visibility, and a raised base split across four interlocking pieces. I added four interlocking pieces on the bottom because if they were connected to the initial design, the bottom would be completely raised by supports in order to be 3D printed, which would have tarnished the finish and wasted PLA. I also included the open top and front so the tray could be placed at eye level or table height without adjustment of use. I still use it each day, and it saves me about 10 minutes and a gram of frustration a day.",
         "images": [{"src": "photos/makeup-trey-1.jpg", "date": '02/18/2026'}],
         "skills": ['fusion-360', 'cad', '3d-printing']
       },
@@ -179,18 +179,18 @@ export const CABINS = [
         "scale": 11.5,
         "label": "OpenDots | Babson Hackathon 2026",
         "link": "https://github.com/romanobro56/OpenDots",
-        "description": "I built the full Fusion 360 model for a digital Braille‑style display during Babson University’s 2026 five‑hour hackathon. Each body in the model was intentionally named so our code could address individual pins in real time. When a user pressed a letter on our website, a teammate’s image‑analysis algorithm recognized the character and triggered the corresponding pins in the 3D model, creating a live, interactive Braille output experience designed to support early literacy for blind children. More details are available in the linked GitHub repository.",
+        "description": "I built the full Fusion 360 model for a digital Braille‑style display during Babson University’s 2026 five‑hour hackathon. There is a rapid decrease in Braille literacy among blind adults despite Braille‑literate individuals making up the majority of employed blind individuals, so we created this solution to address the gap in literacy education between visually impaired and able-bodied children. I named each individual solenoid body in the model in Blender so our code could target individual pins in real time. In the physical prototype stage, we would need to incorporate shift registers, which can only map eight Arduino pins at once, so I decided to create the grid in a layout of 8×12 and name them row by column for easy code manipulation. Given the time constraints and the depth of soldering required, we could only create a website, code, and digital model. When a user pressed a letter on our website, a teammate’s image‑analysis algorithm recognized the character and triggered the corresponding pins in the 3D model, creating a live, interactive Braille output experience. The demo worked and is visible, among other details, in the linked GitHub repository. \n \n*My collaborator on this project was Roman Pisani*",
         "images": [{"src": "photos/Open-dots.jpg", "date": '04/11/2026'},{"src": "photos/open-dots-2.jpg", "date": '04/11/2026'},{"src": "photos/open-dots-3.jpg", "date": '04/11/2026'}],
-        "skills": ['fusion-360', 'cad', 'teamwork', 'problem-solving']
+        "skills": ['fusion-360', 'cad', 'blender', 'teamwork', 'problem-solving']
       },
        {
         "glb": "models/tree.glb",
         "seat": "left",
         "positionOffset": [-0.8, 0, -2.6],
         "scale": 0.6,
-        "label": "Tree Distance Algorithm For Pesticide Application | Boston College Engineering",
+        "label": "Tree Distance Algorithm For Pesticide Application | USDA, Boston College Engineering",
         "link": null,
-        "description": "I built and trained a machine learning model to estimate the distance of a tree from a camera, aiming to optimize pesticide application. The training image dataset was cleaned and refined in collaboration with my partner, Michael Busa. Following the completion of our code, we delivered a presentation on our findings to the engineering department. As the research this project contributed to has not yet been published, detailed methodology and data are available upon request.",
+        "description": "I built and trained a machine learning model to estimate the distance of a tree from a camera, aiming to optimize pesticide application. The model was created for a larger code base that is being developed by the USDA to greatly reduce pesticide waste and the associated runoff pollution. The training image dataset was cleaned and refined in collaboration with my partner, Michael Busa. I took his tree masks and developed a random forest regression model that looked at various features of the tree mask and used that to categorize the distance the tree was from the camera. Following the completion of our code, we delivered a presentation on our findings to the engineering department. As the research this project contributed to has not yet been published, detailed methodology and data are available upon request. Our model had an RMSE of 0.02 meters and an MAE of 0.0069 meters. Among the images we saved for testing data, we had a 100% accuracy rating in our confidence interval, with only one differentiation from true values, sitting at 0.06 meters.",
         "images": [{"src": "photos/tree-distance-1.jpg", "date": '03/31/2026'}],
         "rotationY": -0.35,
         "skills": ['python', 'machine-learning', 'teamwork', 'communication', 'public-speaking', 'problem-solving']
@@ -202,7 +202,7 @@ export const CABINS = [
         "scale": 0.3,
         "label": "TideFlow | Personal Scheduling App",
         "link": null,
-        "description": "I authored a 20-page design specification for TideFlow, a custom scheduling app built around machine learning. The spec defines core user flows, feature requirements, and the logic behind ML-driven schedule optimization — laying the groundwork for a future build.",
+        "description": "I built TideFlow, a scheduling app designed around ADHD cognitive patterns for my brother, who was having difficulty managing his schedule. I created a 20-page design spec based on interviews with him and identifying features that would best address his needs. Then I took a week and vibe-coded the system. TideFlow includes a machine learning engine that reads real versus estimated task duration, task satisfaction by category, burnout levels, and when the user prefers to schedule tasks, and it suggests tasks when prompted and provides corrected time estimates for user-added tasks. The model updates per task using recency weighting and satisfaction scores, and it applies safe multipliers to avoid overcorrection. I also built the scheduling logic, which enforces ADHD-friendly rules like protected deep-work windows, nightly cutoffs, burnout-mode load reduction, and collision detection for fixed and flexible tasks. The app includes four views, drag-and-drop rescheduling, ICS export, and a daily survey that feeds back into the ML loop.",
         "images": [{"src": "photos/tideflow-1.jpg", "date": '05/23/2026'}, {"src": "photos/tideflow-2.jpg", "date": '05/23/2026'},{"src": "photos/tideflow-3.jpg", "date": '05/23/2026'},{"src": "photos/tideflow-4.jpg", "date": '05/23/2026'}],
         "rotationY": -2.55,
         "skills": ['machine-learning', 'prompt-engineering', 'ui-design', 'problem-solving']
@@ -214,7 +214,7 @@ export const CABINS = [
         "scale": 15,
         "label": "Poker Chips for the Visually Impaired",
         "link": null,
-        "description": "I designed these poker chips specifically for colorblind players. Since standard poker chip values rely heavily on color differentiation, I introduced four distinct values based on interior geometric cutouts. This approach preserves stackability while allowing for clear tactile and visual differentiation.\n\nI modeled the chips in Fusion 360 and 3D-printed them in PLA on a Prusa MINI, with each chip measuring 39mm in diameter and 0.5–1mm in thickness.",
+        "description": "I designed these poker chips specifically for colorblind players. Since standard poker chip values rely heavily on color differentiation, I introduced four distinct values based on interior geometric cutouts. This approach preserves stackability while allowing for clear tactile and visual differentiation. Each denomination is based on a card suit (such as Clubs, Spades, Hearts, and Diamonds) for immediate recognizability and clean design aesthetic.\n\nI modeled the chips in Fusion 360 and 3D-printed them in PLA on a Prusa MINI, with each chip measuring 39mm in diameter and 0.5–1mm in thickness.",
         "images": [{"src": "photos/chips-1.jpg", "date": '03/10/2026'}],
         "imageOffset": "50% 20%",
         "skills": ['fusion-360', 'cad', '3d-printing', 'problem-solving']
@@ -348,7 +348,7 @@ export const CABINS = [
         "scale": 1,
         "label": "TapN | Accelerate@Shea 2026 Cohort",
         "link": null,
-        "description": "I co-founded TapN, an NFC-based system designed to reduce student phones to only their essential functions during class, minimizing distraction while preserving safety features.\n\nI led the hardware design through multiple iterations, building wooden physical mockups, CAD models, and 3D-printed prototypes. I also built object-oriented frameworks in Swift to optimize the tap-to-restrict user flow.\n\nBecause of our work, TapN was selected for Accelerate@Shea 2026, a competitive startup accelerator at Boston College offering equity-free funding, mentorship, and workshops with industry professionals.",
+        "description": "I co-founded TapN, an NFC-based system designed to reduce student phones to only their essential functions during class, minimizing distraction while preserving safety features.\n\nI led the hardware design through multiple iterations, building wooden physical mockups, CAD models, and 3D-printed prototypes. I also built object-oriented frameworks in Swift to optimize the tap-to-restrict user flow. When a student enters the classroom, they tap their phone to a physical NFC device which sends a notification to a paired application which restricts all apps not included on a by-school whitelist. This allows for communication tools in times of emergency while simultaneously preventing classroom disruption.\n\nBecause of our work, TapN was selected for Accelerate@Shea 2026, a competitive startup accelerator at Boston College offering equity-free funding, mentorship, and workshops with industry professionals.",
         "images": [{"src": "photos/tapn-2.jpg", "date": '02/17/2026'}],
         "skills": ['swift', 'fusion-360', 'cad', '3d-printing', 'entrepreneurship', 'leadership', 'communication', 'teamwork']
       },
@@ -571,8 +571,8 @@ export const SKILLS = {
   // ── Hardware & Electronics  →  tin cans ─────────────────
   'arduino':          { label: 'Arduino',              category: 'hardware',    level: 4 },
   'raspberry-pi':     { label: 'Raspberry Pi',         category: 'hardware',    level: 3 },
-  'soldering':        { label: 'Soldering',            category: 'hardware',    level: 4 },
-  'circuits':         { label: 'Circuit Design',       category: 'hardware',    level: 3 },
+  'soldering':        { label: 'Soldering',            category: 'hardware',    level: 5 },
+  'circuits':         { label: 'Circuit Design',       category: 'hardware',    level: 4 },
   'rfid-nfc':         { label: 'RFID / NFC',           category: 'hardware',    level: 3 },
   'led-matrix':       { label: 'LED Matrix',           category: 'hardware',    level: 3 },
   'motors':           { label: 'Motors & Actuators',   category: 'hardware',    level: 3 },
