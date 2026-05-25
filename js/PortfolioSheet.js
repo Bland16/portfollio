@@ -1460,7 +1460,7 @@ async function _exportPDFSections({ indices, selectedSkills }) {
   doc.setTextColor(26, 26, 26)
   const nameText = _cfg.COVER?.name || 'Portfolio'
   doc.text(nameText, (PW - doc.getTextWidth(nameText)) / 2, y)
-  y += 10
+  y += 14   // was 10 — 34pt cap-height needs more breathing room before next element
 
   // Tagline
   const tagText = _cfg.COVER?.tagline || ''
@@ -1469,7 +1469,7 @@ async function _exportPDFSections({ indices, selectedSkills }) {
     doc.setFontSize(12)
     doc.setTextColor(120, 120, 120)
     doc.text(tagText, (PW - doc.getTextWidth(tagText)) / 2, y)
-    y += 8
+    y += 10   // was 8
   }
 
   // Terracotta rule
@@ -1482,19 +1482,31 @@ async function _exportPDFSections({ indices, selectedSkills }) {
   const aboutCabin = _cfg.CABINS.find(c => c.id === 'about-me')
   if (aboutCabin) {
     ;(aboutCabin.items || []).filter(_isContactItem).forEach(item => {
-      const icon    = item.link?.includes('linkedin') ? '▸ LinkedIn'
-                    : item.link?.includes('mailto')   ? '▸ Email'
-                    : item.link?.includes('github')   ? '▸ GitHub'
-                    : '▸'
+      const icon    = item.link?.includes('linkedin') ? 'LinkedIn'
+                    : item.link?.includes('mailto')   ? 'Email'
+                    : item.link?.includes('github')   ? 'GitHub'
+                    : 'Link'
       const display = (item.link || '').replace('mailto:', '')
+      const sep     = '  '
+
+      // Measure each segment with its own font weight so centering is accurate.
+      // The old code measured the full string in bold, causing the normal-weight
+      // display text to land on top of the terracotta label.
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(9)
       doc.setTextColor(...TC)
-      const iconW = doc.getTextWidth(icon + '  ')
-      const full  = icon + '  ' + display
-      const fullW = doc.getTextWidth(full)
-      const startX = (PW - fullW) / 2
-      doc.text(icon + '  ', startX, y)
+      const iconW = doc.getTextWidth(icon + sep)
+
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(60, 60, 60)
+      const displayW = doc.getTextWidth(display)
+
+      const startX = (PW - iconW - displayW) / 2
+
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(...TC)
+      doc.text(icon + sep, startX, y)
+
       doc.setFont('helvetica', 'normal')
       doc.setTextColor(60, 60, 60)
       doc.text(display, startX + iconW, y)
@@ -1539,6 +1551,7 @@ async function _exportPDFSections({ indices, selectedSkills }) {
     if (row.length) rows.push(row)
 
     rows.forEach(rowItems => {
+      if (y + chipH > PH - 30) return   // stop before overrunning date / page-number area
       const totalW = rowItems.reduce((s, c, i) => s + c.w + (i ? chipGap : 0), 0)
       let chipX = (PW - totalW) / 2
       rowItems.forEach(({ label, w }) => {
@@ -1713,7 +1726,8 @@ async function _exportPDFSections({ indices, selectedSkills }) {
             doc.setFont('helvetica', 'italic')
             doc.setFontSize(8)
             doc.setTextColor(...TC)
-            const dateY = Math.min(cursorY + 4 + imgH + 5, cursorY + bandH - 3)
+            // Always anchor date below the image, not clamped inside it
+            const dateY = cursorY + 4 + imgH + 5
             doc.text(images[0].date, imgX, dateY)
           }
         } catch (_) { /* skip */ }
@@ -1726,7 +1740,10 @@ async function _exportPDFSections({ indices, selectedSkills }) {
         if (glbEntry && glbEntry.scene && glbEntry.camera) {
           try {
             const renderer = _ensureSharedRenderer()
-            const pdfRotY  = item.seat === 'left' ? -(item.rotationY ?? 0) : (item.rotationY ?? 0)
+            // rotationY in config is calibrated for the in-cabin 3D scene view, not the
+            // PDF mini-viewer (camera at z=4). Use pdfRotationY if set; default to 0 so
+            // models face their native forward direction toward the viewer.
+            const pdfRotY = item.pdfRotationY ?? 0
             let savedRotX, savedRotY
             if (glbEntry._model) {
               savedRotX = glbEntry._model.rotation.x

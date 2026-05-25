@@ -429,6 +429,7 @@ export const CABINS = [
         "description": "Sir Matcher was modeled in Fusion 360 across 42 mesh bodies including a top hat, monocle, clock, face, eyebrows, and glowing pupils. He is a rather dapper fellow modeled after Alfred the Butler from the Batman series, so the third vibe 'Pop Art' (inspired by Batman: Brave and the Bold) is where he feels most at home. His 30 animation empties inform his idle movements, mouse tracking, expressions, and talking animations. When speaking, his jaw moves on word boundaries via the Web Speech API onboundary event, synced to a British male voice selected from available system voices at runtime. Expression animation methods fire based on the conversation topic at the moment speech begins. He tracks the mouse cursor in real-time as visitors explore the site.\n\nThe conversation system is made up of handwritten phrases. A four-tier classification algorithm—written in pure JavaScript alongside a backend machine learning Python algorithm to learn from chat history and suggest improved responses—routes each message through exact social pre-matching, Levenshtein-based typo correction, direct keyword scoring, and topic bucket retrieval before falling back to a phrase bank scan. Unknowns are deflected with a contextual fallback and logged silently to a Google Form in the background. Question mirroring extracts the subject from common question structures and echoes it back before responding.",
         "images": [],
         "rotationY": -1,
+        "pdfRotationY": -Math.PI / 2,
         "skills": ['threejs', 'javascript', 'web-dev', 'python', 'machine-learning', 'blender', 'fusion-360', 'cad', 'problem-solving']
       },
       {
@@ -456,7 +457,9 @@ export const CABINS = [
         "link": null,
         "description": "I built three distinct camera modes for this experience: Orbit allows for a free look around the wheel, Transit provides a smooth tween to a selected cabin, and Interior locks the view inside a cabin using a precise position offset and look target set in the config file.\n\nThere is also an Auto-Explore feature that automatically cycles through every cabin on a timer. You can press 'A' inside any cabin to activate it.",
         "images": [],
-        "rotationY": 3
+        "rotationY": Math.PI / 2,
+        "pdfRotationY": 1,
+
       }
     ]
   },
