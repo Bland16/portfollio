@@ -63,7 +63,7 @@ export const CABINS = [
         "label": "Chinese Immersion Learner",
         "link": null,
         "description": "I have been learning Mandarin for 15 years. I was enrolled in a Chinese immersion program through middle school, which included accelerated math and competing in Mandarin speech competitions at UMD. In high school, I wrote and performed a short play in Mandarin about cultural appropriation alongside my friend Kevin Ma — it headlined our school's Lunar New Year celebration. I later visited my pen pal in Beijing, a trip that deepened the connection the language has always given me to the world beyond my own.",
-        "images": [],
+        "images": [{"src": "photos/chinese-1.jpg", "date": '02/06/2024'}],
         "rotationY": -2.1,
         "skills": ['communication', 'public-speaking','teamwork']
       },
@@ -79,7 +79,7 @@ export const CABINS = [
         "label": "MakeBC Officer",
         "link": null,
         "description": "As an officer for MakeBC, Boston College's premier make and design club, I help scale our club and execute event management and preperation. For instance, this year, I built metal pumpkin trophies for our Punkin' Chunkin' event, organized inventory management for our annual Make-A-Thon, and grew our member base by over 30%. Additionally, I provided tool assistance, photography, and general set-up/clean-up for our annual programming. As a club member, I (successfully) completed an egg drop off a 7 story building, launched a pumpkin 40 some odd feet, and won second place in our independently judged 24-hour Make-A-Thon.",
-        "images": [],
+        "images": [{"src": "photos/makebc-1.jpg", "date": '12/02/2025'},{"src": "photos/makebc-2.jpg", "date": '11/22/2025'}],
         "rotationY": -1.8,
         "skills": ['teamwork', 'problem-solving', 'event-planning','communication']
       },
@@ -96,7 +96,7 @@ export const CABINS = [
         "label": "Society Of Women Engineers at Boston College Co-director of Community Service",
         "link": null,
         "description": "As Co‑director of Community Service for SWE, I have coordinated early planning for our 2026–2027 outreach initiatives, including researching nearby organizations that work to increase access for women returning to STEM education. This year, I attended the National SWE Conference of 2025 in New Orleans. While there, I was fortunate to hear about the initiatives being put in place by female engineers across the globe, and I was especially interested in the recent push in assistive technology and custom prostheses. It was an incredible experience, and I took back concrete solutions for enhanced career readiness from industry professionals that our chapter is already integrating into our preparations for next year’s conference.",
-        "images": [],
+        "images": [{"src": "photos/swe.jpg", "date": '10/25/2026'}],
         "rotationY": -2.3,
         "skills": ['leadership', 'event-planning', 'teamwork', 'communication']
       },
@@ -108,7 +108,7 @@ export const CABINS = [
         "label": "Where I'm Located",
         "link": null,
         "description": "I am originally from Maryland. My preferred work locations are New York, Los Angeles, Boston, and Washington, D.C.",
-        "images": [],
+        "images": [{"src": "photos/crab.jpg", "date": null}],
         "rotationY": -1
       },
       {
@@ -130,7 +130,7 @@ export const CABINS = [
         "label": "My Interests",
         "link": null,
         "description": "I enjoy learning about a wide variety of subjects. Some topics I maintain a strong body of knowledge in include the Flint, Michigan water crisis and community vulnerability to public health crises, entertainment engineering techniques, the long-term effects of redlining on modern housing districts, the intersection between religion and economic theory, and asylum law regulations and procedures.",
-        "images": []
+        "images": [{"src": "photos/water.jpg", "date": null}]
       },
       {
         "glb": "models/about-cooking.glb",
@@ -151,7 +151,7 @@ export const CABINS = [
         "label": "Former Pre-Amateur Boxer",
         "link": null,
         "description": "I boxed all four years of high school and was one of two girls on a boxing team in White Flint, Maryland. My coach was an old-fashioned 'tough-love' mentor who taught me about delayed gratification, discipline, and punctuality. My favorite moment from the sport was participating in a gym-run Punch-A-Thon to help bring boxing to impoverished youth.",
-        "images": [],
+        "images": [{"src": "photos/boxing.jpg", "date": '10/13/2023'}],
         "rotationY": 0.45
       }
     ]
@@ -457,8 +457,8 @@ export const CABINS = [
         "link": null,
         "description": "I built three distinct camera modes for this experience: Orbit allows for a free look around the wheel, Transit provides a smooth tween to a selected cabin, and Interior locks the view inside a cabin using a precise position offset and look target set in the config file.\n\nThere is also an Auto-Explore feature that automatically cycles through every cabin on a timer. You can press 'A' inside any cabin to activate it.",
         "images": [],
-        "rotationY": Math.PI / 2,
-        "pdfRotationY": 1,
+        "rotationY": 3,
+        "pdfRotationY": -Math.PI/2,
 
       }
     ]

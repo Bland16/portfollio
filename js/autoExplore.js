@@ -29,8 +29,8 @@
 export const AUTO_EXPLORE_TILT        = 0.5   // radians — pitch down amount  (↑ more, ↓ less)
 export const AUTO_EXPLORE_YAW_SPEED   = 0.50   // radians/sec — full auto sweep speed
 export const AUTO_EXPLORE_YAW_RANGE   = 1.70   // radians — half-width of full auto sweep arc
-export const AUTO_EXPLORE_MINI_RANGE  = 0.6   // radians — half-width of intro mini-pan
-export const AUTO_EXPLORE_MINI_SPEED  = 0.4   // radians/sec — intro mini-pan speed
+export const AUTO_EXPLORE_MINI_RANGE  = 1.70   // radians — half-width of intro mini-pan
+export const AUTO_EXPLORE_MINI_SPEED  = 0.35   // radians/sec — intro mini-pan speed
 export const AUTO_EXPLORE_BEAT_DELAY  = 2.4    // seconds after cabin entry before intro starts
 export const AUTO_EXPLORE_HINT_CYCLES = 3      // full loops before hint re-appears in auto mode
 

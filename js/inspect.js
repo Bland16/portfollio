@@ -109,12 +109,18 @@ export class InspectSystem {
     window.addEventListener('keydown', (e) => {
       if (!this._active) return
       switch (e.key) {
-        case 'ArrowLeft':  this._keys.left  = true; break
-        case 'ArrowRight': this._keys.right = true; break
+        case 'ArrowLeft':
+          this._keys.left = true
+          e.stopImmediatePropagation()
+          break
+        case 'ArrowRight':
+          this._keys.right = true
+          e.stopImmediatePropagation()
+          break
         case 'ArrowUp':    this._keys.up    = true; break
         case 'ArrowDown':  this._keys.down  = true; break
       }
-    })
+    }, true)   // capture phase — fires before camera controller
     window.addEventListener('keyup', (e) => {
       switch (e.key) {
         case 'ArrowLeft':  this._keys.left  = false; break
