@@ -1736,7 +1736,7 @@ async function _exportPDFSections({ indices, selectedSkills }) {
               doc.setFont('helvetica', 'italic')
               doc.setFontSize(7)
               doc.setTextColor(...TC)
-              doc.text(images[i].label || 'schematic / technical documentation', imgX, imgCursorY + 2)
+              //doc.text(images[i].label || 'schematic / technical documentation', imgX, imgCursorY + 2)
               imgCursorY += 6
             }
 

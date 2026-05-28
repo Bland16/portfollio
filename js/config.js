@@ -28,131 +28,99 @@ export const COVER = {
 // attachIndex: which of the 12 wheel attach points to use (0–11)
 //              every other point = 0, 2, 4, 6, 8, 10
 export const CABINS = [
-  {
-    id: 'about-me',
-    label: 'About Me',
-    attachIndex: 6,
+    {
+    id: 'hobby-work',
+    label: 'The Portfolio',
+    attachIndex: 8,
     items: [
       {
-        "glb": "models/linkedIn.glb",
+        "glb": "models/wheel-rails.glb",
         "seat": "left",
-        "positionOffset": [-0.2, -0.1, 2.4],
-        "scale": 10,
-        "label": "LinkedIn",
-        "link": "https://www.linkedin.com/in/sarah-bland-808405357/",
-        "description": null,
-        "images": [],
-        "rotationY": 0.15
-      },
-      {
-        "glb": "models/gmail.glb",
-        "seat": "left",
-        "positionOffset": [-0.1, -0.1, 1.2],
-        "scale": 10,
-        "label": "Gmail",
-        "link": "mailto:blandsa@bc.edu",
-        "description": null,
-        "images": [],
-        "rotationY": -0.2
-      },
-      {
-        "glb": "models/about-chinese.glb",
-        "seat": "right",
-        "positionOffset": [-0.9, 0, 1.6],
-        "scale": 1.5,
-        "label": "Chinese Immersion Learner",
+        "positionOffset": [-0.8, 1.4, 3.1],
+        "scale": 5,
+        "label": "The Ferris Wheel",
         "link": null,
-        "description": "I have been learning Mandarin for 15 years. I was enrolled in a Chinese immersion program through middle school, which included accelerated math and competing in Mandarin speech competitions at UMD. In high school, I wrote and performed a short play in Mandarin about cultural appropriation alongside my friend Kevin Ma — it headlined our school's Lunar New Year celebration. I later visited my pen pal in Beijing, a trip that deepened the connection the language has always given me to the world beyond my own.",
-        "images": [{"src": "photos/chinese-1.jpg", "date": '02/06/2024'}],
-        "rotationY": -2.1,
-        "skills": ['communication', 'public-speaking','teamwork']
+        "description": "I love the beach. Every time I have the opportunity to visit one, I find myself transfixed by the Ferris wheels. There's a certain elegance to the architecture and lighting design that tricks the mind into seeing them fly. When it came time to build my portfolio, I thought it would be nice if I could fly, too.\n\nThe wheel and stand together contain 73 named mesh bodies. There are 12 empties that work as attachment point anchors, one per spoke. The code reads these coordinates to position each cabin precisely on the wheel.",
+        "images": [],
+        "rotationY": 2.2,
+        "skills": ['threejs', 'javascript', 'blender', 'fusion-360', 'cad', 'web-dev', 'problem-solving']
       },
       {
-        "glb": "models/gingerbread.glb",
+        "glb": "models/wheel-stand.glb",
+        "seat": "left",
+        "positionOffset": [-0.8, 1.4, 3.1],
+        "scale": 5,
+        "label": null,
+        "link": null,
+        "description": null,
+        "images": [],
+        "rotationY": 2.2
+      },
+      {
+        "glb": "models/cabin.glb",
+        "seat": "right",
+        "positionOffset": [0.7, 2.5, 4],
+        "scale": 14.5,
+        "label": "The Cabin",
+        "link": null,
+        "description": "I follow the same build pipeline for every model in the scene: design in Fusion 360, export as an FBX, reposition and name all bodies in Blender, add animation empties where needed, export as a GLB, and then re-apply all base materials by mesh name prefix in Three.js.\n\nThe cabin is built from 79 individually named mesh bodies. The material system reads each name prefix and assigns the correct color in code depending on the 'vibe' (see the Vibe Switcher for more info), so every cabin in the scene actually shares one base GLB. Two animation empties drive the door swing, timed to the camera transition into the interior. There is also an empty for the seat height of the left and right seats. The code places project objects at the coordinate of the empty. In dev mode, I can manually drag, scale, position, and rotate the objects exactly where I want them to sit in the cabin relative to the seats.",
+        "images": [],
+        "rotationY": 3.8,
+        "skills": ['blender', 'fusion-360', 'cad', 'threejs', 'javascript', 'web-dev']
+      },
+      {
+        "glb": "models/booth.glb",
+        "seat": "left",
+        "positionOffset": [-0.1, 0, 0.1],
+        "scale": 9,
+        "label": "The Ticket Booth",
+        "link": null,
+        "description": "Sir's ticket stand was modeled in Fusion 360 across 36 mesh bodies. The booth provides a strong visual counterweight to the wheel and button enclosure on screen left.\n\nIt is also home to Sir Matcher. When Sir is clicked, the camera orbits to the ticket booth, locks into a fixed position, and switches its target to him.",
+        "images": [],
+        "rotationY": 1.55,
+        "skills": ['fusion-360', 'cad', 'blender']
+      },
+      {
+        "glb": "models/robot.glb",
+        "seat": "left",
+        "positionOffset": [-0.2, 0, -2.6],
+        "scale": 20.5,
+        "label": "Sir Matcher",
+        "link": null,
+        "description": "Sir Matcher was modeled in Fusion 360 across 42 mesh bodies including a top hat, monocle, clock, face, eyebrows, and glowing pupils. He is a rather dapper fellow modeled after Alfred the Butler from the Batman series, so the third vibe 'Pop Art' (inspired by Batman: Brave and the Bold) is where he feels most at home. His 30 animation empties inform his idle movements, mouse tracking, expressions, and talking animations. When speaking, his jaw moves on word boundaries via the Web Speech API onboundary event, synced to a British male voice selected from available system voices at runtime. Expression animation methods fire based on the conversation topic at the moment speech begins. He tracks the mouse cursor in real-time as visitors explore the site.\n\nThe conversation system is made up of handwritten phrases. A four-tier classification algorithm—written in pure JavaScript alongside a backend machine learning Python algorithm to learn from chat history and suggest improved responses—routes each message through exact social pre-matching, Levenshtein-based typo correction, direct keyword scoring, and topic bucket retrieval before falling back to a phrase bank scan. Unknowns are deflected with a contextual fallback and logged silently to a Google Form in the background. Question mirroring extracts the subject from common question structures and echoes it back before responding.",
+        "images": [],
+        "rotationY": -1,
+        "pdfRotationY": -Math.PI / 2,
+        "skills": ['threejs', 'javascript', 'web-dev', 'python', 'machine-learning', 'blender', 'fusion-360', 'cad', 'problem-solving']
+      },
+      {
+        "glb": "models/keycap_vibes.glb",
+        "seat": "right",
+        "positionOffset": [-0.3, 1.1, -4.8],
+        "scale": 2,
+        "label": "Vibe Switcher",
+        "link": null,
+        "description": "The vibe button is truly a vibe—a keyboard keycap on the front page that cycles the world's palette. There are seven themes: Aurora, Suave, Carnival, Pop Art, Blueprint, Midnight Arcade, and Pastel Dream.\n\nEach theme is a delta patch against a shared base material set. The vibe properties are specified in a config document, and the system merges them on top at each 'vibe-switch'. Every named mesh in the scene responds simultaneously.\n\nBlueprint sets each structural mesh to wireframe and activates OutlinePass, turning the scene into a technical drawing. Midnight Arcade adds scanlines and pushes bloom to maximum. Aurora runs a custom GLSL shader alongside a particle rain system.\n\nOn load, a 30-frame rAF benchmark runs alongside hardware heuristics: device memory, core count, max texture size, and mobile detection. The combined score determines how far the post-processing stack scales back on lower-end devices.",
+        "images": [],
+        "rotationY": -1.25,
+        "skills": ['threejs', 'javascript', 'web-dev', 'problem-solving']
+      },
+      {
+        "glb": "models/object-camera.glb",
         "seat": "right",
         "positionOffset": [
-          1.1,
+          1,
           0,
-          -0.5
+          -1.9
         ],
         "scale": 1,
-        "label": "MakeBC Officer",
+        "label": "Camera System",
         "link": null,
-        "description": "As an officer for MakeBC, Boston College's premier make and design club, I help scale our club and execute event management and preparation. For instance, this year, I built metal pumpkin trophies for our Punkin' Chunkin' event, organized inventory management for our annual Make-A-Thon, and grew our member base by over 30%. Additionally, I provided tool assistance, photography, and general set-up/clean-up for our annual programming. As a club member, I (successfully) completed an egg drop off a 7 story building, launched a pumpkin 40 some odd feet, and won second place in our independently judged 24-hour Make-A-Thon.",
-        "images": [{"src": "photos/makebc-1.jpg", "date": '12/02/2025'},{"src": "photos/makebc-2.jpg", "date": '11/22/2025'}],
-        "rotationY": -1.8,
-        "skills": ['teamwork', 'problem-solving', 'event-planning','communication']
-      },
-      {
-              
-        "glb": "models/cup.glb",
-        "seat": "right",
-        "positionOffset": [
-          -0.3,
-          2.6,
-          -3
-        ],
-        "scale": 0.1,
-        "label": "Society Of Women Engineers at Boston College Co-director of Community Service",
-        "link": null,
-        "description": "As Co‑director of Community Service for SWE, I have coordinated early planning for our 2026–2027 outreach initiatives, including researching nearby organizations that work to increase access for women returning to STEM education. This year, I attended the National SWE Conference of 2025 in New Orleans. While there, I was fortunate to hear about the initiatives being put in place by female engineers across the globe, and I was especially interested in the recent push in assistive technology and custom prostheses. It was an incredible experience, and I took back concrete solutions for enhanced career readiness from industry professionals that our chapter is already integrating into our preparations for next year’s conference.",
-        "images": [{"src": "photos/swe-1.jpg", "date": '10/25/2026'}],
-        "rotationY": -2.3,
-        "skills": ['leadership', 'event-planning', 'teamwork', 'communication']
-      },
-      {
-        "glb": "models/about-house.glb",
-        "seat": "left",
-        "positionOffset": [-1.5, 0, 1.2],
-        "scale": 0.28,
-        "label": "Where I'm Located",
-        "link": null,
-        "description": "I am originally from Maryland. My preferred work locations are New York, Los Angeles, Boston, and Washington, D.C.",
-        "images": [{"src": "photos/crab.jpg", "date": null}],
-        "rotationY": -1
-      },
-      {
-        "glb": "models/about-tv.glb",
-        "seat": "right",
-        "positionOffset": [-1.1, 0.1, -3.2],
-        "scale": 0.51,
-        "label": "Certified Cinephile",
-        "link": null,
-        "description": "I have seen over a thousand movies and wrote a screenplay at 18. Every Wednesday I watch a film with friends — a ritual I look forward to every week. Some of my favorites are 'The Half of It', 'Perfect Days', 'Scream', 'Godzilla Minus One', 'The Pig, The Snake and the Pigeon', and 'Who Framed Roger Rabbit'. On the TV side, 'Interior Chinatown' is a recent standout. Beyond film, I am a serious sports fan — football, hockey, and basketball are fixtures in my viewing life.",
-        "images": [{"src": "photos/movies-1.jpg", "date": '04/04/2026'}],
-        "rotationY": -2
-      },
-      {
-        "glb": "models/about-water.glb",
-        "seat": "left",
-        "positionOffset": [0.8, 0.2, -1.6],
-        "scale": 0.5,
-        "label": "My Interests",
-        "link": null,
-        "description": "I enjoy learning about a wide variety of subjects. Some topics I maintain a strong body of knowledge in include the Flint, Michigan water crisis and community vulnerability to public health crises, entertainment engineering techniques, the long-term effects of redlining on modern housing districts, the intersection between religion and economic theory, and asylum law regulations and procedures.",
-        "images": [{"src": "photos/water.jpg", "date": null}]
-      },
-      {
-        "glb": "models/about-cooking.glb",
-        "seat": "left",
-        "positionOffset": [0.9, -1.1, -4.5],
-        "scale": 0.4,
-        "label": "Red-Meat Cooking Prodigy",
-        "link": null,
-        "description": "I can make a mean steak—and that is an understatement. I love cooking for family and friends. While I usually take requests, my favorite secret recipes include sugar fish fillet, hidden-vegetable pumpkin buns, popsicle-poached apples, and onion-tomato seared steak. Recipes are available upon request.",
-        "images": [{"src": "photos/cooking-0.jpg", "date": null},{"src": "photos/cooking-1.jpg", "date": null}],
-        "rotationY": -0.012
-      },
-      {
-        "glb": "models/about-boxing.glb",
-        "seat": "left",
-        "positionOffset": [-1.3, 0, 4.2],
-        "scale": 0.2,
-        "label": "Former Pre-Amateur Boxer",
-        "link": null,
-        "description": "I boxed all four years of high school and was one of two girls on a boxing team in White Flint, Maryland. My coach was an old-fashioned 'tough-love' mentor who taught me about delayed gratification, discipline, and punctuality. My favorite moment from the sport was participating in a gym-run Punch-A-Thon to help bring boxing to impoverished youth.",
-        "images": [{"src": "photos/boxing.jpg", "date": '10/13/2023'}],
-        "rotationY": 0.45
+        "description": "I built three distinct camera modes for this experience: Orbit allows for a free look around the wheel, Transit provides a smooth tween to a selected cabin, and Interior locks the view inside a cabin using a precise position offset and look target set in the config file.\n\nThere is also an Auto-Explore feature that automatically cycles through every cabin on a timer. You can press 'A' inside any cabin to activate it.",
+        "images": [],
+        "rotationY": 3,
+        "pdfRotationY": -Math.PI/2,
+
       }
     ]
   },
@@ -366,104 +334,134 @@ export const CABINS = [
       }
     ]
   },
-  
   {
-    id: 'hobby-work',
-    label: 'The Portfolio',
-    attachIndex: 8,
+    id: 'about-me',
+    label: 'About Me',
+    attachIndex: 6,
     items: [
-      {
-        "glb": "models/wheel-rails.glb",
-        "seat": "left",
-        "positionOffset": [-0.8, 1.4, 3.1],
-        "scale": 5,
-        "label": "The Ferris Wheel",
-        "link": null,
-        "description": "I love the beach. Every time I have the opportunity to visit one, I find myself transfixed by the Ferris wheels. There's a certain elegance to the architecture and lighting design that tricks the mind into seeing them fly. When it came time to build my portfolio, I thought it would be nice if I could fly, too.\n\nThe wheel and stand together contain 73 named mesh bodies. There are 12 empties that work as attachment point anchors, one per spoke. The code reads these coordinates to position each cabin precisely on the wheel.",
-        "images": [],
-        "rotationY": 2.2,
-        "skills": ['threejs', 'javascript', 'blender', 'fusion-360', 'cad', 'web-dev', 'problem-solving']
-      },
-      {
-        "glb": "models/wheel-stand.glb",
-        "seat": "left",
-        "positionOffset": [-0.8, 1.4, 3.1],
-        "scale": 5,
-        "label": null,
-        "link": null,
-        "description": null,
-        "images": [],
-        "rotationY": 2.2
-      },
-      {
-        "glb": "models/cabin.glb",
-        "seat": "right",
-        "positionOffset": [0.7, 2.5, 4],
-        "scale": 14.5,
-        "label": "The Cabin",
-        "link": null,
-        "description": "I follow the same build pipeline for every model in the scene: design in Fusion 360, export as an FBX, reposition and name all bodies in Blender, add animation empties where needed, export as a GLB, and then re-apply all base materials by mesh name prefix in Three.js.\n\nThe cabin is built from 79 individually named mesh bodies. The material system reads each name prefix and assigns the correct color in code depending on the 'vibe' (see the Vibe Switcher for more info), so every cabin in the scene actually shares one base GLB. Two animation empties drive the door swing, timed to the camera transition into the interior. There is also an empty for the seat height of the left and right seats. The code places project objects at the coordinate of the empty. In dev mode, I can manually drag, scale, position, and rotate the objects exactly where I want them to sit in the cabin relative to the seats.",
-        "images": [],
-        "rotationY": 3.8,
-        "skills": ['blender', 'fusion-360', 'cad', 'threejs', 'javascript', 'web-dev']
-      },
-      {
-        "glb": "models/booth.glb",
-        "seat": "left",
-        "positionOffset": [-0.1, 0, 0.1],
-        "scale": 9,
-        "label": "The Ticket Booth",
-        "link": null,
-        "description": "Sir's ticket stand was modeled in Fusion 360 across 36 mesh bodies. The booth provides a strong visual counterweight to the wheel and button enclosure on screen left.\n\nIt is also home to Sir Matcher. When Sir is clicked, the camera orbits to the ticket booth, locks into a fixed position, and switches its target to him.",
-        "images": [],
-        "rotationY": 1.55,
-        "skills": ['fusion-360', 'cad', 'blender']
-      },
-      {
-        "glb": "models/robot.glb",
-        "seat": "left",
-        "positionOffset": [-0.2, 0, -2.6],
-        "scale": 20.5,
-        "label": "Sir Matcher",
-        "link": null,
-        "description": "Sir Matcher was modeled in Fusion 360 across 42 mesh bodies including a top hat, monocle, clock, face, eyebrows, and glowing pupils. He is a rather dapper fellow modeled after Alfred the Butler from the Batman series, so the third vibe 'Pop Art' (inspired by Batman: Brave and the Bold) is where he feels most at home. His 30 animation empties inform his idle movements, mouse tracking, expressions, and talking animations. When speaking, his jaw moves on word boundaries via the Web Speech API onboundary event, synced to a British male voice selected from available system voices at runtime. Expression animation methods fire based on the conversation topic at the moment speech begins. He tracks the mouse cursor in real-time as visitors explore the site.\n\nThe conversation system is made up of handwritten phrases. A four-tier classification algorithm—written in pure JavaScript alongside a backend machine learning Python algorithm to learn from chat history and suggest improved responses—routes each message through exact social pre-matching, Levenshtein-based typo correction, direct keyword scoring, and topic bucket retrieval before falling back to a phrase bank scan. Unknowns are deflected with a contextual fallback and logged silently to a Google Form in the background. Question mirroring extracts the subject from common question structures and echoes it back before responding.",
-        "images": [],
-        "rotationY": -1,
-        "pdfRotationY": -Math.PI / 2,
-        "skills": ['threejs', 'javascript', 'web-dev', 'python', 'machine-learning', 'blender', 'fusion-360', 'cad', 'problem-solving']
-      },
-      {
-        "glb": "models/keycap_vibes.glb",
-        "seat": "right",
-        "positionOffset": [-0.3, 1.1, -4.8],
-        "scale": 2,
-        "label": "Vibe Switcher",
-        "link": null,
-        "description": "The vibe button is truly a vibe—a keyboard keycap on the front page that cycles the world's palette. There are seven themes: Aurora, Suave, Carnival, Pop Art, Blueprint, Midnight Arcade, and Pastel Dream.\n\nEach theme is a delta patch against a shared base material set. The vibe properties are specified in a config document, and the system merges them on top at each 'vibe-switch'. Every named mesh in the scene responds simultaneously.\n\nBlueprint sets each structural mesh to wireframe and activates OutlinePass, turning the scene into a technical drawing. Midnight Arcade adds scanlines and pushes bloom to maximum. Aurora runs a custom GLSL shader alongside a particle rain system.\n\nOn load, a 30-frame rAF benchmark runs alongside hardware heuristics: device memory, core count, max texture size, and mobile detection. The combined score determines how far the post-processing stack scales back on lower-end devices.",
-        "images": [],
-        "rotationY": -1.25,
-        "skills": ['threejs', 'javascript', 'web-dev', 'problem-solving']
-      },
-      {
-        "glb": "models/object-camera.glb",
-        "seat": "right",
-        "positionOffset": [
-          1,
-          0,
-          -1.9
-        ],
-        "scale": 1,
-        "label": "Camera System",
-        "link": null,
-        "description": "I built three distinct camera modes for this experience: Orbit allows for a free look around the wheel, Transit provides a smooth tween to a selected cabin, and Interior locks the view inside a cabin using a precise position offset and look target set in the config file.\n\nThere is also an Auto-Explore feature that automatically cycles through every cabin on a timer. You can press 'A' inside any cabin to activate it.",
-        "images": [],
-        "rotationY": 3,
-        "pdfRotationY": -Math.PI/2,
-
-      }
-    ]
-  },
-
+        {
+          "glb": "models/linkedIn.glb",
+          "seat": "left",
+          "positionOffset": [-0.2, -0.1, 2.4],
+          "scale": 10,
+          "label": "LinkedIn",
+          "link": "https://www.linkedin.com/in/sarah-bland-808405357/",
+          "description": null,
+          "images": [],
+          "rotationY": 0.15
+        },
+        {
+          "glb": "models/gmail.glb",
+          "seat": "left",
+          "positionOffset": [-0.1, -0.1, 1.2],
+          "scale": 10,
+          "label": "Gmail",
+          "link": "mailto:blandsa@bc.edu",
+          "description": null,
+          "images": [],
+          "rotationY": -0.2
+        },
+        {
+          "glb": "models/about-chinese.glb",
+          "seat": "right",
+          "positionOffset": [-0.9, 0, 1.6],
+          "scale": 1.5,
+          "label": "Chinese Immersion Learner",
+          "link": null,
+          "description": "I have been learning Mandarin for 15 years. I was enrolled in a Chinese immersion program through middle school, which included accelerated math and competing in Mandarin speech competitions at UMD. In high school, I wrote and performed a short play in Mandarin about cultural appropriation alongside my friend Kevin Ma — it headlined our school's Lunar New Year celebration. I later visited my pen pal in Beijing, a trip that deepened the connection the language has always given me to the world beyond my own.",
+          "images": [{"src": "photos/chinese-1.jpg", "date": '02/06/2024'}],
+          "rotationY": -2.1,
+          "skills": ['communication', 'public-speaking','teamwork']
+        },
+        {
+          "glb": "models/gingerbread.glb",
+          "seat": "right",
+          "positionOffset": [
+            1.1,
+            0,
+            -0.5
+          ],
+          "scale": 1,
+          "label": "MakeBC Officer",
+          "link": null,
+          "description": "As an officer for MakeBC, Boston College's premier make and design club, I help scale our club and execute event management and preparation. For instance, this year, I built metal pumpkin trophies for our Punkin' Chunkin' event, organized inventory management for our annual Make-A-Thon, and grew our member base by over 30%. Additionally, I provided tool assistance, photography, and general set-up/clean-up for our annual programming. As a club member, I (successfully) completed an egg drop off a 7 story building, launched a pumpkin 40 some odd feet, and won second place in our independently judged 24-hour Make-A-Thon.",
+          "images": [{"src": "photos/makebc-1.jpg", "date": '12/02/2025'},{"src": "photos/makebc-2.jpg", "date": '11/22/2025'}],
+          "rotationY": -1.8,
+          "skills": ['teamwork', 'problem-solving', 'event-planning','communication']
+        },
+        {
+                
+          "glb": "models/cup.glb",
+          "seat": "right",
+          "positionOffset": [
+            -0.3,
+            2.6,
+            -3
+          ],
+          "scale": 0.1,
+          "label": "Society Of Women Engineers at Boston College Co-director of Community Service",
+          "link": null,
+          "description": "As Co‑director of Community Service for SWE, I have coordinated early planning for our 2026–2027 outreach initiatives, including researching nearby organizations that work to increase access for women returning to STEM education. This year, I attended the National SWE Conference of 2025 in New Orleans. While there, I was fortunate to hear about the initiatives being put in place by female engineers across the globe, and I was especially interested in the recent push in assistive technology and custom prostheses. It was an incredible experience, and I took back concrete solutions for enhanced career readiness from industry professionals that our chapter is already integrating into our preparations for next year’s conference.",
+          "images": [{"src": "photos/swe-1.jpg", "date": '10/25/2026'}],
+          "rotationY": -2.3,
+          "skills": ['leadership', 'event-planning', 'teamwork', 'communication']
+        },
+        {
+          "glb": "models/about-house.glb",
+          "seat": "left",
+          "positionOffset": [-1.5, 0, 1.2],
+          "scale": 0.28,
+          "label": "Where I'm Located",
+          "link": null,
+          "description": "I am originally from Maryland. My preferred work locations are New York, Los Angeles, Boston, and Washington, D.C.",
+          "images": [{"src": "photos/crab.jpg", "date": null}],
+          "rotationY": -1
+        },
+        {
+          "glb": "models/about-tv.glb",
+          "seat": "right",
+          "positionOffset": [-1.1, 0.1, -3.2],
+          "scale": 0.51,
+          "label": "Certified Cinephile",
+          "link": null,
+          "description": "I have seen over a thousand movies and wrote a screenplay at 18. Every Wednesday I watch a film with friends — a ritual I look forward to every week. Some of my favorites are 'The Half of It', 'Perfect Days', 'Scream', 'Godzilla Minus One', 'The Pig, The Snake and the Pigeon', and 'Who Framed Roger Rabbit'. On the TV side, 'Interior Chinatown' is a recent standout. Beyond film, I am a serious sports fan — football, hockey, and basketball are fixtures in my viewing life.",
+          "images": [{"src": "photos/movies-1.jpg", "date": '04/04/2026'}],
+          "rotationY": -2
+        },
+        {
+          "glb": "models/about-water.glb",
+          "seat": "left",
+          "positionOffset": [0.8, 0.2, -1.6],
+          "scale": 0.5,
+          "label": "My Interests",
+          "link": null,
+          "description": "I enjoy learning about a wide variety of subjects. Some topics I maintain a strong body of knowledge in include the Flint, Michigan water crisis and community vulnerability to public health crises, entertainment engineering techniques, the long-term effects of redlining on modern housing districts, the intersection between religion and economic theory, and asylum law regulations and procedures.",
+          "images": [{"src": "photos/water.jpg", "date": null}]
+        },
+        {
+          "glb": "models/about-cooking.glb",
+          "seat": "left",
+          "positionOffset": [0.9, -1.1, -4.5],
+          "scale": 0.4,
+          "label": "Red-Meat Cooking Prodigy",
+          "link": null,
+          "description": "I can make a mean steak—and that is an understatement. I love cooking for family and friends. While I usually take requests, my favorite secret recipes include sugar fish fillet, hidden-vegetable pumpkin buns, popsicle-poached apples, and onion-tomato seared steak. Recipes are available upon request.",
+          "images": [{"src": "photos/cooking-0.jpg", "date": null},{"src": "photos/cooking-1.jpg", "date": null}],
+          "rotationY": -0.012
+        },
+        {
+          "glb": "models/about-boxing.glb",
+          "seat": "left",
+          "positionOffset": [-1.3, 0, 4.2],
+          "scale": 0.2,
+          "label": "Former Pre-Amateur Boxer",
+          "link": null,
+          "description": "I boxed all four years of high school and was one of two girls on a boxing team in White Flint, Maryland. My coach was an old-fashioned 'tough-love' mentor who taught me about delayed gratification, discipline, and punctuality. My favorite moment from the sport was participating in a gym-run Punch-A-Thon to help bring boxing to impoverished youth.",
+          "images": [{"src": "photos/boxing.jpg", "date": '10/13/2023'}],
+          "rotationY": 0.45
+        }
+      ]
+    },
   {
     id: 'more-stuff',
     label: 'Coming Soon',
