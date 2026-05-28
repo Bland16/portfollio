@@ -659,6 +659,7 @@ async function init() {
         hudOrbit.classList.add('hud--hidden')
         hudInterior.classList.remove('hud--hidden')
         autoExplore.onCabinEnter()   // start beat delay + intro pan
+        ferrisWheel.closeDoor(index)
       })
       inspectSystem.spawnItems(cabin)
       ferrisWheel.spinSpeed = 0
@@ -679,6 +680,10 @@ async function init() {
     cameraController.onExitCabin(() => {
       autoExplore.onCabinExit()
       inspectSystem.clearItems()
+      const exitingIndex = selectedCabinIndex   // capture before it gets nulled
+      if (exitingIndex !== null) {
+        ferrisWheel.openDoor(exitingIndex)      // ← reopen so camera exits through it
+      }
       if (selectedCabinIndex !== null) {
         ferrisWheel.closeDoor(selectedCabinIndex)
       }
@@ -692,6 +697,7 @@ async function init() {
           setAuroraActive(true)
           hudOrbit.classList.remove('hud--hidden')
           labelSystem.setVisible(true)
+          if (exitingIndex !== null) ferrisWheel.closeDoor(exitingIndex)  // ← close after exit
           selectedCabinIndex = null
         }
       )

@@ -170,36 +170,32 @@ export class FerrisWheel {
 // Extract door hinge empties + door mesh from a cabin clone
 // Returns: { doorTop, doorBottom, doorMesh }
 // ───────────────────────────────────────────────────────────
-_extractDoorAxes(cabinClone) {
-  let doorTop = null;
-  let doorBottom = null;
-  let doorMesh = null;
+  _extractDoorAxes(cabinClone) {
+    let doorTop    = null;
+    let doorBottom = null;
+    const doorMeshes = [];
 
-  cabinClone.traverse((child) => {
-    // Hinge empties
-    if (child.name === 'door_hinge_top') {
-      doorTop = child;
-    }
-    if (child.name === 'door_hinge_bottom') {
-      doorBottom = child;
+    cabinClone.traverse((child) => {
+      if (child.name === 'door_hinge_top')    doorTop    = child;
+      if (child.name === 'door_hinge_bottom') doorBottom = child;
+      if (child.name.startsWith('cabin_door')) doorMeshes.push(child);
+    });
+
+    // Re-parent ALL door parts under the top hinge so they all rotate together
+    if (doorTop && doorMeshes.length > 0) {
+      doorMeshes.forEach((mesh) => {
+        // Convert mesh position into hinge-local space before re-parenting
+        const worldPos = new THREE.Vector3();
+        mesh.getWorldPosition(worldPos);
+        doorTop.add(mesh);
+        doorTop.worldToLocal(worldPos);
+        mesh.position.copy(worldPos);
+      });
     }
 
-    // Door mesh — prefer "cabin_door_body" if present
-    if (child.name.startsWith('cabin_door')) {
-      if (!doorMesh || child.name === 'cabin_door_body') {
-        doorMesh = child;
-      }
-    }
-  });
-
-  // If we found hinges + door, re-parent door under top hinge
-  if (doorTop && doorMesh) {
-    doorMesh.position.sub(doorTop.position);
-    doorTop.add(doorMesh);
+    return { doorTop, doorBottom, doorMesh: doorMeshes[0] ?? null };
   }
 
-  return { doorTop, doorBottom, doorMesh };
-}
   _placeCabins() {
     CABINS.forEach((cabinConfig, i) => {
       const attachIndex = cabinConfig.attachIndex  // which of the 12 points to use (0,2,4,6,8,10 for 6 cabins)
@@ -407,7 +403,7 @@ closeDoor(cabinIndex) {
       const hinge = cabin.doorTop;
 
       // Target rotation: open = 135°, closed = 0°
-      const targetRot = this._doorOpen ? Math.PI * 0.75 : 0;
+      const targetRot = this._doorOpen ? -Math.PI * 0.75 : 0;
 
       hinge.rotation.y = THREE.MathUtils.lerp(
         hinge.rotation.y,

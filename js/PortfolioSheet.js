@@ -1684,7 +1684,8 @@ async function _exportPDFSections({ indices, selectedSkills }) {
       doc.setFontSize(9)
       const descLines = cleanDesc ? doc.splitTextToSize(cleanDesc, CW * 0.58) : []
 
-      const bandH = Math.max(45, Math.min(160, titleH + 8 + descLines.length * 5.2 + 10))
+      const hasDocImage = Array.isArray(item.images) && item.images.length >= 2
+      const bandH = Math.max(45, Math.min(hasDocImage ? 240 : 160, titleH + 8 + descLines.length * 5.2 + 10))
 
       if (cursorY + bandH > PH - 18) {
         _pageNum()
@@ -1710,27 +1711,48 @@ async function _exportPDFSections({ indices, selectedSkills }) {
         doc.text(descLines, MARGIN + 5, cursorY + 8 + titleH, { lineHeightFactor: 1.55 })
       }
 
-      // Primary image + date (date anchored below image, clamped inside card)
+      // Images — renders up to 2 stacked in right column (build photo + schematic/doc).
+      // Add a `label` field to an image entry in config.js for a custom caption,
+      // e.g. {"src": "photos/rfid-schematic.jpg", "date": "...", "label": "MOSFET switching circuit"}
+      // Images without a label fall back to "schematic / technical documentation".
       const images = Array.isArray(item.images) && item.images.length
         ? item.images
         : item.image ? [{ src: item.image, date: null }] : []
 
       if (images.length) {
-        try {
-          const { dataUrl: imgData, w: iw, h: ih } = await _loadImageWithInfo(images[0].src)
-          const imgX = MARGIN + CW * 0.62
-          const imgW = CW * 0.36
-          const imgH = Math.min(bandH - 10, imgW * (ih / iw))
-          doc.addImage(imgData, 'JPEG', imgX, cursorY + 4, imgW, imgH, undefined, 'FAST')
-          if (images[0].date) {
-            doc.setFont('helvetica', 'italic')
-            doc.setFontSize(8)
-            doc.setTextColor(...TC)
-            // Always anchor date below the image, not clamped inside it
-            const dateY = cursorY + 4 + imgH + 5
-            doc.text(images[0].date, imgX, dateY)
-          }
-        } catch (_) { /* skip */ }
+        const imgX = MARGIN + CW * 0.62
+        const imgW = CW * 0.36
+        let imgCursorY = cursorY + 4
+        const maxToRender = Math.min(images.length, 2)
+
+        for (let i = 0; i < maxToRender; i++) {
+          try {
+            const { dataUrl: imgData, w: iw, h: ih } = await _loadImageWithInfo(images[i].src)
+            const availH = bandH - (imgCursorY - cursorY) - 10
+            const maxH   = maxToRender === 2 && i === 0 ? (bandH - 10) * 0.52 : availH
+            const imgH   = Math.min(maxH, imgW * (ih / iw))
+
+            if (i === 1) {
+              doc.setFont('helvetica', 'italic')
+              doc.setFontSize(7)
+              doc.setTextColor(...TC)
+              doc.text(images[i].label || 'schematic / technical documentation', imgX, imgCursorY + 2)
+              imgCursorY += 6
+            }
+
+            doc.addImage(imgData, 'JPEG', imgX, imgCursorY, imgW, imgH, undefined, 'FAST')
+
+            if (images[i].date) {
+              doc.setFont('helvetica', 'italic')
+              doc.setFontSize(8)
+              doc.setTextColor(...TC)
+              doc.text(images[i].date, imgX, imgCursorY + imgH + 4)
+              imgCursorY += imgH + 10
+            } else {
+              imgCursorY += imgH + 6
+            }
+          } catch (_) { /* skip */ }
+        }
       }
 
       // GLB screenshot — The Portfolio tab only
