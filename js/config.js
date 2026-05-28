@@ -96,7 +96,7 @@ export const CABINS = [
         "label": "Society Of Women Engineers at Boston College Co-director of Community Service",
         "link": null,
         "description": "As Co‑director of Community Service for SWE, I have coordinated early planning for our 2026–2027 outreach initiatives, including researching nearby organizations that work to increase access for women returning to STEM education. This year, I attended the National SWE Conference of 2025 in New Orleans. While there, I was fortunate to hear about the initiatives being put in place by female engineers across the globe, and I was especially interested in the recent push in assistive technology and custom prostheses. It was an incredible experience, and I took back concrete solutions for enhanced career readiness from industry professionals that our chapter is already integrating into our preparations for next year’s conference.",
-        "images": [{"src": "photos/swe.jpg", "date": '10/25/2026'}],
+        "images": [{"src": "photos/swe-1.jpg", "date": '10/25/2026'}],
         "rotationY": -2.3,
         "skills": ['leadership', 'event-planning', 'teamwork', 'communication']
       },
