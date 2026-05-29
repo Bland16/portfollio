@@ -606,7 +606,7 @@ function initDoodleCanvas(canvas) {
       const { width, height } = canvas.getBoundingClientRect()
       ctx.clearRect(0, 0, width, height)
     },
-    toDataURL: () => canvas.toDataURL('image/png'),
+    toDataURL: () => canvas.toDataURL('image/jpeg', 0.6), // JPEG keeps payload small enough for URL-encoded form fields
     isEmpty: () => {
       const d = ctx.getImageData(0, 0, canvas.width, canvas.height).data
       return !d.some((v, i) => i % 4 === 3 && v > 0) // check alpha channel
@@ -620,17 +620,20 @@ function initDoodleCanvas(canvas) {
 // ─────────────────────────────────────────────────────────────
 
 async function submitToGoogleForms({ name, email, message, doodle }) {
-  const formData = new FormData()
-  formData.append(FORM_FIELDS.name,    name)
-  formData.append(FORM_FIELDS.email,   email)
-  formData.append(FORM_FIELDS.message, message)
-  formData.append(FORM_FIELDS.doodle,  doodle || '')
+  // Google Forms only accepts application/x-www-form-urlencoded.
+  // FormData sends multipart/form-data which Chrome tolerates but
+  // other browsers (Safari, Firefox) do not — submissions silently drop.
+  const params = new URLSearchParams()
+  params.append(FORM_FIELDS.name,    name)
+  params.append(FORM_FIELDS.email,   email)
+  params.append(FORM_FIELDS.message, message)
+  params.append(FORM_FIELDS.doodle,  doodle || '')
 
   try {
     await fetch(FORM_ACTION, {
       method: 'POST',
       mode:   'no-cors', // opaque response is expected — not an error
-      body:   formData,
+      body:   params,
     })
   } catch (err) {
     console.warn('Guestbook submission failed:', err)
