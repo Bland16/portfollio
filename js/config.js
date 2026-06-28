@@ -134,140 +134,472 @@ export const CABINS = [
         "seat": "left",
         "positionOffset": [-0.1, 0.5, 3.1],
         "scale": 10,
-        "label": "Makeup Tray",
-        "link": null,
-        "description": "I created this makeup tray as a simple, clean solution to streamline my daily makeup routine. This tray removed a step from my day of opening and sifting through a makeup bag for what I needed. Before it was implemented, I was using a paper plate for the same purpose, but I decided a tray would allow for ease of use, more space, and aesthetic improvement. I designed the model in Fusion 360 and printed it on a Prusa XL in PLA at a size of approximately 18 cm × 10 cm × 4 cm. Key features include an open top and front for dual access, separated hollow, ribbed sides for content visibility, and a raised base split across four interlocking pieces. I added four interlocking pieces on the bottom because if they were connected to the initial design, the bottom would be completely raised by supports in order to be 3D printed, which would have tarnished the finish and wasted PLA. I also included the open top and front so the tray could be placed at eye level or table height without adjustment of use. I still use it each day, and it saves me about 10 minutes and a gram of frustration a day.",
-        "images": [{"src": "photos/makeup-trey-1.jpg", "date": '02/18/2026'}],
-        "skills": ['fusion-360', 'cad', '3d-printing']
+        label: 'CAD-Modeled and 3D-Printed Makeup Tray',
+        description: 'I created this makeup tray as a simple, clean solution to streamline my daily makeup routine. This tray removed a step from my day of opening and sifting through a makeup bag for what I needed. Before it was implemented, I was using a paper plate for the same purpose, but I decided a tray would allow for ease of use, more space, and aesthetic improvement. I designed the model in Fusion 360 and printed it on a Prusa XL in PLA at a size of approximately 18 cm × 10 cm × 4 cm. Key features include an open top and front for dual access, separated hollow, ribbed sides for content visibility, and a raised base split across four interlocking pieces. I added four interlocking pieces on the bottom because if they were connected to the initial design, the bottom would be completely raised by supports in order to be 3D printed, which would have tarnished the finish and wasted PLA. I also included the open top and front so the tray could be placed at eye level or table height without adjustment of use. I still use it each day, and it saves me about 10 minutes and a gram of frustration a day.',
+        skills: [
+          'fusion-360',
+          'cad',
+          '3d-printing',
+        ],
+        pdfExport: {
+          hardware: true,
+          software: true,
+          all: true,
+        },
+        images: [
+          {
+            src: 'photos/makeup-trey-1.jpg',
+            date: '02/18/2026',
+          },
+        ],
       },
       {
         "glb": "models/openDots.glb",
         "seat": "left",
         "positionOffset": [-0.4, 0.5, 0.6],
         "scale": 11.5,
-        "label": "OpenDots | Babson Hackathon 2026",
-        "link": "https://github.com/romanobro56/OpenDots",
-        "description": "I built the full Fusion 360 model for a digital Braille‑style display during Babson University’s 2026 five‑hour hackathon. There is a rapid decrease in Braille literacy among blind adults despite Braille‑literate individuals making up the majority of employed blind individuals, so we created this solution to address the gap in literacy education between visually impaired and able-bodied children. I named each individual solenoid body in the model in Blender so our code could target individual pins in real time. In the physical prototype stage, we would need to incorporate shift registers, which can only map eight Arduino pins at once, so I decided to create the grid in a layout of 8×12 and name them row by column for easy code manipulation. Given the time constraints and the depth of soldering required, we could only create a website, code, and digital model. When a user pressed a letter on our website, a teammate’s image‑analysis algorithm recognized the character and triggered the corresponding pins in the 3D model, creating a live, interactive Braille output experience. The demo worked and is visible, among other details, in the linked GitHub repository. \n \n*My collaborator on this project was Roman Pisani*",
-        "images": [{"src": "photos/Open-dots.jpg", "date": '04/11/2026'},{"src": "photos/open-dots-2.jpg", "date": '04/11/2026'},{"src": "photos/open-dots-3.jpg", "date": '04/11/2026'}],
-        "skills": ['fusion-360', 'cad', 'blender', 'teamwork', 'problem-solving']
+        label: 'OpenDots for Braille Literacy | Babson Hackathon 2026',
+        description: 'I built the full Fusion 360 model for a digital Braille‑style display during Babson University’s 2026 five‑hour hackathon. There is a rapid decrease in Braille literacy among blind adults despite Braille‑literate individuals making up the majority of employed blind individuals, so we created this solution to address the gap in literacy education between visually impaired and able-bodied children. I named each individual solenoid body in the model in Blender so our code could target individual pins in real time. In the physical prototype stage, we would need to incorporate shift registers, which can only map eight Arduino pins at once, so I decided to create the grid in a layout of 8×12 and name them row by column for easy code manipulation. Given the time constraints and the depth of soldering required, we could only create a website, code, and digital model. When a user pressed a letter on our website, a teammate’s image‑analysis algorithm recognized the character and triggered the corresponding pins in the 3D model, creating a live, interactive Braille output experience. The demo worked and is visible, among other details, in the linked GitHub repository. \n \n*My collaborator on this project was Roman Pisani*',
+        link: 'https://github.com/romanobro56/OpenDots',
+        skills: [
+          'fusion-360',
+          'cad',
+          'blender',
+          'teamwork',
+          'problem-solving',
+        ],
+        pdfExport: {
+          hardware: true,
+          software: false,
+          all: true,
+        },
+        images: [
+          {
+            src: 'photos/Open-dots.jpg',
+            date: '04/11/2026',
+          },
+          {
+            src: 'photos/open-dots-2.jpg',
+            date: '04/11/2026',
+          },
+          {
+            src: 'photos/open-dots-3.jpg',
+            date: '04/11/2026',
+          },
+        ],
       },
-       {
+      {
         "glb": "models/tree.glb",
         "seat": "left",
         "positionOffset": [-0.8, 0, -2.6],
         "scale": 0.6,
-        "label": "Tree Distance Algorithm For Pesticide Application | USDA, Boston College Engineering",
-        "link": null,
-        "description": "I built and trained a machine learning model to estimate the distance of a tree from a camera, aiming to optimize pesticide application. The model was created for a larger code base that is being developed by the USDA to greatly reduce pesticide waste and the associated runoff pollution. The training image dataset was cleaned and refined in collaboration with my partner, Michael Busa. I took his tree masks and developed a random forest regression model that looked at various features of the tree mask and used that to categorize the distance the tree was from the camera. Following the completion of our code, we delivered a presentation on our findings to the engineering department. As the research this project contributed to has not yet been published, detailed methodology and data are available upon request. Our model had an RMSE of 0.02 meters and an MAE of 0.0069 meters. Among the images we saved for testing data, we had a 100% accuracy rating in our confidence interval, with only one differentiation from true values, sitting at 0.06 meters.",
-        "images": [{"src": "photos/tree-distance-1.jpg", "date": '03/31/2026'}],
-        "rotationY": -0.35,
-        "skills": ['python', 'machine-learning', 'teamwork', 'communication', 'public-speaking', 'problem-solving']
+        label: 'Tree Distance Algorithm For Pesticide Application | USDA, Boston College Engineering',
+        description: 'I built and trained a machine learning model to estimate the distance of a tree from a camera, aiming to optimize pesticide application. The model was created for a larger code base that is being developed by the USDA to greatly reduce pesticide waste and the associated runoff pollution. The training image dataset was cleaned and refined in collaboration with my partner, Michael Busa. I took his tree masks and developed a random forest regression model that looked at various features of the tree mask and used that to categorize the distance the tree was from the camera. Following the completion of our code, we delivered a presentation on our findings to the engineering department. As the research this project contributed to has not yet been published, detailed methodology and data are available upon request. Our model had an RMSE of 0.02 meters and an MAE of 0.0069 meters. Among the images we saved for testing data, we had a 100% accuracy rating in our confidence interval, with only one differentiation from true values, sitting at 0.06 meters.',
+        skills: [
+          'python',
+          'machine-learning',
+          'teamwork',
+          'communication',
+          'public-speaking',
+          'problem-solving',
+        ],
+        pdfExport: {
+          hardware: true,
+          software: 'flagship',
+          all: 'flagship',
+        },
+        pdfSummary: 'I built and trained a machine learning model in Python to estimate the distance of a tree from a camera, aiming to optimize pesticide application with my partner Michael Busa. We were given two weeks for this project. Following the completion of our code, we delivered a presentation on our findings.  As the research this project contributed to has not yet been published, detailed methodology and data are available upon request.',
+        problem: 'At present, pesticide application in the United States is either applied by hand or using a set value which doesn\'t differentiate between tree size, distance or species. This wasted product not only costs significantly more than an optimized approach but can have unintended consequences on nearby populations. ',
+        outcome: 'My model achieved a Root Mean Squared Error (a measurement of the magnitude of average error of our model) of 0.02 meters, which was two orders of magnitude lower than our intended distance range of 1.5 - 3 meters. Additionally, it reached a Mean Absolute Error of 0.0069 meters. ',
+        contribution: 'I developed a machine learning model trained on masked tree images cleaned by an algorithm written by my partner Michael Busa. My contribution to this project entailed selecting the best-fit regression model, choosing and assigning weights to heuristics for the model to consider, and assisting Michael in the iteration process for selecting the best tree-masking strategy. ',
+        lessons: 'I learned that iteration is the beginning of success, not the end of it. Also, I learned how to optimize machine learning models. ',
+        images: [
+          {
+            src: 'photos/tree-distance-1.jpg',
+            date: '03/31/2026',
+          },
+        ],
+        technicalDoc: {
+          size: 'sm',
+          skills: [
+            'python',
+            'machine-learning',
+            'teamwork',
+            'communication',
+            'public-speaking',
+            'problem-solving',
+          ],
+          pdfSkip: {
+            hardware: false,
+          },
+          docs: [
+            {
+              src: 'photos/schematics/tree-past-solutions.png',
+              stage: 'ITERATION',
+              caption: 'This is a slide from our presentation which includes a compilation of image-processing techniques which we ultimately abandoned in favor of our present choices.',
+            },
+          ],
+        },
       },
       {
         "glb": "models/tideflow.glb",
         "seat": "right",
         "positionOffset": [-0.3, 0, -3.1],
         "scale": 0.3,
-        "label": "TideFlow | Personal Scheduling App",
-        "link": null,
-        "description": "I built TideFlow, a scheduling app designed around ADHD cognitive patterns for my brother, who was having difficulty managing his schedule. I created a 20-page design spec based on interviews with him and identifying features that would best address his needs. I implemented the system using an iterative rapid-development approach over one week. TideFlow includes a machine learning engine that reads real versus estimated task duration, task satisfaction by category, burnout levels, and when the user prefers to schedule tasks, and it suggests tasks when prompted and provides corrected time estimates for user-added tasks. The model updates per task using recency weighting and satisfaction scores, and it applies safe multipliers to avoid overcorrection. I also built the scheduling logic, which enforces ADHD-friendly rules like protected deep-work windows, nightly cutoffs, burnout-mode load reduction, and collision detection for fixed and flexible tasks. The app includes four views, drag-and-drop rescheduling, ICS export, and a daily survey that feeds back into the ML loop.",
-        "images": [{"src": "photos/tideflow-1.jpg", "date": '05/23/2026'}, {"src": "photos/tideflow-2.jpg", "date": '05/23/2026'},{"src": "photos/tideflow-3.jpg", "date": '05/23/2026'},{"src": "photos/tideflow-4.jpg", "date": '05/23/2026'}],
-        "rotationY": -2.55,
-        "skills": ['machine-learning', 'prompt-engineering', 'ui-design', 'problem-solving']
+        label: 'TideFlow | Personal Scheduling App',
+        description: 'I built TideFlow, a scheduling app designed around ADHD cognitive patterns for my brother, who was having difficulty managing his schedule using an Object-Oriented Framework in JavaScript. I created a 20-page design spec based on interviews with him and identifying features that would best address his needs. I implemented the system using an iterative rapid-development approach over one week. TideFlow includes a machine learning engine that reads real versus estimated task duration, task satisfaction by category, burnout levels, and when the user prefers to schedule tasks, and it suggests tasks when prompted and provides corrected time estimates for user-added tasks. The model updates per task using recency weighting and satisfaction scores, and it applies safe multipliers to avoid overcorrection. I also built the scheduling logic, which enforces ADHD-friendly rules like protected deep-work windows, nightly cutoffs, burnout-mode load reduction, and collision detection for fixed and flexible tasks. The app includes four views, drag-and-drop rescheduling, ICS export, and a daily survey that feeds back into the ML loop.',
+        skills: [
+          'machine-learning',
+          'prompt-engineering',
+          'ui-design',
+          'problem-solving',
+        ],
+        pdfExport: {
+          software: true,
+          all: true,
+        },
+        problem: 'Although normal scheduling applications are helpful with remembering what someone has planned, they offer no guidance as to how to actually schedule out your time. Thus, it can be easy for someone with ADHD to both over and under book their schedule. ',
+        outcome: 'TideFlow contributed to a 15% increase in my brother\'s weekly satisfaction rating (collected by TideFlow for machine learning purposes) over the span since he first implemented it.',
+        lessons: 'I learned how important it is to consider user feedback in the implementation process. I went into this project with a clear idea of what could benefit my brother, but through user interviews, I was able to refine my vision to what would be practically beneficial to my target user. ',
+        images: [
+          {
+            src: 'photos/tideflow-1.jpg',
+            date: '05/23/2026',
+          },
+          {
+            src: 'photos/tideflow-2.jpg',
+            date: '05/23/2026',
+          },
+          {
+            src: 'photos/tideflow-3.jpg',
+            date: '05/23/2026',
+          },
+          {
+            src: 'photos/tideflow-4.jpg',
+            date: '05/23/2026',
+          },
+        ],
       },
       {
-        "glb": "models/chips.glb",
         "seat": "left",
         "positionOffset": [0.8, 0.5, 1.2],
         "scale": 15,
-        "label": "Poker Chips for the Visually Impaired",
-        "link": null,
-        "description": "I designed these poker chips specifically for colorblind players. Since standard poker chip values rely heavily on color differentiation, I introduced four distinct values based on interior geometric cutouts. This approach preserves stackability while allowing for clear tactile and visual differentiation. Each denomination is based on a card suit (such as Clubs, Spades, Hearts, and Diamonds) for immediate recognizability and clean design aesthetic.\n\nI modeled the chips in Fusion 360 and 3D-printed them in PLA on a Prusa MINI, with each chip measuring 39mm in diameter and 0.5–1mm in thickness.",
-        "images": [{"src": "photos/chips-1.jpg", "date": '03/10/2026'}],
-        "imageOffset": "50% 20%",
-        "skills": ['fusion-360', 'cad', '3d-printing', 'problem-solving']
-      }
-    ]
+        "glb": 'chips.glb',
+        label: 'Poker Chips for the Visually Impaired',
+        description: 'I designed these poker chips specifically for colorblind players. Since standard poker chip values rely heavily on color differentiation, I introduced four distinct values based on interior geometric cutouts. This approach preserves stackability while allowing for clear tactile and visual differentiation. Each denomination is based on a card suit (such as Clubs, Spades, Hearts, and Diamonds) for immediate recognizability and clean design aesthetic.\n\nI modeled the chips in Fusion 360 and 3D-printed them in PLA on a Prusa MINI, with each chip measuring 39mm in diameter and 0.5–1mm in thickness.',
+        skills: [
+        ],
+        pdfExport: {
+          hardware: true,
+          software: true,
+          all: true,
+        },
+        images: [
+          {
+            src: 'photos/chips-1.jpg',
+            date: '03/10/2026',
+          },
+        ],
+        technicalDoc: {
+          size: 'md',
+          skills: [
+          ],
+          docs: [
+            {
+              src: 'photos/schematics/poker-chip-og.png',
+              stage: 'SKETCHING',
+              caption: 'This was the original 3rd angle design for the poker chips. Before I decided to move to image cut outs, I considered displaying the chip value in braille. This design was ultimately abandoned due to the requirement of braille literacy in users and for stackability of chips.',
+            },
+          ],
+        },
+      },
+    ],
   },
 
-  {
-    id: 'physical-projects',
-    label: 'Physical Projects',
-    attachIndex: 2,
-    items: [
-      {
-        "glb": "models/object-project-rfid.glb",
-        "seat": "right",
-        "positionOffset": [-0.6, 0, -4.1],
-        "scale": 1,
-        "label": "RFID Remote Authorization Lock Box | Making The Modern World 2026 Design Conference",
-        "link": null,
-        "description": "I built this lock box as a smarter alternative to my college's lost and found system for low-to-medium value items. Rather than relying on staff to manually match owners to items, the box integrates directly with the school's existing ID infrastructure. When someone is confirmed as the owner of a lost item, I designed the system to remotely authorize their student ID to unlock the box and retrieve it on their own time.\n\nThe system runs C++ firmware I wrote for an Arduino Nano, which controls a 5V solenoid lock through a MOSFET switching circuit and communicates with a 13.56MHz RC522 RFID reader over SPI. I handled the card authorization logic and hardware control timing entirely on-device. The custom electronics I wired include flyback protection, gate pull-down resistors, and multi-voltage power distribution (5V/3.3V) for reliable high-current switching.\n\nI CAD modeled and 3D-printed a thermal housing for the solenoid to ensure precise actuation alignment and protect nearby components from heat. I also fabricated the enclosure itself—a 19\" × 14\" × 5\" wooden box—using a table saw, adding full cable management and strain relief for a production-quality finish.",
-        "images": [{"src": "photos/rfid-0.jpg", "date": '11/21/2025'},{"src": "photos/rfid-1.jpg", "date": '11/21/2025'},{"src": "photos/rfid-2.jpg", "date": '11/18/2025'},{"src": "photos/rfid-3.jpg", "date": '11/19/2025'}],
-        "rotationY": -1,
-        "skills": ['cpp', 'arduino', 'circuits', 'rfid-nfc', 'soldering', 'woodworking', '3d-printing', 'fusion-360', 'problem-solving']
+ {
+  id: 'physical-projects',
+  label: 'Physical Projects',
+  attachIndex: 2,
+  items: [
+    {
+      glb: 'models/object-project-rfid.glb',
+      seat: 'right',
+      positionOffset: [
+        -0.6,
+        0,
+        -4.1,
+      ],
+      scale: 1,
+      rotationY: -1,
+      label: 'RFID Remote Authorization Lock Box | Making The Modern World 2026 Design Conference',
+      description: 'I built this lock box as a smarter alternative to my college\'s lost and found system for low-to-medium value items. Rather than relying on staff to manually match owners to items, the box integrates directly with the school\'s existing ID infrastructure. When someone is confirmed as the owner of a lost item, I designed the system to remotely authorize their student ID to unlock the box and retrieve it on their own time.\n\nThe system runs C++ firmware I wrote for an Arduino Nano, which controls a 5V solenoid lock through a MOSFET switching circuit and communicates with a 13.56MHz RC522 RFID reader over SPI. I handled the card authorization logic and hardware control timing entirely on-device. The custom electronics I wired include flyback protection, gate pull-down resistors, and multi-voltage power distribution (5V/3.3V) for reliable high-current switching.\n\nI CAD modeled and 3D-printed a thermal housing for the solenoid to ensure precise actuation alignment and protect nearby components from heat. I also fabricated the enclosure itself—a 19" × 14" × 5" wooden box—using a table saw, adding full cable management and strain relief for a production-quality finish.',
+      skills: [
+        'cpp',
+        'arduino',
+        'circuits',
+        'rfid-nfc',
+        'soldering',
+        'woodworking',
+        '3d-printing',
+        'fusion-360',
+        'problem-solving',
+      ],
+      pdfExport: {
+        hardware: 'flagship',
+        software: true,
+        all: 'flagship',
       },
-      {
-        "glb": "models/object-project-arcade.glb",
-        "seat": "right",
-        "positionOffset": [0.5, 0, 0.2],
-        "scale": 2,
-        "label": "Dino Metal Rampage",
-        "link": null,
-        "description": "I engineered and fabricated a fully custom hard rock dinosaur-themed arcade cabinet, which I laser-cut with dino designs and finished with a clear acrylic back panel so the interior circuitry is visible.\n\nI powered the hardware with a Raspberry Pi 5 and an Adafruit RGB Matrix HAT, driving three 64×32 HUB75 LED panels as a single 96×64 display. I hand-wired and soldered all circuitry components, mapping seven physical buttons and a joystick directly to the software input layer while utilizing two external power supplies to handle the Pi and panels separately.\n\nI wrote the entire software stack from scratch: five games (Coloring Book, Maze, Meteorite Massacre, Cretaceous Shred: Rex's Revenge, and Blackjack), a scrolling game-select launcher, a universal high score system, and per-session coloring book storage with email delivery. I also built a custom sprite extraction tool that pulls from sprite sheets and converts them into the flat .txt format the LED matrix consumes, as well as an offline MIDI analysis pipeline for Rex's Revenge that auto-generates note charts from audio using beat tracking, onset detection, and spectral band mapping.\n\nI collaborated with Garrett Mackenzie, who constructed and spray-painted the wooden physical enclosure. I built this project for our Physical Computing Class at Boston College.",
-        "images": [{"src": "photos/arcade-1.jpg", "date": '05/10/2026'},{"src": "photos/arcade-2.jpg", "date": '04/13/2026'},{"src": "photos/arcade-3.jpg", "date": '04/9/2026'}],
-        "rotationY": -1.55,
-        "skills": ['python', 'raspberry-pi', 'led-matrix', 'soldering', 'laser-cutting', 'machine-learning', 'prompt-engineering', 'teamwork', 'problem-solving']
+      pdfSummary: 'I built this lock box as a smarter alternative to my college\'s lost and found system for low-to-medium value items. Rather than relying on staff to manually match owners to items, the box integrates directly with the school\'s existing ID infrastructure. When someone is confirmed as the owner of a lost item, I designed the system to remotely authorize their student ID to unlock the box and retrieve it on their own time.',
+      problem: 'At Boston College, the current lost and found system relies on medium-to-high value items being submitted to the sole pick-up location located in the Boston College Police Department on Lower Campus where students can pick up their items upon proof of ownership and/or identification. The pain point of this system is two-fold: it doesn\'t account for items with low material value but high sentimental value, and it places an unnecessary burden on an overstressed system, namely the police station of a college campus.',
+      outcome: 'The project was presented at the Making the Modern World 2026 design conference. It functioned as intended, for the purposes of demonstration I had judges and attendees use a practice Eagle ID which had been registered as an authorized user prior to the event to open the lock box and retrieve a faux lost item. In the user feedback stage of testing, there was an average user satisfaction level of 9.875/10 across 16 users. ',
+      contribution: 'The system runs C++ firmware I wrote for an Arduino Nano, which using card authorization logic, controls a 5V solenoid lock through a MOSFET switching circuit and communicates with a 13.56MHz RC522 RFID reader over SPI. The custom electronics I wired include flyback protection, gate pull-down resistors, and multi-voltage power distribution (5V/3.3V) for reliable high-current switching.',
+      lessons: 'I learned the importance of planning out the electronic housing prior to soldering the circuit and electronics.',
+      images: [
+        {
+          src: 'photos/rfid-0.jpg',
+          date: '11/21/2025',
+        },
+        {
+          src: 'photos/rfid-1.jpg',
+          date: '11/21/2025',
+        },
+        {
+          src: 'photos/rfid-2.jpg',
+          date: '11/18/2025',
+        },
+        {
+          src: 'photos/rfid-3.jpg',
+          date: '11/19/2025',
+        },
+      ],
+      technicalDoc: {
+        size: 'md',
+        pdfSkip: {
+          software: true,
+        },
+        docs: [
+          {
+            src: 'photos/schematics/rfid.png',
+            stage: 'DOCUMENTATION',
+            caption: 'This KiCAD circuit diagram shows the connections between the Arduino Nano Connect, MOSFET (IRLZ44N), flyback diode (LN007), and RFID reader (RC522) used in the construction of the lockbox.',
+          },
+        ],
       },
-      {
-        "glb": "models/object-project-math.glb",
-        "seat": "left",
-        "positionOffset": [0, 0, -2.9],
-        "scale": 1,
-        "label": "Portable Counting Game | Exemplary Build Award",
-        "link": null,
-        "description": "I developed a portable counting game designed for children with combined physical and cognitive impairments, purposefully sizing it to fit directly on a wheelchair tray for independent use.\n\nI designed the device to run on a rechargeable battery while retaining plug-in capabilities to ensure uninterrupted sessions. I reduced the interaction to two large buttons, making it accessible to children with limited fine motor control, and added a glass light diffuser above the indicator to soften visual feedback.\n\nI soldered and assembled the internal circuitry (a Matrix Portal connected to a HUB75 and mobile battery) and designed the logic controlling the code behind the counting game.\n\nI built this in conjunction with Garrett Mackenzie for our Physical Computing class at Boston College.",
-        "images": [{"src": "photos/math-game-1.jpg", "date": '04/29/2026'}],
-        "rotationY": 1.35,
-        "skills": ['circuitpython', 'led-matrix', 'soldering', 'teamwork', 'problem-solving', 'communication']
+    },
+    {
+      glb: 'models/object-project-arcade.glb',
+      seat: 'right',
+      positionOffset: [
+        0.5,
+        0,
+        0.2,
+      ],
+      scale: 2,
+      rotationY: -1.55,
+      label: 'Dino Metal Rampage',
+      description: 'I engineered and fabricated a fully custom hard rock dinosaur-themed arcade cabinet, which I laser-cut with dino designs and finished with a clear acrylic back panel so the interior circuitry is visible.\n\nI powered the hardware with a Raspberry Pi 5 and an Adafruit RGB Matrix HAT, driving three 64×32 HUB75 LED panels as a single 96×64 display. I hand-wired and soldered all circuitry components, mapping seven physical buttons and a joystick directly to the software input layer while utilizing two external power supplies to handle the Pi and panels separately.\n\nI wrote the entire software stack from scratch: five games (Coloring Book, Maze, Meteorite Massacre, Cretaceous Shred: Rex\'s Revenge, and Blackjack), a scrolling game-select launcher, a universal high score system, and per-session coloring book storage with email delivery. I also built a custom sprite extraction tool that pulls from sprite sheets and converts them into the flat .txt format the LED matrix consumes, as well as an offline MIDI analysis pipeline for Rex\'s Revenge that auto-generates note charts from audio using beat tracking, onset detection, and spectral band mapping.\n\nI collaborated with Garrett Mackenzie, who constructed and spray-painted the wooden physical enclosure. I built this project for our Physical Computing Class at Boston College.',
+      skills: [
+        'python',
+        'raspberry-pi',
+        'led-matrix',
+        'soldering',
+        'laser-cutting',
+        'machine-learning',
+        'prompt-engineering',
+        'teamwork',
+        'problem-solving',
+      ],
+      pdfExport: {
+        hardware: 'flagship',
+        software: 'flagship',
+        all: 'flagship',
       },
-      {
-        "glb": "models/object-project-tapn.glb",
-        "seat": "left",
-        "positionOffset": [-0.4, 0.2, 0.7],
-        "scale": 1,
-        "label": "TapN | Accelerate@Shea 2026 Cohort",
-        "link": null,
-        "description": "I co-founded TapN, an NFC-based system designed to reduce student phones to only their essential functions during class, minimizing distraction while preserving safety features.\n\nI led the hardware design through multiple iterations, building wooden physical mockups, CAD models, and 3D-printed prototypes. I also built object-oriented frameworks in Swift to optimize the tap-to-restrict user flow.\n\nBecause of our work, TapN was selected for Accelerate@Shea 2026, a competitive startup accelerator at Boston College offering equity-free funding, mentorship, and workshops with industry professionals.",
-        "images": [{"src": "photos/tapn-2.jpg", "date": '02/17/2026'}],
-        "skills": ['swift', 'fusion-360', 'cad', '3d-printing', 'entrepreneurship', 'leadership', 'communication', 'teamwork']
+      pdfSummary: 'I engineered a custom arcade machine, "Dino Metal Rampage", with five games: Cretaceous Shred: Rex\'s Revenge (a guitar hero spoof), Asteroid Avoider, a character selection game to avoid falling asteroids, a BlackJack display with an animated raptor bartender/dealer, a coloring book with 20 different coloring pages, and a maze game with a maze generation algorithm. \n\n',
+      problem: 'This project was constructed in combination with Garrett Mackensie for my final project in my Physical Computer class at Boston College. For this project, we were given two weeks and a maximum budget of $200 to create an interactive display that incorporated light and movement.  ',
+      outcome: 'The display ran smoothly and worked for all five games with active communication between the controls and Hub75s. The head of the engineering department at Boston College and our Physical Computing professor requested to display the piece at the front entrance of 245 Beacon Street, Boston College\'s engineering building, for the remainder of my study to promote the caliber of the engineering program at our university. ',
+      contribution: 'For my portion of the project, I integrated a Raspberry Pi 5, Adafruit RGB Matrix HAT, seven LED 3.3V buttons, a four-direction joystick, and three 64×32 HUB75 LED panels into a unified 96×64 low‑latency display, with hand‑wired controls and dual‑rail power distribution for stable high‑current operation. I also programmed a five-game game engine, an offline MIDI/audio analysis engine, a PNG sprite‑sheet extractor with per‑pixel color quantization, sprite blitting routines, and a persistent high‑score subsystem.',
+      images: [
+        {
+          src: 'photos/arcade-1.jpg',
+          date: '05/10/2026',
+        },
+        {
+          src: 'photos/arcade-2.jpg',
+          date: '04/13/2026',
+          pdfSkipImage: true,
+        },
+        {
+          src: 'photos/arcade-3.jpg',
+          date: '04/9/2026',
+          pdfSkipImage: true,
+        },
+      ],
+    },
+    {
+      glb: 'models/object-project-math.glb',
+      seat: 'left',
+      positionOffset: [
+        0,
+        0,
+        -2.9,
+      ],
+      scale: 1,
+      rotationY: 1.35,
+      label: 'Portable Counting Game | Exemplary Build Award',
+      description: 'I developed a portable counting game designed for children with combined physical and cognitive impairments, purposefully sizing it to fit directly on a wheelchair tray for independent use.\n\nI designed the device to run on a rechargeable battery while retaining plug-in capabilities to ensure uninterrupted sessions. I reduced the interaction to two large buttons, making it accessible to children with limited fine motor control, and added a glass light diffuser above the indicator to soften visual feedback.\n\nI soldered and assembled the internal circuitry (a Matrix Portal connected to a HUB75 and mobile battery) and designed the logic controlling the code behind the counting game.\n\nI built this in conjunction with Garrett Mackenzie for our Physical Computing class at Boston College.',
+      skills: [
+        'circuitpython',
+        'led-matrix',
+        'soldering',
+        'teamwork',
+        'problem-solving',
+        'communication',
+      ],
+      pdfExport: {
+        hardware: true,
+        software: false,
+        all: true,
       },
-      {
-        "glb": "models/object-project-cat-bed.glb",
-        "seat": "right",
-        "positionOffset": [-0.4, 0.8, -3.6],
-        "scale": 3,
-        "label": "Keypad-Controlled Vibrating Cat Bed | 2nd Place — Boston College Make-A-Thon 2026",
-        "link": null,
-        "description": "I designed this vibrating cat bed for deaf cats who can no longer experience music audibly, engineering it to deliver calming sensory stimulation through touch. I integrated a wired 4×4 keypad so the owner can easily adjust the bed's settings without disturbing a resting pet.\n\nI built the electronics around an Elegoo Uno paired with a CircuitPython Bluefruit, which I programmed to drive a connected speaker and amplifier via PWM signals. I wired five vibration motors through a shared common ground and power line, regulating their intensity with a MOSFET. I mapped the 4×4 keypad to give the user direct control over three functions: power on/off, vibration intensity, and playback of one of three songs, each of which I coded to be felt as rhythmic vibration through the bed's surface.",
-        "images": [{"src": "photos/cat-bed-0.jpg", "date": '03/21/2026'},{"src": "photos/cat-bed-1.jpg", "date": '03/22/2026'},{"src": "photos/cat-bed-2.jpg", "date": '03/22/2026'},{"src": "photos/cat-bed-3.jpg", "date": '03/22/2026'},{"src": "photos/cat-bed-4.jpg", "date": '03/21/2026'}],
-        "rotationY": 5.4,
-        "skills": ['arduino', 'circuitpython', 'circuits', 'pwm', 'motors', 'soldering', 'problem-solving']
+      images: [
+        {
+          src: 'photos/math-game-1.jpg',
+          date: '04/29/2026',
+        },
+      ],
+    },
+    {
+      glb: 'models/object-project-tapn.glb',
+      seat: 'left',
+      positionOffset: [
+        -0.4,
+        0.2,
+        0.7,
+      ],
+      scale: 1,
+      label: 'TapN | Accelerate@Shea 2026 Cohort',
+      description: 'I co-founded TapN, an NFC-based system designed to reduce student phones to only their essential functions during class, minimizing distraction while preserving safety features.\n\nI led the hardware design through multiple iterations, building wooden physical mockups, CAD models, and 3D-printed prototypes. I also built object-oriented frameworks in Swift to optimize the tap-to-restrict user flow.\n\nBecause of our work, TapN was selected for Accelerate@Shea 2026, a competitive startup accelerator at Boston College offering equity-free funding, mentorship, and workshops with industry professionals.',
+      skills: [
+        'swift',
+        'fusion-360',
+        'cad',
+        '3d-printing',
+        'entrepreneurship',
+        'leadership',
+        'communication',
+        'teamwork',
+      ],
+      pdfExport: {
+        hardware: false,
+        software: true,
+        all: true,
       },
-      {
-        "glb": "models/object-project-hay-bag.glb",
-        "seat": "left",
-        "positionOffset": [0.2, 0, 1.8],
-        "scale": 1,
-        "label": "Mobile Hay-Bag Shelf | Lovelane Special Needs Horseback Riding Program — Boston College Engineering Project",
-        "link": null,
-        "description": "I co-designed and constructed this mobile shelf in collaboration with the Lovelane Special Needs Horseback Riding Program to help students with disabilities independently participate in horse feeding. By holding a hay bag at a consistent two-foot height, the shelf I helped design frees the student to focus on the clasping mechanism without needing to support the bag's weight.\n\nMy team and I constructed the shelf from plywood using piano hinges, allowing it to fold down to less than a third of its original width for easy storage and transport. I contributed to adding adjustable hooks for flexible bag placement and laser-engraving horse designs on the side panels for visual detail. We ensured the final build safely supports over 25 lbs and requires no fine-motor manipulation to operate.\n\n*Built in collaboration with Karilynn Arellano, Kaitlyn Cabalu, and Burke Bessette.*",
-        "images": [{"src": "photos/hay-bag-1.jpg", "date": '05/01/2026'},{"src": "photos/hay-bag-2.jpg", "date": '04/29/2026'}],
-        "rotationY": 1.7,
-        "skills": ['woodworking', 'laser-cutting', 'hand-tools', 'teamwork', 'communication', 'problem-solving']
-      }
-    ]
-  },
+      images: [
+        {
+          src: 'photos/tapn-2.jpg',
+          date: '02/17/2026',
+        },
+      ],
+    },
+    {
+      glb: 'models/object-project-cat-bed.glb',
+      seat: 'right',
+      positionOffset: [
+        -0.4,
+        0.8,
+        -3.6,
+      ],
+      scale: 3,
+      rotationY: 5.4,
+      label: 'Keypad-Controlled Vibrating Cat Bed | 2nd Place — Boston College Make-A-Thon 2026',
+      description: 'I designed this vibrating cat bed for deaf cats who can no longer experience music audibly, engineering it to deliver calming sensory stimulation through touch. I integrated a wired 4×4 keypad so the owner can easily adjust the bed\'s settings without disturbing a resting pet.\n\nI built the electronics around an Elegoo Uno paired with a CircuitPython Bluefruit, which I programmed to drive a connected speaker and amplifier via PWM signals. I wired five vibration motors through a shared common ground and power line, regulating their intensity with a MOSFET. I mapped the 4×4 keypad to give the user direct control over three functions: power on/off, vibration intensity, and playback of one of three songs, each of which I coded to be felt as rhythmic vibration through the bed\'s surface.',
+      skills: [
+        'arduino',
+        'circuitpython',
+        'circuits',
+        'pwm',
+        'motors',
+        'soldering',
+        'problem-solving',
+      ],
+      pdfExport: {
+        hardware: true,
+        all: true,
+      },
+      images: [
+        {
+          src: 'photos/cat-bed-0.jpg',
+          date: '03/21/2026',
+        },
+        {
+          src: 'photos/cat-bed-1.jpg',
+          date: '03/22/2026',
+        },
+        {
+          src: 'photos/cat-bed-2.jpg',
+          date: '03/22/2026',
+        },
+        {
+          src: 'photos/cat-bed-3.jpg',
+          date: '03/22/2026',
+        },
+        {
+          src: 'photos/cat-bed-4.jpg',
+          date: '03/21/2026',
+        },
+      ],
+    },
+    {
+      glb: 'models/object-project-hay-bag.glb',
+      seat: 'left',
+      positionOffset: [
+        0.2,
+        0,
+        1.8,
+      ],
+      scale: 1,
+      rotationY: 1.7,
+      label: 'Mobile Hay-Bag Shelf | Lovelane Special Needs Horseback Riding Program — Boston College Engineering Project',
+      description: 'I co-designed and constructed this mobile shelf in collaboration with the Lovelane Special Needs Horseback Riding Program to help students with disabilities independently participate in horse feeding. By holding a hay bag at a consistent two-foot height, the shelf I helped design frees the student to focus on the clasping mechanism without needing to support the bag\'s weight.\n\nMy team and I constructed the shelf from plywood using piano hinges, allowing it to fold down to less than a third of its original width for easy storage and transport. I contributed to adding adjustable hooks for flexible bag placement and laser-engraving horse designs on the side panels for visual detail. We ensured the final build safely supports over 25 lbs and requires no fine-motor manipulation to operate.\n\n*Built in collaboration with Karilynn Arellano, Kaitlyn Cabalu, and Burke Bessette.*',
+      skills: [
+        'woodworking',
+        'laser-cutting',
+        'hand-tools',
+        'teamwork',
+        'communication',
+        'problem-solving',
+      ],
+      pdfExport: {
+        hardware: 'flagship',
+        all: 'flagship' ,
+      },
+      pdfSummary: 'I co-designed and constructed this mobile shelf in collaboration with the Lovelane Special Needs Horseback Riding Program, Karilynn Arellano, Kaitlyn Cabalu, and Burke Bessette to help students with disabilities independently participate in horse feeding. By holding a hay bag at a consistent two-foot height, the shelf I helped design frees the student to focus on the clasping mechanism without needing to support the bag\'s weight.',
+      problem: 'The Lovelane Special Needs Horseback Riding Program allows students of all conditions to help care for and ride horses. One caretaking activity is feeding the horses by hanging a hay bag at a height of approximately two feet from the ground. The process prior to the implementation of our solution was for the person hanging the bag was to carry and push their entire body weight against the bag while simultaneously facilitating the bag\'s clasps. Our targeted user was someone with difficulties with fine muscle coordination. ',  
+      outcome: 'Our final design allowed the bag to be placed at a height below the two-foot range such that regardless of the different physical abilities of users, the bag will sit at the same height with no fine motor manipulation required to hold the bag in place. Additionally, the design was easily mobile and storable with a weight of 12.5lbs and a moveable hook design which allowed tension cables to be used as our storage mechanism to compress the width of the shelf to less than a third of its original width. ',
+      contribution: 'I designed and produced the sketches for our initial and final prototype, which I then iterated on with my teammates. I also did the math substantiating the size constraints of our final design. Additionally, I completed the majority of the physical construction including fabricating the wooden backing and floor, attaching a piano hinge, tension cables, and hooks for portability, and laser cutting paneling for our nail heads to prevent snagging and improve the overall aesthetics of our design. \n',
+      lessons: 'Having a simple effective design with an intuitive interface is often better than a complicated more \'technically advanced\' build that may isolate the targeted user.',
+      images: [
+        {
+          src: 'photos/hay-bag-1.jpg',
+          date: '05/01/2026',
+          pdfSkipImage: true,
+        },
+        {
+          src: 'photos/hay-bag-2.jpg',
+          date: '04/29/2026',
+        },
+      ],
+      technicalDoc: {
+        size: 'md',
+        docs: [
+          {
+            src: 'photos/schematics/math-hay.jpg',
+            stage: 'PLANNING',
+            caption: 'One of our goals in the shelf construction was minimizing weight while allotting space for the majority of hay-bags to be hung, thus we wanted to be precise with the amount of space we dedicated to the flooring of our shelf. Since we had a set width to accommodate the stall dimensions, I decided to calculate the length our flooring would need to extend to in order to fit most hay bags. This is the write up of the math I did to justify our dimensions for the floor of the hay bag.',          },
+        ],
+      },
+    },
+  ],
+},
 
   {
     id: 'events',
@@ -402,7 +734,7 @@ export const CABINS = [
           "label": "Society Of Women Engineers at Boston College Co-director of Community Service",
           "link": null,
           "description": "As Co‑director of Community Service for SWE, I have coordinated early planning for our 2026–2027 outreach initiatives, including researching nearby organizations that work to increase access for women returning to STEM education. This year, I attended the National SWE Conference of 2025 in New Orleans. While there, I was fortunate to hear about the initiatives being put in place by female engineers across the globe, and I was especially interested in the recent push in assistive technology and custom prostheses. It was an incredible experience, and I took back concrete solutions for enhanced career readiness from industry professionals that our chapter is already integrating into our preparations for next year’s conference.",
-          "images": [{"src": "photos/swe-1.jpg", "date": '10/25/2026'}],
+          "images": [{"src": "photos/swe-1.jpg", "date": '10/25/2025'}],
           "rotationY": -2.3,
           "skills": ['leadership', 'event-planning', 'teamwork', 'communication']
         },

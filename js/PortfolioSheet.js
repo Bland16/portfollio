@@ -39,6 +39,9 @@ let _cfg = {
   SKILLS:        _CONFIG_SKILLS,
   COVER:         _CONFIG_COVER   ?? {},
   ABOUT_ME:      _CONFIG_ABOUT_ME ?? {},
+  SOLO:          false,   // portfolio-wide default for the Process/Contribution label;
+                           // override by passing SOLO in initPortfolioSheet(opts) — an
+                           // individual item.solo, when set, takes precedence over this
   getActiveVibe: () => 'suave',
 }
 
@@ -143,6 +146,17 @@ function _isContactItem(item) {
     !item.description &&
     (!item.images || item.images.length === 0)
   )
+}
+
+/**
+ * Individual images can be flagged `pdfSkipImage: true` to exclude just that
+ * image from PDF export — e.g. a WIP screenshot that's fine on the live
+ * carousel but not polished enough for print. The live carousel (see
+ * _buildCarousel) intentionally does NOT use this filter, so flagged images
+ * still show there; only the PDF code paths should call this.
+ */
+function _pdfImages(item) {
+  return Array.isArray(item.images) ? item.images.filter(img => !img?.pdfSkipImage) : []
 }
 
 // ─── DOM BUILDERS ─────────────────────────────────────────────────────────────
@@ -715,7 +729,7 @@ function _buildCarousel(item, tabIndex) {
   const dateEl = document.createElement('div')
   dateEl.className = 'ps-carousel-date'
   dateEl.textContent = images[0].date || ''
-  dateEl.style.color = _tabColorDark(tabIndex)
+  dateEl.style.color = 'rgba(0,0,0,0.38)'
   wrap.appendChild(dateEl)
 
   return wrap
@@ -1203,6 +1217,7 @@ function _showPdfSectionPicker() {
 
   const selectedSkills   = new Set()
   const selectedSections = new Set()
+  let selectedMode        = 'software'   // 'software' | 'hardware' | 'general' — drives flagship palette
 
   // ── Which sections have content given current skill filter ────────────────
   // Always excludes the 'events' cabin.
@@ -1253,15 +1268,50 @@ function _showPdfSectionPicker() {
   hdr.appendChild(closeBtn)
   inner.appendChild(hdr)
 
-  // ── Skills filter (optional context) ──────────────────────────────────────
-  const skillSub = document.createElement('p')
-  skillSub.className   = 'ps-pdf-picker-sub'
-  skillSub.textContent = 'Filter by role (optional):'
-  inner.appendChild(skillSub)
+  // ── Spread style (replaces the old hardcoded 'software' default) ──────────
+  const modeSub = document.createElement('p')
+  modeSub.className   = 'ps-pdf-picker-sub'
+  modeSub.textContent = 'Spread style:'
+  inner.appendChild(modeSub)
+
+  const modeWrap = document.createElement('div')
+  modeWrap.className = 'ps-pdf-mode-grid'
+  inner.appendChild(modeWrap)
+
+  const modeChips = {}
+  ;['software', 'hardware', 'general'].forEach(modeKey => {
+    const chip = document.createElement('button')
+    chip.type = 'button'
+    chip.className = 'ps-pdf-mode-chip'
+    chip.textContent = modeKey.toUpperCase()
+    chip.classList.toggle('ps-pdf-mode-chip--on', modeKey === selectedMode)
+    chip.addEventListener('click', () => {
+      selectedMode = modeKey
+      Object.entries(modeChips).forEach(([k, el]) => el.classList.toggle('ps-pdf-mode-chip--on', k === modeKey))
+    })
+    modeChips[modeKey] = chip
+    modeWrap.appendChild(chip)
+  })
+
+  // ── Skills filter — collapsed by default, expands via the toggle below ────
+  const skillToggle = document.createElement('button')
+  skillToggle.type = 'button'
+  skillToggle.className = 'ps-pdf-skill-toggle'
+  skillToggle.textContent = 'or filter by skill ▾'
+  inner.appendChild(skillToggle)
+
+  const skillCollapse = document.createElement('div')
+  skillCollapse.className = 'ps-pdf-skill-collapse'
+  inner.appendChild(skillCollapse)
+
+  skillToggle.addEventListener('click', () => {
+    const open = skillCollapse.classList.toggle('ps-pdf-skill-collapse--open')
+    skillToggle.textContent = open ? 'or filter by skill ▴' : 'or filter by skill ▾'
+  })
 
   const skillsWrap = document.createElement('div')
   skillsWrap.className = 'ps-pdf-skill-grid ps-pdf-skill-grid--picker'
-  inner.appendChild(skillsWrap)
+  skillCollapse.appendChild(skillsWrap)
 
   const allSkills = _cfg.SKILLS || {}
   Object.entries(allSkills)
@@ -1345,7 +1395,7 @@ function _showPdfSectionPicker() {
     const indices = Array.from(selectedSections).sort((a, b) => a - b)
     if (!indices.length) return
     picker.remove()
-    _exportPDFSections({ indices, selectedSkills })
+    _exportPDFSections({ indices, selectedSkills, mode: selectedMode })
   })
 
   actions.appendChild(exportBtn)
@@ -1391,7 +1441,687 @@ async function _ensureHobbyWorkScenesLoaded(tabIndex, cabin) {
  * Export one combined PDF covering the requested cabin indices.
  * @param {{ indices: number[], selectedSkills: Set<string> }} opts
  */
-async function _exportPDFSections({ indices, selectedSkills }) {
+function _cleanText(str) {
+  return String(str || '')
+    .replace(/[\u2010-\u2015\u2212]/g, '-')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[^\x20-\xFF\n]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// FLAGSHIP SPREAD — punk-carnival case-study page for pdfExport:'flagship'
+// items. Two presets: 'software' (full angle/trapezoid treatment) and
+// 'hardware' (steel/grey chips, all seam angles forced to 0).
+// ════════════════════════════════════════════════════════════════════════
+
+ 
+const FLAGSHIP_FONT_ASSETS = [
+  { path: 'fonts/Staatliches-Regular.ttf',         vfs: 'Staatliches-Regular.ttf',         name: 'Staatliches',        style: 'normal' },
+  { path: 'fonts/BigShouldersText-ExtraLight.ttf', vfs: 'BigShouldersText-ExtraLight.ttf', name: 'BigShouldersXLight', style: 'normal' },
+  { path: 'fonts/BigShouldersText-Regular.ttf',    vfs: 'BigShouldersText-Regular.ttf',    name: 'BigShouldersReg',    style: 'normal' },
+  { path: 'fonts/BigShouldersText-Black.ttf',      vfs: 'BigShouldersText-Black.ttf',      name: 'BigShouldersBlack',  style: 'normal' },
+]
+ 
+  let _flagshipFontsReady = false   // reflects whether THIS export's doc has the custom fonts registered
+let _flagshipFontData   = null    // cached { ...asset, base64 }[] — fetched once, re-applied to every new doc
+async function _loadFlagshipFonts(doc) {
+  try {
+    // Only the network fetch + base64 encode is worth caching across exports.
+    // doc.addFont/addFileToVFS register fonts on a SPECIFIC jsPDF instance —
+    // each export creates a brand-new `doc`, so this part must run every time
+    // regardless of whether a previous export already loaded the bytes.
+    // (Previously this whole function early-returned once `_flagshipFontsReady`
+    // was true, which skipped re-registering on every export after the first —
+    // those docs silently fell back to Helvetica with no error.)
+    if (!_flagshipFontData) {
+      _flagshipFontData = await Promise.all(FLAGSHIP_FONT_ASSETS.map(async f => {
+        const buf = await fetch(f.path).then(r => {
+          if (!r.ok) throw new Error(`Missing font asset: ${f.path}`)
+          return r.arrayBuffer()
+        })
+        return { ...f, base64: _arrayBufferToBase64(buf) }
+      }))
+    }
+    _flagshipFontData.forEach(f => {
+      doc.addFileToVFS(f.vfs, f.base64)
+      doc.addFont(f.vfs, f.name, f.style)
+    })
+    _flagshipFontsReady = true
+  } catch (err) {
+    // Fonts not deployed yet (e.g. /fonts/ folder missing from the build) —
+    // fall back to Helvetica rather than failing the whole export.
+    console.warn('[PortfolioSheet] flagship fonts unavailable, falling back to helvetica:', err)
+    _flagshipFontsReady = false
+  }
+}
+function _arrayBufferToBase64(buf) {
+  let binary = ''
+  const bytes = new Uint8Array(buf)
+  const chunk = 0x8000
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk))
+  }
+  return btoa(binary)
+}
+
+function _flagshipFont(doc, role) {
+  // role: 'title' | 'headXLight' | 'headReg' | 'headBlack'
+  const map = {
+    title:      ['Staatliches',        'normal', 'helvetica', 'bold'],
+    headXLight: ['BigShouldersXLight', 'normal', 'helvetica', 'normal'],
+    headReg:    ['BigShouldersReg',    'normal', 'helvetica', 'bold'],
+    headBlack:  ['BigShouldersBlack',  'normal', 'helvetica', 'bold'],
+  }
+  const [name, style, fbName, fbStyle] = map[role]
+  doc.setFont(_flagshipFontsReady ? name : fbName, _flagshipFontsReady ? style : fbStyle)
+}
+
+const FLAGSHIP_PALETTES = {
+  // `paper` was the old cream paper-scrap color ([244,241,234] / [236,236,232]).
+  // Removed for continuity — but it can't be IDENTICAL to `bg`, or the scrap's
+  // fill blends invisibly into the page (no silhouette at all). Using a close
+  // tint of bg instead, plus a frame-colored outline in _drawPaperBox, so the
+  // box still reads as a distinct "scrap" without reintroducing cream.
+  software: {
+    bg: [14, 14, 20], frame: [255, 45, 138], paper: [27, 27, 36], ink: [225, 222, 215],
+    label: [255, 45, 138],
+    chipShades: [[25, 230, 230], [111, 245, 240], [11, 175, 175]],
+    lightAccent: [111, 245, 240],   // = chipShades' existing lightest — unchanged from before
+    angled: true,
+  },
+  hardware: {
+    bg: [22, 26, 30], frame: [88, 124, 150], paper: [33, 38, 43], ink: [220, 220, 218],
+    label: [88, 124, 150],
+    chipShades: [[88, 124, 150], [196, 198, 200], [140, 156, 168]],
+    lightAccent: [148, 196, 230],   // deliberate light blue, not chipShades' near-white "lightest" ([196,198,200]) — that read too washed-out/heavy as an outline
+    angled: false,
+  },
+  // 'general' had no entry of its own — it was silently falling back to
+  // `software` (FLAGSHIP_PALETTES[mode] || FLAGSHIP_PALETTES.software),
+  // picking up the neon pink/cyan theme by accident. Brought hardware's
+  // steel-blue accent colors (frame/label/chipShades) over wholesale rather
+  // than inventing a third palette.
+  general: {
+    bg: [22, 26, 30], frame: [88, 124, 150], paper: [33, 38, 43], ink: [220, 220, 218],
+    label: [88, 124, 150],
+    chipShades: [[88, 124, 150], [196, 198, 200], [140, 156, 168]],
+    lightAccent: [148, 196, 230],   // same reasoning as hardware above
+    angled: false,
+  },
+}
+
+function _isFlagshipItem(item, mode = 'software') {
+  if (!item || !item.pdfExport) return false
+  return item.pdfExport[mode] === 'flagship' || item.pdfExport.all === 'flagship'
+}
+
+// Fills a rectangle of size w×h, centered at (cx,cy), rotated by angleDeg —
+// used for the torn-banner title and every paper-scrap text box.
+function _fillRotatedRect(doc, cx, cy, w, h, angleDeg, colorRgb, strokeRgb = null, strokeWidth = 0.4) {
+  const rad = (angleDeg * Math.PI) / 180
+  const hw = w / 2, hh = h / 2
+  const corners = [[-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh]].map(([dx, dy]) => [
+    cx + dx * Math.cos(rad) - dy * Math.sin(rad),
+    cy + dx * Math.sin(rad) + dy * Math.cos(rad),
+  ])
+  doc.setFillColor(...colorRgb)
+  if (strokeRgb) {
+    doc.setDrawColor(...strokeRgb)
+    doc.setLineWidth(strokeWidth)
+  }
+  doc.lines(
+    [
+      [corners[1][0] - corners[0][0], corners[1][1] - corners[0][1]],
+      [corners[2][0] - corners[1][0], corners[2][1] - corners[1][1]],
+      [corners[3][0] - corners[2][0], corners[3][1] - corners[2][1]],
+      [corners[0][0] - corners[3][0], corners[0][1] - corners[3][1]],
+    ],
+    corners[0][0], corners[0][1], [1, 1], strokeRgb ? 'FD' : 'F', true
+  )
+}
+
+// Draws one paper-scrap box: rotated rect + capitalized heading + wrapped body.
+function _drawPaperBox(doc, palette, x, y, w, h, label, body, rotateDeg = -1.2) {
+  _fillRotatedRect(doc, x + w / 2, y + h / 2, w, h, rotateDeg, palette.paper, palette.frame, 0.4)
+
+  // NOTE: jsPDF's native text `angle` rotates through the PDF content stream's
+  // y-up text matrix, while _fillRotatedRect's box math assumes y-down page
+  // space — same number, opposite visual spin. Negating here makes the text
+  // follow the box instead of fighting it. Verify the sign on a real export;
+  // if it's backwards, flip the box matrix instead of this negation.
+  _flagshipFont(doc, 'headReg')
+  doc.setFontSize(11)
+  doc.setTextColor(...palette.label)
+  const capLabel = label ? label.charAt(0).toUpperCase() + label.slice(1) : ''
+  doc.text(capLabel, x + 4, y + 6.5, { angle: -rotateDeg })
+
+  _flagshipFont(doc, 'headXLight')
+  doc.setFontSize(9.5)
+  doc.setTextColor(...palette.ink)
+  const lines = body ? doc.splitTextToSize(body, w - 10) : []
+  const maxLines = Math.max(0, Math.floor((h - 10) / 4.4))
+  lines.slice(0, maxLines).forEach((ln, i) => {
+    doc.text(ln, x + 5, y + 13 + i * 4.4, { angle: -rotateDeg })
+  })
+  return h
+}
+
+// Same purpose as _fillRotatedRect, but with rounded corners — used for the
+// relocated Lessons sticker (see _drawLessonsSticker) so it reads as a
+// rounded "note" rather than a sharp-cornered paper scrap. Corners are
+// approximated with cubic Béziers (kappa ≈ 0.5523, the standard
+// circle-to-bezier constant) since jsPDF's lines() API accepts bezier
+// segments natively — this keeps the shape fully vector (crisp at any
+// zoom/print size) instead of rasterizing to a canvas like the image-grid
+// helpers below do.
+function _fillRotatedRoundedRect(doc, cx, cy, w, h, r, angleDeg, colorRgb, strokeRgb = null, strokeWidth = 0.4) {
+  const rad = (angleDeg * Math.PI) / 180
+  const cos = Math.cos(rad), sin = Math.sin(rad)
+  const hw = w / 2, hh = h / 2
+  r = Math.min(r, hw, hh)   // clamp so the curve can't overshoot the box
+  const k = 0.5523 * r      // circle→bezier constant, scaled to this radius
+
+  // Rotates a LOCAL delta (dx,dy) into page space. Translation cancels out
+  // for deltas — same rotation math _fillRotatedRect applies to absolute
+  // points, applied here to edge/control-point deltas instead.
+  const rotD = (dx, dy) => [dx * cos - dy * sin, dx * sin + dy * cos]
+
+  // Local (box-centered) start anchor — just right of the top-left corner —
+  // walking clockwise from there. Standard rounded-rect-via-bezier
+  // construction: 4 straight edges, 4 corner curves.
+  const P0 = [-hw + r, -hh]
+  const start = [cx + (P0[0] * cos - P0[1] * sin), cy + (P0[0] * sin + P0[1] * cos)]
+
+  // Each entry is a LOCAL delta from the point before it; 2 values = line,
+  // 6 values = jsPDF's bezier leg [d1x,d1y, d2x,d2y, d3x,d3y].
+  const legsLocal = [
+    [2 * (hw - r), 0],                  // top edge
+    [k, 0, r, r - k, r, r],             // top-right corner
+    [0, 2 * (hh - r)],                  // right edge
+    [0, k, k - r, r, -r, r],            // bottom-right corner
+    [-2 * (hw - r), 0],                 // bottom edge
+    [-k, 0, -r, k - r, -r, -r],         // bottom-left corner
+    [0, -2 * (hh - r)],                 // left edge
+    [0, -k, r - k, -r, r, -r],          // top-left corner (closes back to P0)
+  ]
+
+  const legs = legsLocal.map(leg =>
+    leg.length === 2
+      ? rotD(leg[0], leg[1])
+      : [...rotD(leg[0], leg[1]), ...rotD(leg[2], leg[3]), ...rotD(leg[4], leg[5])]
+  )
+
+  doc.setFillColor(...colorRgb)
+  if (strokeRgb) {
+    doc.setDrawColor(...strokeRgb)
+    doc.setLineWidth(strokeWidth)
+  }
+  doc.lines(legs, start[0], start[1], [1, 1], strokeRgb ? 'FD' : 'F', true)
+}
+
+// Picks the darkest and lightest swatches out of a palette's chip-shade
+// trio by perceived brightness, rather than assuming a fixed index — the
+// three shades aren't sorted light-to-dark in either palette (e.g.
+// hardware's middle entry is its lightest, not its last), so this has to
+// actually measure rather than guess a position.
+function _chipShadeExtremes(chipShades) {
+  const luma = ([r, g, b]) => 0.299 * r + 0.587 * g + 0.114 * b
+  const sorted = [...chipShades].sort((a, b) => luma(a) - luma(b))
+  return { darkest: sorted[0], lightest: sorted[sorted.length - 1] }
+}
+
+// Renders the relocated "Lessons" box — pulled out of the main content flow
+// and pinned as a rounded, rotated sticker over the bottom-right corner of
+// the page (see the call site at the end of _drawFlagshipSpread). Styling
+// is intentionally mixed from two other components per spec:
+//   • fill/outline drawn from the skill-pill chip palette (darkest shade
+//     for the fill, lightest for the outline + heading), heading font/
+//     weight/size matching those same chips (palette.chipShades, headBlack)
+//   • body copy in flat black, sized/fonted to match the other paper-scrap
+//     boxes — Problem/Process/Outcome — which all use headXLight via
+//     _drawPaperBox
+function _drawLessonsSticker(doc, palette, x, y, w, h, body, rotateDeg = -4) {
+  const r = 4   // corner radius, mm
+  const { darkest } = _chipShadeExtremes(palette.chipShades)
+  _fillRotatedRoundedRect(doc, x + w / 2, y + h / 2, w, h, r, rotateDeg, darkest, palette.lightAccent, 0.6)
+
+  // Heading — same font, weight and size as the skill-pill chip labels
+  // (headBlack, 8.5pt, all-caps), coloured with the lightest chip shade so
+  // it reads against the darkest one used for the fill.
+  _flagshipFont(doc, 'headBlack')
+  doc.setFontSize(8.5)
+  doc.setTextColor(0,0,0)
+  doc.text('LESSONS', x + 5, y + 7, { angle: -rotateDeg })
+
+  // Body — same font/size as the Problem/Process/Outcome boxes (headXLight,
+  // 9.5pt), same y-up/y-down angle negation _drawPaperBox uses, but flat
+  // black rather than palette.ink per spec.
+  _flagshipFont(doc, 'headXLight')
+  doc.setFontSize(9.5)
+  doc.setTextColor(0, 0, 0)
+  const lines = body ? doc.splitTextToSize(body, w - 10) : []
+  const maxLines = Math.max(0, Math.floor((h - 10) / 4.4))
+  lines.slice(0, maxLines).forEach((ln, i) => {
+    doc.text(ln, x + 5, y + 12 + i * 4.4, { angle: -rotateDeg })
+  })
+}
+
+function _loadImgEl(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload  = () => resolve(img)
+    img.onerror = reject
+    img.src = src
+  })
+}
+
+// Clips `img` to `polyPts` (canvas-pixel coords), cover-fits it inside the
+// poly's bounding box, then strokes the SAME path twice (black, then white)
+// AFTER the clip. The outline is drawn from the cut itself, not from a
+// rectangular padding inset — so it can never get clipped off along an
+// angled edge, which is what happened in the box-shadow/padding version.
+function _drawClippedPanel(ctx, img, polyPts, stage, stageCorner) {
+  ctx.save()
+  const path = new Path2D()
+  polyPts.forEach(([x, y], i) => (i === 0 ? path.moveTo(x, y) : path.lineTo(x, y)))
+  path.closePath()
+  ctx.clip(path)
+
+  const xs = polyPts.map(p => p[0]), ys = polyPts.map(p => p[1])
+  const bx = Math.min(...xs), by = Math.min(...ys)
+  const bw = Math.max(...xs) - bx, bh = Math.max(...ys) - by
+  const ir = img.naturalWidth / img.naturalHeight
+  const br = bw / bh
+  let dw, dh
+  if (ir > br) { dh = bh; dw = bh * ir } else { dw = bw; dh = bw / ir }
+  ctx.drawImage(img, bx + (bw - dw) / 2, by + (bh - dh) / 2, dw, dh)
+  ctx.restore()
+
+  ctx.lineJoin = 'round'
+  ctx.strokeStyle = '#0E0E14'
+  ctx.lineWidth = 8
+  ctx.stroke(path)
+  // Was '#F4F1EA' (cream) — swapped to white so flagship carries zero cream now.
+  ctx.strokeStyle = '#FFFFFF'
+  ctx.lineWidth = 3.5
+  ctx.stroke(path)
+
+  if (stage) _drawStageChip(ctx, stage, bx, by, bw, bh, stageCorner)
+}
+
+// Per-image `stage` corner chip — always anchored to the bottom of its own
+// panel, alternating left/right between adjacent panels.
+function _drawStageChip(ctx, stage, bx, by, bw, bh, corner) {
+  const label = String(stage).toUpperCase()
+  ctx.font = '600 20px sans-serif'
+  const padX = 12, chipH = 30
+  const textW = ctx.measureText(label).width
+  const chipW = textW + padX * 2
+  const cx = corner === 'left' ? bx + 10 : bx + bw - chipW - 10
+  const cy = by + bh - chipH - 10
+  ctx.fillStyle = '#0E0E14'
+  ctx.fillRect(cx, cy, chipW, chipH)
+  ctx.fillStyle = '#19E6E6'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(label, cx + padX, cy + chipH / 2 + 1)
+}
+
+// Builds the whole image mosaic (1–4 photos) onto a single square canvas,
+// returning a PNG dataURL placed via one doc.addImage call.
+async function _renderFlagshipImageGrid(images, size, mode) {
+  const canvas = document.createElement('canvas')
+  canvas.width = size; canvas.height = size
+  const ctx = canvas.getContext('2d')
+  ctx.fillStyle = '#0E0E14'
+  ctx.fillRect(0, 0, size, size)
+
+  const loaded = await Promise.all(images.map(im => _loadImgEl(im.src).catch(() => null)))
+  const valid = loaded.map((img, i) => (img ? { img, stage: images[i].stage } : null)).filter(Boolean)
+  if (!valid.length) return canvas.toDataURL('image/png')
+
+  const useAngles = (FLAGSHIP_PALETTES[mode] || FLAGSHIP_PALETTES.software).angled
+  const order = [...valid.keys()].sort(
+    (a, b) =>
+      valid[b].img.naturalWidth * valid[b].img.naturalHeight -
+      valid[a].img.naturalWidth * valid[a].img.naturalHeight
+  )
+
+  if (valid.length === 1) {
+    _drawClippedPanel(ctx, valid[0].img, [[0, 0], [size, 0], [size, size], [0, size]], valid[0].stage, 'left')
+  } else if (valid.length === 2) {
+    const a = valid[order[0]], b = valid[order[1]]
+    const arA = a.img.naturalWidth / a.img.naturalHeight
+    const arB = b.img.naturalWidth / b.img.naturalHeight
+    const bothWide = arA >= 1.8 && arB >= 1.8
+    const e = useAngles ? 10 : 0
+    const shareBig = Math.min(0.6, 0.5 + Math.abs(arA - arB) * 0.05)
+
+    if (bothWide) {
+      const aOnTop = Math.random() < 0.5
+      const top = aOnTop ? a : b, bot = aOnTop ? b : a
+      const topH = size * (aOnTop ? shareBig : 1 - shareBig)
+      const leftPinch = Math.random() < 0.5
+      const dl = leftPinch ? -e : e, dr = leftPinch ? e : -e
+      _drawClippedPanel(ctx, top.img, [[0, 0], [size, 0], [size, topH + dr], [0, topH + dl]], top.stage, 'left')
+      _drawClippedPanel(ctx, bot.img, [[0, topH + dl], [size, topH + dr], [size, size], [0, size]], bot.stage, 'right')
+    } else {
+      const aOnLeft = Math.random() < 0.5
+      const left = aOnLeft ? a : b, right = aOnLeft ? b : a
+      const leftW = size * (aOnLeft ? shareBig : 1 - shareBig)
+      const topPinch = Math.random() < 0.5
+      const dt = topPinch ? -e : e, db = topPinch ? e : -e
+      _drawClippedPanel(ctx, left.img, [[0, 0], [leftW + dt, 0], [leftW + db, size], [0, size]], left.stage, 'left')
+      _drawClippedPanel(ctx, right.img, [[leftW + dt, 0], [size, 0], [size, size], [leftW + db, size]], right.stage, 'right')
+    }
+  } else if (valid.length === 3) {
+    const big = valid[order[0]], mid = valid[order[1]], small = valid[order[2]]
+    const e1 = useAngles ? 12 : 0, e2 = useAngles ? 10 : 0
+    const bigOnTop = Math.random() < 0.5
+    const top = bigOnTop ? big : mid, bottom = bigOnTop ? mid : big, center = small
+    const hTop = size * 0.45, hMid = size * 0.22
+
+    const s1Left = Math.random() < 0.5
+    const s1L = s1Left ? -e1 : e1, s1R = s1Left ? e1 : -e1
+    const s2Left = Math.random() < 0.5
+    const s2L = s2Left ? -e2 : e2, s2R = s2Left ? e2 : -e2
+
+    _drawClippedPanel(ctx, top.img,    [[0, 0], [size, 0], [size, hTop + s1R], [0, hTop + s1L]], top.stage, 'left')
+    _drawClippedPanel(ctx, center.img, [[0, hTop + s1L], [size, hTop + s1R], [size, hTop + hMid + s2R], [0, hTop + hMid + s2L]], center.stage, 'right')
+    _drawClippedPanel(ctx, bottom.img, [[0, hTop + hMid + s2L], [size, hTop + hMid + s2R], [size, size], [0, size]], bottom.stage, 'left')
+  } else {
+    const corners = ['tl', 'tr', 'bl', 'br']
+    const bigCorner = corners[Math.floor(Math.random() * 4)]
+    const opposite = { tl: 'br', tr: 'bl', bl: 'tr', br: 'tl' }
+    const secondCorner = opposite[bigCorner]
+    const remaining = corners.filter(c => c !== bigCorner && c !== secondCorner)
+    const assign = {}
+    assign[bigCorner] = valid[order[0]]
+    assign[secondCorner] = valid[order[1]]
+    assign[remaining[0]] = valid[order[2]]
+    assign[remaining[1]] = valid[order[3]]
+
+    const bigFrac = Math.min(0.68, Math.max(0.32, 0.6)) // min/max area clamp — tune freely
+    const topIsBig = bigCorner === 'tl' || bigCorner === 'tr'
+    const leftIsBig = bigCorner === 'tl' || bigCorner === 'bl'
+    const midY = size * (topIsBig ? bigFrac : 1 - bigFrac)
+    const midX = size * (leftIsBig ? bigFrac : 1 - bigFrac)
+
+    _drawClippedPanel(ctx, assign.tl.img, [[0, 0], [midX, 0], [midX, midY], [0, midY]], assign.tl.stage, 'left')
+    _drawClippedPanel(ctx, assign.tr.img, [[midX, 0], [size, 0], [size, midY], [midX, midY]], assign.tr.stage, 'right')
+    _drawClippedPanel(ctx, assign.bl.img, [[0, midY], [midX, midY], [midX, size], [0, size]], assign.bl.stage, 'left')
+    _drawClippedPanel(ctx, assign.br.img, [[midX, midY], [size, midY], [size, size], [midX, size]], assign.br.stage, 'right')
+  }
+
+  return canvas.toDataURL('image/png')
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// TECHNICAL DOCUMENTATION SECTION — flagship-only. Renders item.technicalDoc
+// .docs[] ({src, stage, caption}, up to 3) below the Lessons box, using
+// whatever vertical space is left on the page. Reuses _drawClippedPanel for
+// the outline treatment and _drawPaperBox for captions (flat/unrotated, to
+// read as "appendix" rather than collage).
+// ════════════════════════════════════════════════════════════════════════
+
+// Renders one rectangular outlined image panel (no stage chip — caption
+// carries that role instead) and returns a PNG dataURL sized w×h (mm, scaled
+// up for crispness before being placed with doc.addImage at the true mm size).
+// scale=8 (~200 DPI) is chosen to actually use the ~1200-1500px source images
+// the portfolio's photos are capped at — scale=4 was throwing away over half
+// of that detail before export, causing a downsample-then-upsample blur that
+// had nothing to do with the source files themselves. This only affects the
+// one-off PDF export canvas, never the live site's image loading.
+function _renderTechDocPanel(img, w, h, scale = 8) {
+  const canvas = document.createElement('canvas')
+  canvas.width  = Math.max(1, Math.round(w * scale))
+  canvas.height = Math.max(1, Math.round(h * scale))
+  const ctx = canvas.getContext('2d')
+  _drawClippedPanel(
+    ctx, img,
+    [[0, 0], [canvas.width, 0], [canvas.width, canvas.height], [0, canvas.height]],
+    null, null
+  )
+  return canvas.toDataURL('image/png')
+}
+
+// 1 image — image left (sized to its own aspect ratio so it isn't cropped),
+// caption right. Image width caps out so the caption column keeps a sane
+// minimum, instead of one wide source image eating all the space.
+async function _layoutTechDoc1(doc, palette, x, y, w, h, docs) {
+  const d = docs[0]
+  const margin = 4, gap = 8, minCapW = 50
+  const availH = h - margin * 2
+  const ar = d.img.naturalWidth / d.img.naturalHeight
+
+  let imgH = availH
+  let imgW = imgH * ar
+  const maxImgW = w - margin * 2 - gap - minCapW
+  if (imgW > maxImgW) { imgW = maxImgW; imgH = imgW / ar }
+
+  const imgX = x + margin, imgY = y + margin + (availH - imgH) / 2
+  const dataUrl = _renderTechDocPanel(d.img, imgW, imgH)
+  doc.addImage(dataUrl, 'PNG', imgX, imgY, imgW, imgH, undefined, 'FAST')
+
+  const capX = imgX + imgW + gap
+  const capW = x + w - margin - capX
+  _drawPaperBox(doc, palette, capX, y + margin, capW, availH, d.stage, _cleanText(d.caption || ''), 0)
+}
+
+// 2 images — pulled to the section's left/right edges, full available height.
+// Captions sit in the middle but are nudged apart by half a gap budget each
+// so they "point at" their own photo instead of competing for dead-center.
+async function _layoutTechDoc2(doc, palette, x, y, w, h, docs) {
+  const margin = 4, capGapBudget = 16
+  const availH = h - margin * 2
+  const imgW = w * 0.34
+  const imgY = y + margin
+  const [d1, d2] = docs
+
+  const url1 = _renderTechDocPanel(d1.img, imgW, availH)
+  const url2 = _renderTechDocPanel(d2.img, imgW, availH)
+  doc.addImage(url1, 'PNG', x, imgY, imgW, availH, undefined, 'FAST')
+  doc.addImage(url2, 'PNG', x + w - imgW, imgY, imgW, availH, undefined, 'FAST')
+
+  const capW = (w - imgW * 2) / 2 - 6
+  const centerX = x + w / 2
+  const leftCapX  = centerX - capW - capGapBudget / 2
+  const rightCapX = centerX + capGapBudget / 2
+
+  _drawPaperBox(doc, palette, leftCapX,  imgY, capW, availH, d1.stage, _cleanText(d1.caption || ''), 0)
+  _drawPaperBox(doc, palette, rightCapX, imgY, capW, availH, d2.stage, _cleanText(d2.caption || ''), 0)
+}
+
+// 3 images — equal-width row, caption underneath each in a fixed-height band
+// rather than beside it.
+async function _layoutTechDoc3(doc, palette, x, y, w, h, docs) {
+  const margin = 4, colGap = 5, capH = 16
+  const colW = (w - colGap * 2) / 3
+  const imgH = h - margin - capH - 3
+
+  for (let i = 0; i < docs.length; i++) {
+    const d = docs[i]
+    const colX = x + i * (colW + colGap)
+    const url = _renderTechDocPanel(d.img, colW, imgH)
+    doc.addImage(url, 'PNG', colX, y, colW, imgH, undefined, 'FAST')
+    _drawPaperBox(doc, palette, colX, y + imgH + 3, colW, capH, d.stage, _cleanText(d.caption || ''), 0)
+  }
+}
+
+async function _drawFlagshipSpread(doc, item, mode = 'software') {
+  await _loadFlagshipFonts(doc)
+  const palette = FLAGSHIP_PALETTES[mode] || FLAGSHIP_PALETTES.software
+  const PW = 210, PH = 297, MARGIN = 16
+
+  doc.setFillColor(...palette.bg)
+  doc.rect(0, 0, PW, PH, 'F')
+  doc.setDrawColor(...palette.frame)
+  doc.setLineWidth(2.2)
+  doc.rect(MARGIN - 6, MARGIN - 8, PW - (MARGIN - 6) * 2, PH - (MARGIN - 8) * 2)
+
+  let y = MARGIN + 2   // nudged up slightly from MARGIN + 4 to recover room for the
+                        // Overview label now sitting atop the pdfSummary box below
+
+  // Title banner — capped to page width and wraps for long project titles
+  const titleText = _cleanText(item.label || 'Untitled project')
+  _flagshipFont(doc, 'title')
+  doc.setFontSize(19)
+  const maxTitleW = (PW - MARGIN * 2) - 30   // leaves room for side padding + icon
+  const titleLines = doc.splitTextToSize(titleText, maxTitleW)
+  // Line spacing for wrapped multi-line titles. Was 4.4 — a leftover from the
+  // much smaller ~9.5pt body-text line-height used elsewhere on the page —
+  // which crowded wrapped lines together at this banner's 19pt size. Expanded
+  // to give wrapped titles breathing room.
+  const titleLineH = 8
+  const bannerW = Math.max(...titleLines.map(l => doc.getTextWidth(l))) + 22
+  const bannerH = titleLines.length > 1 ? 15 + (titleLines.length - 1) * titleLineH : 15
+  const bannerCX = MARGIN + bannerW / 2 + 2, bannerCY = y + bannerH / 2
+  _fillRotatedRect(doc, bannerCX, bannerCY, bannerW, bannerH, -2, palette.frame)
+  doc.setTextColor(...palette.bg)
+  titleLines.forEach((line, i) => {
+    const lineY = bannerCY - (titleLines.length - 1) * (titleLineH / 2) + i * titleLineH
+    // angle negated to match the box (same y-up/y-down fix as _drawPaperBox) —
+    // this got missed on the first pass since this banner doesn't go through _drawPaperBox
+    doc.text(line, bannerCX, lineY, { align: 'center', baseline: 'middle', angle: 2 })
+  })
+  y += bannerH + 6   // shrunk slightly from +7 — part of the overall tightened
+                      // inter-box spacing on this page
+
+  // Skill chips — ALL CAPS, poison-blue shades
+  if (Array.isArray(item.skills) && item.skills.length) {
+    _flagshipFont(doc, 'headBlack')
+    doc.setFontSize(8.5)
+    let cx = MARGIN
+    item.skills.slice(0, 6).forEach((slug, i) => {
+      const label = String(slug).toUpperCase()
+      const w = doc.getTextWidth(label) + 7
+      doc.setFillColor(...palette.chipShades[i % palette.chipShades.length])
+      doc.roundedRect(cx, y, w, 6, 1, 1, 'F')
+      doc.setTextColor(...palette.bg)
+      doc.text(label, cx + w / 2, y + 4.1, { align: 'center' })
+      cx += w + 3
+    })
+    y += 8   // shrunk slightly from +10
+  }
+
+  // pdfSummary scrap
+  if (item.pdfSummary) {
+    const sumW = PW - MARGIN * 2   // was 55% width, left-anchored — looked unbalanced; now spans both margins like the Lessons box
+    _flagshipFont(doc, 'headXLight')
+    doc.setFontSize(9.5)
+    const lines = doc.splitTextToSize(_cleanText(item.pdfSummary), sumW - 8)
+    // labelGap accounts for the "Overview" heading now sitting above the body
+    // text — same 6.5mm offset _drawPaperBox uses between its label (at +6.5)
+    // and its first body line (at +13)
+    const labelGap = 6.5
+    const boxH = lines.length * 4.4 + 7 + labelGap
+    _fillRotatedRect(doc, MARGIN + sumW / 2, y + boxH / 2, sumW, boxH, 1, palette.paper, palette.frame, 0.4)
+
+    // "Overview" label — matches the heading style _drawPaperBox uses for
+    // Problem/Process/Outcome (headReg, 11pt, palette.label)
+    _flagshipFont(doc, 'headReg')
+    doc.setFontSize(11)
+    doc.setTextColor(...palette.label)
+    doc.text('Overview', MARGIN + 5, y + 6.5, { angle: -1 })
+
+    _flagshipFont(doc, 'headXLight')
+    doc.setFontSize(9.5)
+    doc.setTextColor(...palette.ink)
+    // angle negated to match the box, same fix as _drawPaperBox/title banner —
+    // this block predates _drawPaperBox and duplicates its pattern by hand
+    lines.forEach((ln, i) => doc.text(ln, MARGIN + 5, y + 6.5 + labelGap + i * 4.4, { angle: -1 }))
+    y += boxH + 7   // shrunk slightly from +9
+  }
+
+  // Main row — problem | image grid | process/contribution
+  // (Problem and Process have swapped places from the original layout, and
+  // Problem now runs the full row height — it used to share the right
+  // column with Outcome at half-height each; Outcome's content moved down
+  // into the full-width box below in its place, so Problem expanded to
+  // fill the space that freed up.)
+  const rowTop = y, colGap = 6, rowH = 88
+  const leftW  = (PW - MARGIN * 2 - colGap * 2) * 0.27
+  const midW   = (PW - MARGIN * 2 - colGap * 2) * 0.46
+  const rightW = (PW - MARGIN * 2 - colGap * 2) * 0.27
+  const leftX = MARGIN, midX = leftX + leftW + colGap, rightX = midX + midW + colGap
+
+  _drawPaperBox(doc, palette, leftX, rowTop, leftW, rowH, 'Problem', _cleanText(item.problem || ''), 1.5)
+
+  const images = _pdfImages(item).slice(0, 4)
+  if (images.length) {
+    const gridUrl = await _renderFlagshipImageGrid(images, 560, mode)
+    // Vertically centered against the row height so it lines up with the
+    // middle of the Problem/Process text boxes either side, instead of
+    // sitting flush with their tops (midW is shorter than rowH, so it was
+    // previously stranded at the top with empty space below it).
+    const imgY = rowTop + (rowH - midW) / 2
+    doc.addImage(gridUrl, 'PNG', midX, imgY, midW, midW, undefined, 'FAST')
+  }
+
+  // item.solo overrides the config-level default (_cfg.SOLO) when set;
+  // falls back to the portfolio-wide solo flag otherwise
+  const processLabel = (item.solo ?? _cfg.SOLO) ? 'Process' : 'Contribution'
+  _drawPaperBox(doc, palette, rightX, rowTop, rightW, rowH, processLabel, _cleanText(item.contribution || ''), -1.2)
+
+  y = rowTop + Math.max(midW, rowH) + 7   // shrunk slightly from +9
+
+  // Outcome, full width — this is the slot "Lessons" used to occupy. Lessons
+  // itself moved out into its own sticker box (see the bottom-right corner
+  // sticker drawn at the end of this function); Outcome's content took over
+  // this full-width spot since it no longer fits beside Problem above.
+  if (item.outcome) {
+    _drawPaperBox(doc, palette, MARGIN, y, PW - MARGIN * 2, 24, 'Outcome', _cleanText(item.outcome || ''), -0.6)
+    y += 24 + 7   // shrunk slightly from +9 — was missing entirely before, which
+                  // didn't matter until something needed to render below it
+  }
+
+  // Technical Documentation — flagship-only, fills whatever's left at the
+  // bottom of the page. Never hardcode a Y position here; it depends on how
+  // much room the summary/lessons text above took up.
+  if (item.technicalDoc && Array.isArray(item.technicalDoc.docs) && item.technicalDoc.docs.length) {
+    const frameBottomY = PH - (MARGIN - 8) - 5   // 5mm breathing room above the outer frame stroke
+    const availableH = frameBottomY - y
+
+    if (availableH > 30) {
+      const loaded = await Promise.all(
+        item.technicalDoc.docs.slice(0, 3).map(async d => {
+          try {
+            return { ...d, img: await _loadImgEl(d.src) }
+          } catch (_) {
+            return null
+          }
+        })
+      )
+      const techDocs = loaded.filter(Boolean)
+      const sectionW = PW - MARGIN * 2
+
+      if (techDocs.length === 1) {
+        await _layoutTechDoc1(doc, palette, MARGIN, y, sectionW, availableH, techDocs)
+      } else if (techDocs.length === 2) {
+        await _layoutTechDoc2(doc, palette, MARGIN, y, sectionW, availableH, techDocs)
+      } else if (techDocs.length >= 3) {
+        await _layoutTechDoc3(doc, palette, MARGIN, y, sectionW, availableH, techDocs)
+      }
+    }
+  }
+
+  // Lessons sticker — drawn last so it sits visually on top of everything
+  // else, pinned to the bottom-right corner of the page with its rotated
+  // corners poking slightly past the pink frame stroke.
+  if (item.lessons) {
+    const stickerW = 58, stickerH = 30
+    const frameRightX  = PW - (MARGIN - 6)   // pink frame's right edge
+    const frameBottomY = PH - (MARGIN - 8)   // pink frame's bottom edge
+    const stickerX = frameRightX  - stickerW + 5   // nudges right edge ~5mm past the frame
+    const stickerY = frameBottomY - stickerH + 5   // nudges bottom edge ~5mm past the frame
+    _drawLessonsSticker(doc, palette, stickerX, stickerY, stickerW, stickerH, _cleanText(item.lessons), -4)
+  }
+}
+
+async function _exportPDFSections({ indices, selectedSkills, mode = 'software' }) {
   const exportBtn = _overlay.querySelector('.ps-btn-export')
   if (exportBtn) {
     exportBtn.textContent = 'Generating…'
@@ -1414,12 +2144,27 @@ async function _exportPDFSections({ indices, selectedSkills }) {
   const PH     = 297
   const MARGIN = 20
   const CW     = PW - MARGIN * 2
-  const TC     = [184, 92, 69]   // terracotta rgb
+  // Accent color for every non-flagship page (cover, section headers, skills,
+  // standard project cards, page numbers). Pulled straight from the same
+  // FLAGSHIP_PALETTES used by the flagship spread's frame color, so a
+  // 'general' or 'hardware' export reads as one consistent document instead
+  // of flagship pages going steel-blue/grey while every other page stays
+  // software's pink.
+  const _nonFlagshipPalette = FLAGSHIP_PALETTES[mode] || FLAGSHIP_PALETTES.software
+  const TC = _nonFlagshipPalette.frame
+
+  // Skill chips on non-flagship pages now match the Lessons sticker's color
+  // scheme instead of the old black-outline/pink-text treatment, which read
+  // a bit heavy. Fill = darkest chip shade, outline = lightAccent (a
+  // deliberate light blue for hardware/general rather than the washed-out
+  // near-white their chipShades' "lightest" would otherwise give).
+  const chipFill    = _chipShadeExtremes(_nonFlagshipPalette.chipShades).darkest
+  const chipOutline = _nonFlagshipPalette.lightAccent
 
   let pageNum = 0
 
   // ── Shared helpers ────────────────────────────────────────────────────────
-  const _bg = () => { doc.setFillColor(250, 248, 244); doc.rect(0, 0, PW, PH, 'F') }
+  const _bg = () => { doc.setFillColor(243, 243, 245); doc.rect(0, 0, PW, PH, 'F') }   // was cream [250,248,244] — now light gray
 
   const _pageNum = () => {
     const label = `— ${pageNum} —`
@@ -1430,23 +2175,15 @@ async function _exportPDFSections({ indices, selectedSkills }) {
   }
 
   const _sectionHeader = (label, y) => {
-    doc.setFont('helvetica', 'bold')
+    _flagshipFont(doc, 'headBlack')
     doc.setFontSize(22)
-    doc.setTextColor(26, 26, 26)
+    doc.setTextColor(0, 0, 0)
     doc.text(label, MARGIN, y + 10)
     doc.setDrawColor(...TC)
     doc.setLineWidth(0.8)
     doc.line(MARGIN, y + 14, PW - MARGIN, y + 14)
     return y + 24
   }
-
-  const _cleanText = str => String(str || '')
-    .replace(/[\u2010-\u2015\u2212]/g, '-')
-    .replace(/[\u2018\u2019]/g, "'")
-    .replace(/[\u201C\u201D]/g, '"')
-    .replace(/[^\x20-\xFF\n]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim()
 
   // ── Cover page ────────────────────────────────────────────────────────────
   pageNum++
@@ -1455,9 +2192,9 @@ async function _exportPDFSections({ indices, selectedSkills }) {
   let y = 72
 
   // Name
-  doc.setFont('helvetica', 'bold')
+  _flagshipFont(doc, 'title')
   doc.setFontSize(34)
-  doc.setTextColor(26, 26, 26)
+  doc.setTextColor(0, 0, 0)
   const nameText = _cfg.COVER?.name || 'Portfolio'
   doc.text(nameText, (PW - doc.getTextWidth(nameText)) / 2, y)
   y += 14   // was 10 — 34pt cap-height needs more breathing room before next element
@@ -1555,10 +2292,11 @@ async function _exportPDFSections({ indices, selectedSkills }) {
       const totalW = rowItems.reduce((s, c, i) => s + c.w + (i ? chipGap : 0), 0)
       let chipX = (PW - totalW) / 2
       rowItems.forEach(({ label, w }) => {
-        doc.setDrawColor(...TC)
+        doc.setFillColor(...chipFill)
+        doc.setDrawColor(...chipOutline)
         doc.setLineWidth(0.5)
-        doc.roundedRect(chipX, y - chipPadY, w, chipH, 2, 2, 'S')
-        doc.setTextColor(...TC)
+        doc.roundedRect(chipX, y - chipPadY, w, chipH, 2, 2, 'FD')
+        doc.setTextColor(255, 255, 255)
         doc.text(label, chipX + chipPadX, y + chipPadY - 0.5)
         chipX += w + chipGap
       })
@@ -1605,7 +2343,7 @@ async function _exportPDFSections({ indices, selectedSkills }) {
   let ty = ay
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(14)
-  doc.setTextColor(26, 26, 26)
+  doc.setTextColor(0, 0, 0)
   doc.text(_cfg.COVER?.name || '', textX, ty + 7)
   ty += 12
 
@@ -1631,49 +2369,183 @@ async function _exportPDFSections({ indices, selectedSkills }) {
 
   _pageNum()
 
-  // ── Per-section pages ─────────────────────────────────────────────────────
-  for (const tabIndex of indices) {
-    const cabin = _cfg.CABINS[tabIndex]
-    if (!cabin) continue
+  // ── Table of contents (after About Me) ───────────────────────────────────
+  // Collect all visible items to build the TOC and to know which pages
+  // flagships will land on. We do a two-pass approach: first build the
+  // ordered page list, then render TOC, then render pages.
+  {
+    // Build ordered item list: flagships first (in cabin order), then regular
+    // items grouped by section.
+    const allSectionItems = []   // { tabIndex, cabin, item, isFlagship }
+    for (const tabIndex of indices) {
+      const cabin = _cfg.CABINS[tabIndex]
+      if (!cabin) continue
+      const allProjectItems = (cabin.items || []).filter(
+        item => item.label !== null && item.label !== undefined && !_isContactItem(item)
+      )
+      const vis = selectedSkills.size === 0
+        ? allProjectItems
+        : allProjectItems.filter(item =>
+            Array.isArray(item.skills) && item.skills.some(s => selectedSkills.has(s))
+          )
+      vis.forEach(item => allSectionItems.push({
+        tabIndex, cabin, item,
+        isFlagship: _isFlagshipItem(item, mode),
+      }))
+    }
 
-    const allProjectItems = (cabin.items || []).filter(
-      item => item.label !== null && item.label !== undefined && !_isContactItem(item)
-    )
-    const visibleItems = selectedSkills.size === 0
-      ? allProjectItems
-      : allProjectItems.filter(item =>
-          Array.isArray(item.skills) && item.skills.some(s => selectedSkills.has(s))
-        )
+    const flagshipItems  = allSectionItems.filter(e => e.isFlagship)
+    const regularItems   = allSectionItems.filter(e => !e.isFlagship)
 
-    const contactItems = (cabin.items || []).filter(
-      item => item.label !== null && item.label !== undefined && _isContactItem(item)
-    )
+    // Page-count estimates (used for TOC page numbers):
+    //   • this TOC page itself:   +1 (rendered just below)
+    //   • each flagship:          +1 page each
+    //   • regular items are packed into section pages — rough estimate only
+    let tocPageStart = pageNum + 1  // TOC is the next page
+    let nextPageNum  = tocPageStart + 1  // first content page after TOC
 
-    doc.addPage(); pageNum++; _bg()
-    let cursorY = MARGIN
-    cursorY = _sectionHeader(cabin.label, cursorY)
+    const tocEntries = []
 
-    if (contactItems.length) {
-      contactItems.forEach(item => {
-        doc.setFont('helvetica', 'normal')
-        doc.setFontSize(10)
-        doc.setTextColor(80, 80, 80)
-        doc.text(`${item.label}: ${item.link || ''}`, MARGIN + 4, cursorY)
-        cursorY += 7
+    if (flagshipItems.length) {
+      tocEntries.push({ label: 'Featured Projects', page: null, isHeading: true })
+      flagshipItems.forEach(e => {
+        tocEntries.push({ label: e.item.label || 'Untitled', page: nextPageNum, isHeading: false })
+        nextPageNum++
       })
-      cursorY += 4
     }
 
-    if (!visibleItems.length && !contactItems.length) {
-      doc.setFont('helvetica', 'normal')
-      doc.setFontSize(11)
-      doc.setTextColor(120, 120, 120)
-      doc.text('No projects in this section yet.', MARGIN, cursorY)
+    // Group regular items by section
+    const sectionMap = new Map()
+    for (const tabIndex of indices) {
+      const cabin = _cfg.CABINS[tabIndex]
+      if (!cabin) continue
+      const sectionEntries = regularItems.filter(e => e.tabIndex === tabIndex)
+      if (!sectionEntries.length) continue
+      if (!sectionMap.has(tabIndex)) sectionMap.set(tabIndex, { cabin, items: [] })
+      sectionEntries.forEach(e => sectionMap.get(tabIndex).items.push(e.item))
+    }
+
+    sectionMap.forEach(({ cabin, items }) => {
+      tocEntries.push({ label: cabin.label, page: nextPageNum, isHeading: true })
+      // Pack items into pages: rough 3 items per page
+      const itemsPerPage = 3
+      items.forEach((item, i) => {
+        if (i % itemsPerPage === 0 && i > 0) nextPageNum++
+        tocEntries.push({ label: item.label || 'Untitled', page: nextPageNum, isHeading: false })
+      })
+      nextPageNum++
+    })
+
+    tocEntries.push({ label: 'Skills', page: nextPageNum, isHeading: true })
+
+    // Draw TOC page
+    doc.addPage(); pageNum++; _bg()
+    let tocY = MARGIN
+    tocY = _sectionHeader('Contents', tocY)
+
+    tocEntries.forEach(entry => {
+      if (tocY > PH - 24) return
+      if (entry.isHeading) {
+        tocY += 4
+        doc.setFont('helvetica', 'bold')
+        doc.setFontSize(10)
+        doc.setTextColor(...TC)
+        doc.text(entry.label.toUpperCase(), MARGIN, tocY)
+        if (entry.page !== null) {
+          doc.setFont('helvetica', 'normal')
+          doc.setFontSize(9)
+          doc.setTextColor(140, 135, 128)
+          doc.text(String(entry.page), PW - MARGIN, tocY, { align: 'right' })
+        }
+        tocY += 7
+        // Thin rule under heading
+        doc.setDrawColor(...TC)
+        doc.setLineWidth(0.3)
+        doc.line(MARGIN, tocY - 3, PW - MARGIN, tocY - 3)
+      } else {
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(9)
+        doc.setTextColor(55, 55, 55)
+        const maxLabelW = PW - MARGIN * 2 - 20
+        const truncated = doc.getTextWidth(entry.label) > maxLabelW
+          ? entry.label.slice(0, 60) + '…'
+          : entry.label
+        doc.text(truncated, MARGIN + 6, tocY)
+        // Dot leader
+        const labelEndX = MARGIN + 6 + doc.getTextWidth(truncated) + 3
+        const pageNumX  = PW - MARGIN
+        doc.setTextColor(180, 180, 180)
+        doc.setFontSize(8)
+        let dotX = labelEndX
+        while (dotX + 8 < pageNumX - 12) { doc.text('.', dotX, tocY); dotX += 5 }
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(9)
+        doc.setTextColor(55, 55, 55)
+        doc.text(String(entry.page), pageNumX, tocY, { align: 'right' })
+        tocY += 6
+      }
+    })
+    _pageNum()
+
+    // ── Flagship spreads — collected block right after TOC ─────────────────
+    for (const e of flagshipItems) {
+      doc.addPage(); pageNum++
+      await _drawFlagshipSpread(doc, e.item, mode)
       _pageNum()
-      continue
     }
 
-    for (const item of visibleItems) {
+    // ── Per-section pages (regular items only) ─────────────────────────────
+    for (const tabIndex of indices) {
+      const cabin = _cfg.CABINS[tabIndex]
+      if (!cabin) continue
+
+      const allProjectItems = (cabin.items || []).filter(
+        item => item.label !== null && item.label !== undefined && !_isContactItem(item)
+      )
+      const visibleItems = selectedSkills.size === 0
+        ? allProjectItems
+        : allProjectItems.filter(item =>
+            Array.isArray(item.skills) && item.skills.some(s => selectedSkills.has(s))
+          )
+
+      const contactItems = (cabin.items || []).filter(
+        item => item.label !== null && item.label !== undefined && _isContactItem(item)
+      )
+
+      // Skip sections that only have flagships — they're already rendered above
+      const nonFlagshipVisible = visibleItems.filter(item => !_isFlagshipItem(item, mode))
+      if (!nonFlagshipVisible.length && !contactItems.length) continue
+      doc.addPage(); pageNum++; _bg()
+      let cursorY = MARGIN
+      // If this is the about-me cabin but it contains project-style items (activities,
+      // interests), label it "Activities & Interests" so it's distinct from the bio page.
+      const sectionLabel = (cabin.id === 'about-me' && nonFlagshipVisible.length)
+        ? 'Activities & Interests'
+        : cabin.label
+      cursorY = _sectionHeader(sectionLabel, cursorY)
+
+      if (contactItems.length) {
+        contactItems.forEach(item => {
+          doc.setFont('helvetica', 'normal')
+          doc.setFontSize(10)
+          doc.setTextColor(80, 80, 80)
+          doc.text(`${item.label}: ${item.link || ''}`, MARGIN + 4, cursorY)
+          cursorY += 7
+        })
+        cursorY += 4
+      }
+
+      if (!nonFlagshipVisible.length && !contactItems.length) {
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(11)
+        doc.setTextColor(120, 120, 120)
+        doc.text('No projects in this section yet.', MARGIN, cursorY)
+        _pageNum()
+        continue
+      }
+
+      for (const item of nonFlagshipVisible) {
+
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(13)
       const titleLines = doc.splitTextToSize(item.label || 'Untitled', CW * 0.58)
@@ -1684,8 +2556,34 @@ async function _exportPDFSections({ indices, selectedSkills }) {
       doc.setFontSize(9)
       const descLines = cleanDesc ? doc.splitTextToSize(cleanDesc, CW * 0.58) : []
 
-      const hasDocImage = Array.isArray(item.images) && item.images.length >= 2
-      const bandH = Math.max(45, Math.min(hasDocImage ? 240 : 160, titleH + 8 + descLines.length * 5.2 + 10))
+      // Measure the skill-chip row ahead of time so bandH can account for it.
+      // Same outlined-pill convention as the cover/skills pages, sized down
+      // for the denser card layout. Title + thin rule + chips + description
+      // is the agreed "quiet sibling" structure — no new labeled sections.
+      const cardSkills = Array.isArray(item.skills) ? item.skills.slice(0, 8) : []
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(7)
+      const chipPadX = 4, chipH = 5.5, chipGap = 4, chipRowGap = 2.5
+      const maxChipRowW = CW * 0.58
+      let chipRows = 0
+      if (cardSkills.length) {
+        let rowW = 0
+        chipRows = 1
+        cardSkills.forEach(slug => {
+          const w = doc.getTextWidth(String(slug).toUpperCase()) + chipPadX * 2
+          if (rowW + w + chipGap > maxChipRowW && rowW > 0) {
+            chipRows++
+            rowW = 0
+          }
+          rowW += w + chipGap
+        })
+      }
+      const ruleBlockH = 5   // space consumed by the thin pink rule under the title
+      const chipBlockH = cardSkills.length ? chipRows * chipH + (chipRows - 1) * chipRowGap + 5 : 0
+
+      const hasDocImage = _pdfImages(item).length >= 2
+      const textBlockH = titleH + ruleBlockH + chipBlockH + 8 + descLines.length * 5.2 + 10
+      const bandH = Math.max(45, Math.min(hasDocImage ? 240 : 160, textBlockH))
 
       if (cursorY + bandH > PH - 18) {
         _pageNum()
@@ -1693,30 +2591,63 @@ async function _exportPDFSections({ indices, selectedSkills }) {
         cursorY = MARGIN
       }
 
-      // Card background — #f2f0eb
-      doc.setFillColor(242, 240, 235)
+      // Card background — light gray, lifted slightly off the page's gray bg
+      doc.setFillColor(250, 250, 252)
       doc.roundedRect(MARGIN, cursorY, CW, bandH - 2, 2, 2, 'F')
 
-      // Title
-      doc.setFont('helvetica', 'bold')
+      // Title — pure black, BigShoulders for visual kinship with flagship pages
+      _flagshipFont(doc, 'headReg')
       doc.setFontSize(13)
-      doc.setTextColor(26, 26, 26)
+      doc.setTextColor(0, 0, 0)
       doc.text(titleLines, MARGIN + 5, cursorY + 8)
+
+      // Thin pink rule — decorative echo of flagship's frame color, not a divider
+      let nextY = cursorY + 8 + titleH
+      doc.setDrawColor(...TC)
+      doc.setLineWidth(0.6)
+      doc.line(MARGIN + 5, nextY - 2, MARGIN + 5 + 26, nextY - 2)
+      nextY += 3
+
+      // Skill chips — fill/outline now matches the Lessons sticker's color
+      // scheme (darkest chip shade fill, lightAccent outline) rather than
+      // the old black-outline/pink-text treatment, which read a bit heavy
+      if (cardSkills.length) {
+        _flagshipFont(doc, 'headBlack')
+        doc.setFontSize(7)
+        let chipX = MARGIN + 5, chipY = nextY + 2
+        cardSkills.forEach(slug => {
+          const label = String(slug).toUpperCase()
+          const w = doc.getTextWidth(label) + chipPadX * 2
+          if (chipX + w > MARGIN + 5 + maxChipRowW && chipX > MARGIN + 5) {
+            chipX = MARGIN + 5
+            chipY += chipH + chipRowGap
+          }
+          doc.setFillColor(...chipFill)
+          doc.setDrawColor(...chipOutline)
+          doc.setLineWidth(0.35)
+          doc.roundedRect(chipX, chipY - 4, w, chipH, 1.2, 1.2, 'FD')
+          doc.setTextColor(255, 255, 255)
+          doc.text(label, chipX + chipPadX, chipY - 0.3)
+          chipX += w + chipGap
+        })
+        nextY = chipY + chipH
+      }
 
       // Description
       if (cleanDesc) {
         doc.setFont('helvetica', 'normal')
         doc.setFontSize(9)
         doc.setTextColor(70, 70, 70)
-        doc.text(descLines, MARGIN + 5, cursorY + 8 + titleH, { lineHeightFactor: 1.55 })
+        doc.text(descLines, MARGIN + 5, nextY + 4, { lineHeightFactor: 1.55 })
       }
 
       // Images — renders up to 2 stacked in right column (build photo + schematic/doc).
       // Add a `label` field to an image entry in config.js for a custom caption,
       // e.g. {"src": "photos/rfid-schematic.jpg", "date": "...", "label": "MOSFET switching circuit"}
       // Images without a label fall back to "schematic / technical documentation".
-      const images = Array.isArray(item.images) && item.images.length
-        ? item.images
+      const pdfImgs = _pdfImages(item)
+      const images = pdfImgs.length
+        ? pdfImgs
         : item.image ? [{ src: item.image, date: null }] : []
 
       if (images.length) {
@@ -1757,7 +2688,7 @@ async function _exportPDFSections({ indices, selectedSkills }) {
 
       // GLB screenshot — The Portfolio tab only
       if (cabin.id === 'hobby-work') {
-        const visBandIdx = visibleItems.indexOf(item)
+        const visBandIdx = nonFlagshipVisible.indexOf(item)
         const glbEntry   = (_glbScenesByTab[tabIndex] || [])[visBandIdx]
         if (glbEntry && glbEntry.scene && glbEntry.camera) {
           try {
@@ -1793,6 +2724,7 @@ async function _exportPDFSections({ indices, selectedSkills }) {
 
     _pageNum()
   }
+  } // end of TOC / flagship / per-section block
 
   // ── Skills page ───────────────────────────────────────────────────────────
   doc.addPage(); pageNum++; _bg()
@@ -1832,8 +2764,8 @@ async function _exportPDFSections({ indices, selectedSkills }) {
       .sort((a, b) => b[1].level - a[1].level)
     if (!catSkills.length) return
 
-    // Category label — terracotta uppercase
-    doc.setFont('helvetica', 'bold')
+    // Category label — terracotta uppercase, BigShoulders to match flagship register
+    _flagshipFont(doc, 'headBlack')
     doc.setFontSize(8.5)
     doc.setTextColor(...TC)
     doc.text(cat.label.toUpperCase(), MARGIN, skillsY)
@@ -1854,17 +2786,22 @@ async function _exportPDFSections({ indices, selectedSkills }) {
 
       if (tagX + tagW > PW - MARGIN) { tagX = MARGIN; skillsY += tagH + 3 }
 
-      // Chip — outlined terracotta
-      doc.setDrawColor(...TC)
+      // Chip — fill/outline now matches the Lessons sticker's color scheme
+      // (darkest chip shade fill, lightAccent outline) instead of a plain
+      // black outline
+      doc.setFillColor(...chipFill)
+      doc.setDrawColor(...chipOutline)
       doc.setLineWidth(0.4)
-      doc.roundedRect(tagX, skillsY - 5, tagW, tagH, 1.5, 1.5, 'S')
+      doc.roundedRect(tagX, skillsY - 5, tagW, tagH, 1.5, 1.5, 'FD')
 
-      // Skill name bold, count normal
+      // Skill name bold, count normal — both darkened only enough to stay
+      // legible against the chip's colored fill (was tuned for the old
+      // plain background)
       doc.setFont('helvetica', 'bold')
-      doc.setTextColor(26, 26, 26)
+      doc.setTextColor(255, 255, 255)
       doc.text(skill.label, tagX + 5, skillsY)
       doc.setFont('helvetica', 'normal')
-      doc.setTextColor(140, 135, 128)
+      doc.setTextColor(210, 210, 210)
       doc.text(`  (${count})`, tagX + 5 + nameW, skillsY)
 
       tagX += tagW + 5
@@ -2529,6 +3466,45 @@ const _CSS = /* css */`
 .ps-pdf-skill-chip input[type=checkbox] { display: none; }
 .ps-pdf-skill-chip--on { background: #2a2a2a; border-color: #2a2a2a; color: #fff; }
 .ps-pdf-skill-chip:hover:not(.ps-pdf-skill-chip--on) { border-color: #999; background: rgba(0,0,0,0.05); }
+/* ── Spread-style mode chips ─────────────────────────────────────────────── */
+.ps-pdf-mode-grid { display: flex; gap: 6px; margin-bottom: 12px; }
+.ps-pdf-mode-chip {
+  flex: 1;
+  padding: 7px 10px;
+  border: 1.5px solid #d6d0c6;
+  border-radius: 8px;
+  background: #faf8f3;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #555;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.ps-pdf-mode-chip--on { background: #1a1a1a; border-color: #1a1a1a; color: #ff2d8a; }
+.ps-pdf-mode-chip:hover:not(.ps-pdf-mode-chip--on) { border-color: #999; background: rgba(0,0,0,0.05); }
+/* ── Collapsible "filter by skill" dropdown ─────────────────────────────── */
+.ps-pdf-skill-toggle {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 4px 0 8px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #777;
+  cursor: pointer;
+}
+.ps-pdf-skill-toggle:hover { color: #1a1a1a; }
+.ps-pdf-skill-collapse {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.18s ease;
+}
+.ps-pdf-skill-collapse--open { max-height: 240px; overflow-y: auto; margin-bottom: 10px; }
 /* ── Picker sub ──────────────────────────────────────────────────────────── */
 .ps-pdf-picker-title {
   margin: 0;
