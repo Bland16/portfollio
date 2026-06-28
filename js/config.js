@@ -255,8 +255,8 @@ export const CABINS = [
           'problem-solving',
         ],
         pdfExport: {
-          software: true,
-          all: true,
+          software: false,
+          all: false,
         },
         problem: 'Although normal scheduling applications are helpful with remembering what someone has planned, they offer no guidance as to how to actually schedule out your time. Thus, it can be easy for someone with ADHD to both over and under book their schedule. ',
         outcome: 'TideFlow contributed to a 15% increase in my brother\'s weekly satisfaction rating (collected by TideFlow for machine learning purposes) over the span since he first implemented it.',
