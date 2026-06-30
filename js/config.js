@@ -77,7 +77,7 @@ export const CABINS = [
       scale: 14.5,
       rotationY: 3.8,
       label: 'The Cabin',
-      description: 'I follow the same build pipeline for every model in the scene: design in Fusion 360, export as an FBX, reposition and name all bodies in Blender, add animation empties where needed, export as a GLB, and then re-apply all base materials by mesh name prefix in Three.js.\n\nThe cabin is built from 79 individually named mesh bodies. The material system reads each name prefix and assigns the correct color in code depending on the \'vibe\' (the active color theme), so every cabin in the scene actually shares one base GLB. Two animation empties drive the door swing, timed to the camera transition into the interior. There is also an empty for the seat height of the left and right seats. The code places project objects at the coordinate of the empty. In dev mode, I can manually drag, scale, position, and rotate the objects exactly where I want them to sit in the cabin relative to the seats. The objects themselves are also assigned descriptions in a config file which can be accessed through a side panel when clicked. ',
+      description: 'I follow the same build pipeline for every model in the scene: design in Fusion 360, export as an FBX, reposition and name all bodies in Blender, add animation empties where needed, export as a GLB, and then re-apply all base materials by mesh name prefix in Three.js.\n\nThe cabin is built from 79 individually named mesh bodies. The material system reads each name prefix and assigns the correct color in code depending on the \'vibe\' (the active color theme), so every cabin in the scene actually shares one base GLB. Two animation empties drive the door swing, timed to the camera transition into the interior. There is also an empty for the seat height of the left and right seats. The code places project objects at the coordinate of the empty. In dev mode, I can manually drag, scale, position, and rotate the objects exactly where I want them to sit in the cabin relative to the seats. A config file assigns the objects descriptions which visitos can access through by clicking on the object to open a side panel. ',
       skills: [
         'blender',
         'fusion-360',
@@ -98,7 +98,7 @@ export const CABINS = [
       scale: 9,
       rotationY: 1.55,
       label: 'The Ticket Booth',
-      description: 'Sir\'s ticket stand was modeled in Fusion 360 across 36 mesh bodies. The both was made by creating a custom rectangular prism in  fusion 360 and having it follow a custom pattern on path to create the over arching shape. The booth provides a strong visual counterweight to the wheel and button enclosure on screen left. The center of the booth has an empty which helps center Sir at the correct height and depth of the booth regardless of booth location. \n\nIt is also home to Sir Matcher. When Sir is clicked, the camera orbits to the ticket booth, locks into a fixed position, and switches its target to him.',
+      description: 'Sir\'s ticket stand was modeled in Fusion 360 across 36 mesh bodies. The booth was made by creating a custom rectangular prism in  Fusion 360 and having it follow a custom pattern along a path to create the overarching shape. The booth provides a strong visual counterweight to the wheel and button enclosure on screen left. The center of the booth has an empty which helps center Sir at the correct height and depth of the booth regardless of booth location. \n\nIt is also home to Sir Matcher. When Sir is clicked, the camera orbits to the ticket booth, locks into a fixed position, and switches its target to him.',
       skills: [
         'fusion-360',
         'cad',
@@ -141,7 +141,7 @@ export const CABINS = [
       scale: 2,
       rotationY: -1.25,
       label: 'Vibe Switcher',
-      description: 'A keyboard keycap on the front page cycles through the sites visual palette through seven distinct themes: Aurora, Suave, Carnival, Pop Art, Blueprint, Midnight Arcade, and Pastel Dream. On load, a 30-frame rAF benchmark runs alongside hardware heuristics: device memory, core count, max texture size, and mobile detection. The combined score determines how far the post-processing stack scales back on lower-end devices.\n\nEach theme is a delta patch against a shared base material set. The vibe properties are specified in a config document, and the system merges them on top at each \'vibe-switch\'. Every named mesh in the scene responds simultaneously. There are a variety of custom theme components across the vibes. For instance, Blueprint sets each structural mesh to wireframe and activates OutlinePass, turning the scene into a technical drawing, Midnight Arcade adds scanlines and pushes bloom to maximum, and Aurora runs a custom GLSL shader alongside a particle rain system.\n\n',
+      description: 'A keyboard keycap on the front page cycles through the site\'s visual palette through seven distinct themes: Aurora, Suave, Carnival, Pop Art, Blueprint, Midnight Arcade, and Pastel Dream. On load, a 30-frame rAF benchmark runs alongside hardware heuristics: device memory, core count, max texture size, and mobile detection. The combined score determines how far the post-processing stack scales back on lower-end devices.\n\nEach theme is a delta patch against a shared base material set. The vibe properties are specified in a config document, and the system merges them on top at each \'vibe-switch\'. Every named mesh in the scene responds simultaneously. Each vibe includes distinct custom components. For instance, Blueprint sets each structural mesh to wireframe and activates OutlinePass, turning the scene into a technical drawing, Midnight Arcade adds scanlines and pushes bloom to maximum, and Aurora runs a custom GLSL shader alongside a particle rain system.\n\n',
       skills: [
         'threejs',
         'javascript',
@@ -160,7 +160,7 @@ export const CABINS = [
       scale: 1,
       rotationY: 3,
       label: 'Camera System',
-      description: 'I built three distinct camera modes for this experience: Orbit allows for a free look around the wheel, Transit provides a smooth tween to a selected cabin, and Interior locks the view inside a cabin using a precise position offset and look target set in the config file. This allows for the user to have a variety of interactions with the site and prevents the website from becoming stale as it is being traversed. There is also an Auto-Explore feature that automatically cycles through every cabin on a timer. You can press \'A\' inside any cabin to activate it. This carries the cabin exploration over to devices without attached keyboards such as mobile devices. ',
+      description: 'I built three distinct camera modes for this experience: Orbit allows for a free look around the wheel, Transit provides a smooth tween to a selected cabin, and Interior locks the view inside a cabin using a precise position offset and look target set in the config file. This allows for the user to have a variety of interactions with the site and prevents the experience from feeling repetitive. There is also an Auto-Explore feature that automatically cycles through every cabin on a timer. You can press \'A\' inside any cabin to activate it. This carries the cabin exploration over to devices without attached keyboards such as mobile devices. ',
       pdfRotationY: -1.5707963267948966,
     },
   ]
@@ -249,11 +249,11 @@ export const CABINS = [
           software: 'flagship',
           all: 'flagship',
         },
-        pdfSummary: 'I built and trained a machine learning model in Python to estimate the distance of a tree from a camera, aiming to optimize pesticide application with my partner Michael Busa. We were given two weeks for this project. Following the completion of our code, we delivered a presentation on our findings.  As the research this project contributed to has not yet been published, detailed methodology and data are available upon request.',
+        pdfSummary: 'I built and trained a machine learning model in Python to estimate the distance of a tree from a camera, aiming to optimize pesticide application with my partner Michael Busa. We constructed and delivered a presentation on our code within a two-week timeline.  As the research this project contributed to has not yet been published, detailed methodology and data are available upon request.',
         problem: 'At present, pesticide application in the United States is either applied by hand or using a set value which doesn\'t differentiate between tree size, distance or species. This wasted product not only costs significantly more than an optimized approach but can have unintended consequences on nearby populations. ',
         outcome: 'My model achieved a Root Mean Squared Error (a measurement of the magnitude of average error of our model) of 0.02 meters, which was two orders of magnitude lower than our intended distance range of 1.5 - 3 meters. Additionally, it reached a Mean Absolute Error of 0.0069 meters. ',
         contribution: 'I developed a machine learning model trained on masked tree images cleaned by an algorithm written by my partner Michael Busa. My contribution to this project entailed selecting the best-fit regression model, choosing and assigning weights to heuristics for the model to consider, and assisting Michael in the iteration process for selecting the best tree-masking strategy. ',
-        lessons: 'I learned that iteration is the beginning of success, not the end of it. Also, I learned how to optimize machine learning models. ',
+        lessons: 'I learned that iteration is the beginning of success, not the end of it. I also learned that changing the weight of different heurstics in training data has a large impact on the success of a ML algorithim. ',
         images: [
           {
             src: 'photos/tree-distance-1.jpg',
@@ -288,7 +288,7 @@ export const CABINS = [
         "positionOffset": [-0.3, 0, -3.1],
         "scale": 0.3,
         label: 'TideFlow | Personal Scheduling App',
-        description: 'I built TideFlow, a scheduling app designed around ADHD cognitive patterns for my brother, who was having difficulty managing his schedule using an Object-Oriented Framework in JavaScript. I created a 20-page design spec based on interviews with him and identifying features that would best address his needs. I implemented the system using an iterative rapid-development approach over one week. TideFlow includes a machine learning engine that reads real versus estimated task duration, task satisfaction by category, burnout levels, and when the user prefers to schedule tasks, and it suggests tasks when prompted and provides corrected time estimates for user-added tasks. The model updates per task using recency weighting and satisfaction scores, and it applies safe multipliers to avoid overcorrection. I also built the scheduling logic, which enforces ADHD-friendly rules like protected deep-work windows, nightly cutoffs, burnout-mode load reduction, and collision detection for fixed and flexible tasks. The app includes four views, drag-and-drop rescheduling, ICS export, and a daily survey that feeds back into the ML loop.',
+        description: 'I built TideFlow, a scheduling app designed around ADHD cognitive patterns, for my brother who was having difficulty managing his schedule. I implemented it using an Object-Oriented Framework in JavaScript. I created a 20-page design spec based on interviews with him and identifying features that would best address his needs. I implemented the system using an iterative rapid-development approach over one week. TideFlow includes a machine learning engine that reads real versus estimated task duration, task satisfaction by category, burnout levels, and when the user prefers to schedule tasks, and it suggests tasks when prompted and provides corrected time estimates for user-added tasks. The model updates per task using recency weighting and satisfaction scores, and it applies safe multipliers to avoid overcorrection. I also built the scheduling logic, which enforces ADHD-friendly rules like protected deep-work windows, nightly cutoffs, burnout-mode load reduction, and collision detection for fixed and flexible tasks. The app includes four views, drag-and-drop rescheduling, ICS export, and a daily survey that feeds back into the ML loop.',
         skills: [
           'machine-learning',
           'prompt-engineering',
@@ -397,7 +397,7 @@ export const CABINS = [
       problem: 'At Boston College, the current lost and found system relies on medium-to-high value items being submitted to the sole pick-up location located in the Boston College Police Department on Lower Campus where students can pick up their items upon proof of ownership and/or identification. The pain point of this system is two-fold: it doesn\'t account for items with low material value but high sentimental value, and it places an unnecessary burden on an overstressed system, namely the police station of a college campus.',
       outcome: 'The project was presented at the Making the Modern World 2026 design conference. It functioned as intended. For the purposes of demonstration, I had attendees use a practice Eagle ID which had been registered as an authorized user prior to the event to open the lock box and retrieve a faux lost item. In the user feedback stage of testing, there was an average user satisfaction level of 9.875/10 across 16 users. ',
       contribution: 'The system runs C++ firmware I wrote for an Arduino Nano, which using card authorization logic, controls a 5V solenoid lock through a MOSFET switching circuit and communicates with a 13.56MHz RC522 RFID reader over SPI. The custom electronics I wired include flyback protection, gate pull-down resistors, and multi-voltage power distribution (5V/3.3V) for reliable high-current switching.',
-      lessons: 'I learned the importance of planning out the electronic housing prior to soldering the circuit and electronics.',
+      lessons: 'I learned the importance of planning out the electronic housing prior to assembling the final enclosure.',
       images: [
         {
           src: 'photos/rfid-0.jpg',
@@ -459,9 +459,10 @@ export const CABINS = [
         all: 'flagship',
       },
       pdfSummary: 'I engineered a custom arcade machine, "Dino Metal Rampage", with five games: Cretaceous Shred: Rex\'s Revenge (a guitar hero spoof), Asteroid Avoider, a character selection game to avoid falling asteroids, a BlackJack display with an animated raptor bartender/dealer, a coloring book with 20 different coloring pages, and a maze game with a maze generation algorithm. \n\n',
-      problem: 'This project was constructed in combination with Garrett Mackensie for my final project in my Physical Computer class at Boston College. For this project, we were given two weeks and a maximum budget of $200 to create an interactive display that incorporated light and movement.  ',
+      problem: 'This project was constructed in combination with Garrett Mackenzie for my final project in my Physical Computer class at Boston College. For this project, we were given two weeks and a maximum budget of $200 to create an interactive display that incorporated light and movement.  ',
       outcome: 'The display ran smoothly and worked for all five games with active communication between the controls and Hub75s. The head of the engineering department at Boston College and our Physical Computing professor requested to display the piece at the front entrance of 245 Beacon Street, Boston College\'s engineering building, for the remainder of my study to promote the caliber of the engineering program at our university. ',
       contribution: 'For my portion of the project, I integrated a Raspberry Pi 5, Adafruit RGB Matrix HAT, seven LED 3.3V buttons, a four-direction joystick, and three 64×32 HUB75 LED panels into a unified 96×64 low‑latency display, with hand‑wired controls and dual‑rail power distribution for stable high‑current operation. I also programmed a five-game game engine, an offline MIDI/audio analysis engine, a PNG sprite‑sheet extractor with per‑pixel color quantization, sprite blitting routines, and a persistent high‑score subsystem.',
+      lessons: 'I learned the importance of testing electrical components prior to implementing them into my final builds.',
       images: [
         {
           src: 'photos/arcade-1.jpg',
@@ -628,7 +629,7 @@ export const CABINS = [
       problem: 'The Lovelane Special Needs Horseback Riding Program allows students of all conditions to help care for and ride horses. One caretaking activity is feeding the horses by hanging a hay bag at a height of approximately two feet from the ground. The process prior to the implementation of our solution was for the person hanging the bag to carry and push their entire body weight against the bag while simultaneously facilitating the bag\'s clasps. Our targeted user was someone with difficulties with fine muscle coordination. ',  
       outcome: 'Our final design allowed the bag to be placed at a height below the two-foot range such that regardless of the different physical abilities of users, the bag will sit at the same height with no fine motor manipulation required to hold the bag in place. Additionally, the design was easily mobile and storable with a weight of 12.5lbs and a moveable hook design which allowed tension cables to be used as our storage mechanism to compress the width of the shelf to less than a third of its original width. ',
       contribution: 'I designed and produced the sketches for our initial and final prototype, which I then iterated on with my teammates. I also did the math substantiating the size constraints of our final design. Additionally, I completed the majority of the physical construction including fabricating the wooden backing and floor, attaching a piano hinge, tension cables, and hooks for portability, and laser cutting paneling for our nail heads to prevent snagging and improve the overall aesthetics of our design. \n',
-      lessons: 'Having a simple effective design with an intuitive interface is often better than a complicated more \'technically advanced\' build that may isolate the targeted user.',
+      lessons: 'Designing an effective build with an intuitive interface is often better than a more complicated, ostensibly \'technically advanced\' build that may isolate the targeted user.',
       images: [
         {
           src: 'photos/hay-bag-1.jpg',
@@ -785,7 +786,7 @@ export const CABINS = [
           "scale": 0.1,
           "label": "Society Of Women Engineers at Boston College Co-director of Community Service",
           "link": null,
-          "description": "As Co‑director of Community Service for SWE, I have coordinated early planning for our 2026–2027 outreach initiatives, including researching nearby organizations that work to increase access for women returning to STEM education. This year, I attended the National SWE Conference of 2025 in New Orleans. While there, I was fortunate to hear about the initiatives being put in place by female engineers across the globe, and I was especially interested in the recent push in assistive technology and custom prostheses. It was an incredible experience, and I took back concrete solutions for enhanced career readiness from industry professionals that our chapter is already integrating into our preparations for next year’s conference.",
+          "description": "As Co‑director of Community Service for SWE, I have coordinated early planning for our 2026–2027 outreach initiatives, including researching nearby organizations that work to increase access for women returning to STEM education. This year, I attended the National SWE Conference of 2025 in New Orleans. While there, I was fortunate to hear about the initiatives being put in place by female engineers across the globe, and I was especially interested in the recent push in assistive technology and custom prostheses. It was an incredible experience. I returned with concrete career readiness strategies from industry professionals that our chapter is already integrating into our preparations for next year’s conference.",
           "images": [{"src": "photos/swe-1.jpg", "date": '10/25/2025'}],
           "rotationY": -2.3,
           "skills": ['leadership', 'event-planning', 'teamwork', 'communication']
@@ -819,7 +820,7 @@ export const CABINS = [
           "scale": 0.5,
           "label": "My Interests",
           "link": null,
-          "description": "I enjoy learning about a wide variety of subjects. Some topics I maintain a strong body of knowledge in include the Flint, Michigan water crisis and community vulnerability to public health crises, entertainment engineering techniques, the long-term effects of redlining on modern housing districts, the intersection between religion and economic theory, and asylum law regulations and procedures.",
+          "description": "I enjoy learning about a wide variety of subjects. Topics in which I maintain a strong body of knowledge include the Flint, Michigan water crisis and community vulnerability to public health crises, entertainment engineering techniques, the long-term effects of redlining on modern housing districts, the intersection between religion and economic theory, and asylum law regulations and procedures.",
           "images": [{"src": "photos/water.jpg", "date": null}]
         },
         {
@@ -1000,7 +1001,7 @@ export const ABOUT_ME = {
   photo: 'photos/headshot.jpg',
   bio: [
     // Paragraph 1 — professional intro
-    "I am a rising sophomore in Boston College's 2029 Human Centered Engineering cohort. My past work experience includes computational biology at Rockefeller University, writing affidavits for U.S. asylum applicants, and front-end software development. I would like to join an engineering firm after graduating from Boston College, attend law school, and return to work as in-house counsel. I am particularly interested in working in an innovative field with limited legal precedent. ",
+    "I am a rising sophomore in Boston College's 2029 Human Centered Engineering cohort. My past work experience includes computational biology research at Rockefeller University, asylum affidavit writing for U.S. applicants, and front-end software development. I would like to join an engineering firm after graduating from Boston College, attend law school, and return to work as in-house counsel. I am particularly interested in working in an innovative field with limited legal precedent. ",
     // Paragraph 2 — mission and context  
     ''
     //'Your second paragraph here. What drives you, where you\'re headed, the thread that connects your work.',
