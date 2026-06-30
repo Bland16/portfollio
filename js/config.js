@@ -32,97 +32,138 @@ export const CABINS = [
     id: 'hobby-work',
     label: 'The Portfolio',
     attachIndex: 8,
-    items: [
-      {
-        "glb": "models/wheel-rails.glb",
-        "seat": "left",
-        "positionOffset": [-0.8, 1.4, 3.1],
-        "scale": 5,
-        "label": "The Ferris Wheel",
-        "link": null,
-        "description": "I love the beach. Every time I have the opportunity to visit one, I find myself transfixed by the Ferris wheels. There's a certain elegance to the architecture and lighting design that tricks the mind into seeing them fly. When it came time to build my portfolio, I thought it would be nice if I could fly, too.\n\nThe wheel and stand together contain 73 named mesh bodies. There are 12 empties that work as attachment point anchors, one per spoke. The code reads these coordinates to position each cabin precisely on the wheel.",
-        "images": [],
-        "rotationY": 2.2,
-        "skills": ['threejs', 'javascript', 'blender', 'fusion-360', 'cad', 'web-dev', 'problem-solving']
-      },
-      {
-        "glb": "models/wheel-stand.glb",
-        "seat": "left",
-        "positionOffset": [-0.8, 1.4, 3.1],
-        "scale": 5,
-        "label": null,
-        "link": null,
-        "description": null,
-        "images": [],
-        "rotationY": 2.2
-      },
-      {
-        "glb": "models/cabin.glb",
-        "seat": "right",
-        "positionOffset": [0.7, 2.5, 4],
-        "scale": 14.5,
-        "label": "The Cabin",
-        "link": null,
-        "description": "I follow the same build pipeline for every model in the scene: design in Fusion 360, export as an FBX, reposition and name all bodies in Blender, add animation empties where needed, export as a GLB, and then re-apply all base materials by mesh name prefix in Three.js.\n\nThe cabin is built from 79 individually named mesh bodies. The material system reads each name prefix and assigns the correct color in code depending on the 'vibe' (see the Vibe Switcher for more info), so every cabin in the scene actually shares one base GLB. Two animation empties drive the door swing, timed to the camera transition into the interior. There is also an empty for the seat height of the left and right seats. The code places project objects at the coordinate of the empty. In dev mode, I can manually drag, scale, position, and rotate the objects exactly where I want them to sit in the cabin relative to the seats.",
-        "images": [],
-        "rotationY": 3.8,
-        "skills": ['blender', 'fusion-360', 'cad', 'threejs', 'javascript', 'web-dev']
-      },
-      {
-        "glb": "models/booth.glb",
-        "seat": "left",
-        "positionOffset": [-0.1, 0, 0.1],
-        "scale": 9,
-        "label": "The Ticket Booth",
-        "link": null,
-        "description": "Sir's ticket stand was modeled in Fusion 360 across 36 mesh bodies. The booth provides a strong visual counterweight to the wheel and button enclosure on screen left.\n\nIt is also home to Sir Matcher. When Sir is clicked, the camera orbits to the ticket booth, locks into a fixed position, and switches its target to him.",
-        "images": [],
-        "rotationY": 1.55,
-        "skills": ['fusion-360', 'cad', 'blender']
-      },
-      {
-        "glb": "models/robot.glb",
-        "seat": "left",
-        "positionOffset": [-0.2, 0, -2.6],
-        "scale": 20.5,
-        "label": "Sir Matcher",
-        "link": null,
-        "description": "Sir Matcher was modeled in Fusion 360 across 42 mesh bodies including a top hat, monocle, clock, face, eyebrows, and glowing pupils. He is a rather dapper fellow modeled after Alfred the Butler from the Batman series, so the third vibe 'Pop Art' (inspired by Batman: Brave and the Bold) is where he feels most at home. His 30 animation empties inform his idle movements, mouse tracking, expressions, and talking animations. When speaking, his jaw moves on word boundaries via the Web Speech API onboundary event, synced to a British male voice selected from available system voices at runtime. Expression animation methods fire based on the conversation topic at the moment speech begins. He tracks the mouse cursor in real-time as visitors explore the site.\n\nThe conversation system is made up of handwritten phrases. A four-tier classification algorithm—written in pure JavaScript alongside a backend machine learning Python algorithm to learn from chat history and suggest improved responses—routes each message through exact social pre-matching, Levenshtein-based typo correction, direct keyword scoring, and topic bucket retrieval before falling back to a phrase bank scan. Unknowns are deflected with a contextual fallback and logged silently to a Google Form in the background. Question mirroring extracts the subject from common question structures and echoes it back before responding.",
-        "images": [],
-        "rotationY": -1,
-        "pdfRotationY": -Math.PI / 2,
-        "skills": ['threejs', 'javascript', 'web-dev', 'python', 'machine-learning', 'blender', 'fusion-360', 'cad', 'problem-solving']
-      },
-      {
-        "glb": "models/keycap_vibes.glb",
-        "seat": "right",
-        "positionOffset": [-0.3, 1.1, -4.8],
-        "scale": 2,
-        "label": "Vibe Switcher",
-        "link": null,
-        "description": "The vibe button is truly a vibe—a keyboard keycap on the front page that cycles the world's palette. There are seven themes: Aurora, Suave, Carnival, Pop Art, Blueprint, Midnight Arcade, and Pastel Dream.\n\nEach theme is a delta patch against a shared base material set. The vibe properties are specified in a config document, and the system merges them on top at each 'vibe-switch'. Every named mesh in the scene responds simultaneously.\n\nBlueprint sets each structural mesh to wireframe and activates OutlinePass, turning the scene into a technical drawing. Midnight Arcade adds scanlines and pushes bloom to maximum. Aurora runs a custom GLSL shader alongside a particle rain system.\n\nOn load, a 30-frame rAF benchmark runs alongside hardware heuristics: device memory, core count, max texture size, and mobile detection. The combined score determines how far the post-processing stack scales back on lower-end devices.",
-        "images": [],
-        "rotationY": -1.25,
-        "skills": ['threejs', 'javascript', 'web-dev', 'problem-solving']
-      },
-      {
-        "glb": "models/object-camera.glb",
-        "seat": "right",
-        "positionOffset": [
-          1,
-          0,
-          -1.9
-        ],
-        "scale": 1,
-        "label": "Camera System",
-        "link": null,
-        "description": "I built three distinct camera modes for this experience: Orbit allows for a free look around the wheel, Transit provides a smooth tween to a selected cabin, and Interior locks the view inside a cabin using a precise position offset and look target set in the config file.\n\nThere is also an Auto-Explore feature that automatically cycles through every cabin on a timer. You can press 'A' inside any cabin to activate it.",
-        "images": [],
-        "rotationY": 3,
-        "pdfRotationY": -Math.PI/2,
-
-      }
-    ]
+     items: [
+    {
+      glb: 'models/wheel-rails.glb',
+      seat: 'left',
+      positionOffset: [
+        -0.8,
+        1.4,
+        3.1,
+      ],
+      scale: 5,
+      rotationY: 2.2,
+      label: 'The Ferris Wheel',
+      description: 'I love the beach. Every time I have the opportunity to visit one, I find myself transfixed by the Ferris wheels. There\'s a certain elegance to the architecture and lighting design that tricks the mind into seeing them fly. When it came time to build my portfolio, I thought it would be nice if I could fly, too.\n\nThe wheel and stand together contain 73 named mesh bodies. There are 12 empties that work as attachment point anchors, one per spoke. The code reads these coordinates to position each cabin precisely on the wheel. The wheel serves as the navigational hub of the portfolio, each cabin contains a collection of projects that visitors can view by clicking on a spoke. ',
+      skills: [
+        'threejs',
+        'javascript',
+        'blender',
+        'fusion-360',
+        'cad',
+        'web-dev',
+        'problem-solving',
+      ],
+    },
+    {
+      glb: 'models/wheel-stand.glb',
+      seat: 'left',
+      positionOffset: [
+        -0.8,
+        1.4,
+        3.1,
+      ],
+      scale: 5,
+      rotationY: 2.2,
+    },
+    {
+      glb: 'models/cabin.glb',
+      seat: 'right',
+      positionOffset: [
+        0.7,
+        2.5,
+        4,
+      ],
+      scale: 14.5,
+      rotationY: 3.8,
+      label: 'The Cabin',
+      description: 'I follow the same build pipeline for every model in the scene: design in Fusion 360, export as an FBX, reposition and name all bodies in Blender, add animation empties where needed, export as a GLB, and then re-apply all base materials by mesh name prefix in Three.js.\n\nThe cabin is built from 79 individually named mesh bodies. The material system reads each name prefix and assigns the correct color in code depending on the \'vibe\' (the active color theme), so every cabin in the scene actually shares one base GLB. Two animation empties drive the door swing, timed to the camera transition into the interior. There is also an empty for the seat height of the left and right seats. The code places project objects at the coordinate of the empty. In dev mode, I can manually drag, scale, position, and rotate the objects exactly where I want them to sit in the cabin relative to the seats. The objects themselves are also assigned descriptions in a config file which can be accessed through a side panel when clicked. ',
+      skills: [
+        'blender',
+        'fusion-360',
+        'cad',
+        'threejs',
+        'javascript',
+        'web-dev',
+      ],
+    },
+    {
+      glb: 'models/booth.glb',
+      seat: 'left',
+      positionOffset: [
+        -0.1,
+        0,
+        0.1,
+      ],
+      scale: 9,
+      rotationY: 1.55,
+      label: 'The Ticket Booth',
+      description: 'Sir\'s ticket stand was modeled in Fusion 360 across 36 mesh bodies. The both was made by creating a custom rectangular prism in  fusion 360 and having it follow a custom pattern on path to create the over arching shape. The booth provides a strong visual counterweight to the wheel and button enclosure on screen left. The center of the booth has an empty which helps center Sir at the correct height and depth of the booth regardless of booth location. \n\nIt is also home to Sir Matcher. When Sir is clicked, the camera orbits to the ticket booth, locks into a fixed position, and switches its target to him.',
+      skills: [
+        'fusion-360',
+        'cad',
+        'blender',
+      ],
+    },
+    {
+      glb: 'models/robot.glb',
+      seat: 'left',
+      positionOffset: [
+        -0.2,
+        0,
+        -2.6,
+      ],
+      scale: 20.5,
+      rotationY: -1,
+      label: 'Sir Matcher',
+      description: 'Sir Matcher was modeled in Fusion 360 across 42 mesh bodies including a top hat, monocle, clock, face, eyebrows, and glowing pupils. He is a rather dapper fellow modeled after Alfred the Butler from the Batman series, so the third vibe \'Pop Art\' (inspired by Batman: Brave and the Bold) is where he feels most at home. His 30 animation empties inform his idle movements, mouse tracking, expressions, and talking animations. When speaking, his jaw moves on word boundaries via the Web Speech API onboundary event, synced to a British male voice selected from available system voices at runtime. Expression animation methods fire based on the conversation topic at the moment speech begins. He tracks the mouse cursor in real-time as visitors explore the site.\n\nThe conversation system is made up of handwritten phrases. I built a four-tier classification algorithm in pure JavaScript that routes each message through exact social pre-matching, Levenshtein-based typo correction, direct keyword scoring, and topic bucket retrieval before falling back to a phrase bank scan. A backend Python machine learning algorithm runs alongside it, learning from chat history to suggest improved responses over time. Unknowns are deflected with a contextual fallback and logged silently to a Google Form in the background. Question mirroring extracts the subject from common question structures and echoes it back before responding.',
+      skills: [
+        'threejs',
+        'javascript',
+        'web-dev',
+        'python',
+        'machine-learning',
+        'blender',
+        'fusion-360',
+        'cad',
+        'problem-solving',
+      ],
+      pdfRotationY: -1.5707963267948966,
+    },
+    {
+      glb: 'models/keycap_vibes.glb',
+      seat: 'right',
+      positionOffset: [
+        -0.3,
+        1.1,
+        -4.8,
+      ],
+      scale: 2,
+      rotationY: -1.25,
+      label: 'Vibe Switcher',
+      description: 'A keyboard keycap on the front page cycles through the sites visual palette through seven distinct themes: Aurora, Suave, Carnival, Pop Art, Blueprint, Midnight Arcade, and Pastel Dream. On load, a 30-frame rAF benchmark runs alongside hardware heuristics: device memory, core count, max texture size, and mobile detection. The combined score determines how far the post-processing stack scales back on lower-end devices.\n\nEach theme is a delta patch against a shared base material set. The vibe properties are specified in a config document, and the system merges them on top at each \'vibe-switch\'. Every named mesh in the scene responds simultaneously. There are a variety of custom theme components across the vibes. For instance, Blueprint sets each structural mesh to wireframe and activates OutlinePass, turning the scene into a technical drawing, Midnight Arcade adds scanlines and pushes bloom to maximum, and Aurora runs a custom GLSL shader alongside a particle rain system.\n\n',
+      skills: [
+        'threejs',
+        'javascript',
+        'web-dev',
+        'problem-solving',
+      ],
+    },
+    {
+      glb: 'models/object-camera.glb',
+      seat: 'right',
+      positionOffset: [
+        1,
+        0,
+        -1.9,
+      ],
+      scale: 1,
+      rotationY: 3,
+      label: 'Camera System',
+      description: 'I built three distinct camera modes for this experience: Orbit allows for a free look around the wheel, Transit provides a smooth tween to a selected cabin, and Interior locks the view inside a cabin using a precise position offset and look target set in the config file. This allows for the user to have a variety of interactions with the site and prevents the website from becoming stale as it is being traversed. There is also an Auto-Explore feature that automatically cycles through every cabin on a timer. You can press \'A\' inside any cabin to activate it. This carries the cabin exploration over to devices without attached keyboards such as mobile devices. ',
+      pdfRotationY: -1.5707963267948966,
+    },
+  ]
   },
   {
     id: 'digital-projects',
@@ -288,6 +329,9 @@ export const CABINS = [
         label: 'Poker Chips for the Visually Impaired',
         description: 'I designed these poker chips specifically for colorblind players. Since standard poker chip values rely heavily on color differentiation, I introduced four distinct values based on interior geometric cutouts. This approach preserves stackability while allowing for clear tactile and visual differentiation. Each denomination is based on a card suit (such as Clubs, Spades, Hearts, and Diamonds) for immediate recognizability and clean design aesthetic.\n\nI modeled the chips in Fusion 360 and 3D-printed them in PLA on a Prusa MINI, with each chip measuring 39mm in diameter and 0.5–1mm in thickness.',
         skills: [
+          'fusion-360',
+          'cad',
+          '3d-printing',
         ],
         pdfExport: {
           hardware: true,
@@ -381,7 +425,7 @@ export const CABINS = [
           {
             src: 'photos/schematics/rfid.png',
             stage: 'DOCUMENTATION',
-            caption: 'This KiCAD circuit diagram shows the connections between the Arduino Nano Connect, MOSFET (IRLZ44N), flyback diode (LN007), and RFID reader (RC522) used in the construction of the lockbox.',
+            caption: 'This KiCAD circuit diagram shows the connections between the Arduino Nano Connect, MOSFET (IRLZ44N), flyback diode (1N4007), and RFID reader (RC522) used in the construction of the lockbox.',
           },
         ],
       },
@@ -426,14 +470,22 @@ export const CABINS = [
         {
           src: 'photos/arcade-2.jpg',
           date: '04/13/2026',
-          pdfSkipImage: true,
         },
         {
           src: 'photos/arcade-3.jpg',
           date: '04/9/2026',
-          pdfSkipImage: true,
         },
       ],
+      technicalDoc: {
+        size: 'md',
+        docs: [
+          {
+            src: 'photos/schematics/arcade_system_block_diagram.jpg',
+            stage: 'DOCUMENTATION',
+            caption: 'This is a system block diagram of Dino Metal Rampage. It shows the connections between input, control, power, and conversion components. It also includes the plans for a Raspberry Pi Pico audio management system which is a planned addition.',
+          },
+        ],
+      },
     },
     {
       glb: 'models/object-project-math.glb',
@@ -953,6 +1005,6 @@ export const ABOUT_ME = {
     ''
     //'Your second paragraph here. What drives you, where you\'re headed, the thread that connects your work.',
   ],
-  education: "Boston College Freshman",
+  education: "Boston College Rising Sophomore",
 
 }
