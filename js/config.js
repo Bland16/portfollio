@@ -161,6 +161,12 @@ export const CABINS = [
       rotationY: 3,
       label: 'Camera System',
       description: 'I built three distinct camera modes for this experience: Orbit allows for a free look around the wheel, Transit provides a smooth tween to a selected cabin, and Interior locks the view inside a cabin using a precise position offset and look target set in the config file. This allows for the user to have a variety of interactions with the site and prevents the experience from feeling repetitive. There is also an Auto-Explore feature that automatically cycles through every cabin on a timer. You can press \'A\' inside any cabin to activate it. This carries the cabin exploration over to devices without attached keyboards such as mobile devices. ',
+      skills: [
+        'threejs',
+        'javascript',
+        'web-dev',
+        'problem-solving',
+      ],
       pdfRotationY: -1.5707963267948966,
     },
   ]
@@ -253,7 +259,7 @@ export const CABINS = [
         problem: 'At present, pesticide application in the United States is either applied by hand or using a set value which doesn\'t differentiate between tree size, distance or species. This wasted product not only costs significantly more than an optimized approach but can have unintended consequences on nearby populations. ',
         outcome: 'My model achieved a Root Mean Squared Error (a measurement of the magnitude of average error of our model) of 0.02 meters, which was two orders of magnitude lower than our intended distance range of 1.5 - 3 meters. Additionally, it reached a Mean Absolute Error of 0.0069 meters. ',
         contribution: 'I developed a machine learning model trained on masked tree images cleaned by an algorithm written by my partner Michael Busa. My contribution to this project entailed selecting the best-fit regression model, choosing and assigning weights to heuristics for the model to consider, and assisting Michael in the iteration process for selecting the best tree-masking strategy. ',
-        lessons: 'I learned that iteration is the beginning of success, not the end of it. I also learned that changing the weight of different heurstics in training data has a large impact on the success of a ML algorithim. ',
+        lessons: 'I learned that iteration is the beginning of success, not the end of it. I also learned the significance of minimal changes to heurstic weights in training ML algorithims. ',
         images: [
           {
             src: 'photos/tree-distance-1.jpg',
