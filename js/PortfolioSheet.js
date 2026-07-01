@@ -2688,7 +2688,13 @@ async function _exportPDFSections({ indices, selectedSkills, mode = 'software' }
 
       // GLB screenshot — The Portfolio tab only
       if (cabin.id === 'hobby-work') {
-        const visBandIdx = nonFlagshipVisible.indexOf(item)
+        // IMPORTANT: _glbScenesByTab was populated during the live (unfiltered)
+        // tab render, where every item's bandIndex is its position in the FULL
+        // per-cabin item list (allProjectItems) — not its position in whatever
+        // skill-filtered subset ends up printed. Indexing against the filtered
+        // list here caused the wrong model to be pulled whenever a skill filter
+        // trimmed out an earlier item (e.g. isolating a single project).
+        const visBandIdx = allProjectItems.indexOf(item)
         const glbEntry   = (_glbScenesByTab[tabIndex] || [])[visBandIdx]
         if (glbEntry && glbEntry.scene && glbEntry.camera) {
           try {

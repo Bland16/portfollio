@@ -1007,9 +1007,9 @@ export const ABOUT_ME = {
   photo: 'photos/headshot.jpg',
   bio: [
     // Paragraph 1 — professional intro
-    "I am a rising sophomore in Boston College's 2029 Human Centered Engineering cohort. My past work experience includes computational biology research at Rockefeller University, asylum affidavit writing for U.S. applicants, and front-end software development. I would like to join an engineering firm after graduating from Boston College, attend law school, and return to work as in-house counsel. I am particularly interested in working in an innovative field with limited legal precedent. ",
+    //"I am a rising sophomore in Boston College's 2029 Human Centered Engineering cohort. My past work experience includes computational biology research at Rockefeller University, asylum affidavit writing for U.S. applicants, and front-end software development. I would like to join an engineering firm after graduating from Boston College, attend law school, and return to work as in-house counsel. I am particularly interested in working in an innovative field with limited legal precedent. ",
     // Paragraph 2 — mission and context  
-    ''
+    "I really enjoy working with AI and machine learning to develop specific tools which can be addressed by training on specialized datasets. Since June 2025, I have conducted research at Rockefeller University in the Simon lab studying pediatric liver cancer from a bio-computational framework. I am a rising sophomore in Boston College's 2029 Human Centered Engineering cohort. My past work experience includes computational biology, asylum affidavit writing for U.S. applicants, and front-end software development. I would like to conduct research after graduating from Boston College in data science or some form of 3D modeling."
     //'Your second paragraph here. What drives you, where you\'re headed, the thread that connects your work.',
   ],
   education: "Boston College Rising Sophomore",
