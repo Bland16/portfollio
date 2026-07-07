@@ -440,7 +440,7 @@ async function init() {
     // tier is too low to build a composer, postRender keeps the scene
     // looking correct (bloom, tone-mapping, etc.) exactly as it did before
     // vibes.js was added.
-    const { render: postRender, bloomPass: ppBloomPass, mixPass: ppMixPass } = setupPostProcessing({ renderer, scene, camera })
+    const { render: postRender, bloomPass: ppBloomPass, mixPass: ppMixPass, outlinePass: ppOutlinePass, scanPass: ppScanPass } = setupPostProcessing({ renderer, scene, camera })
 
     // ── BUILD FERRIS WHEEL ───────────────────────────────────
     const ferrisWheel = new FerrisWheel({
@@ -493,8 +493,10 @@ async function init() {
         // FogSystem now exposes setColor / setOpacity
         fogParticleSystem: fogSystem,
 
-        bloomPass: ppBloomPass,
-        mixPass:   ppMixPass,
+        bloomPass:   ppBloomPass,
+        mixPass:     ppMixPass,
+        outlinePass: ppOutlinePass,
+        scanPass:    ppScanPass,
       })
 
       // Apply opening theme immediately, no transition animation

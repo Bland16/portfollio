@@ -1022,34 +1022,26 @@ function _configurePostFX(vibeName) {
   if (realMix) {
     realMix.uniforms.bloomStrength.value = atm.bloomStrength ?? 0.8
   }
-  if (!_composer) return
-
-  // Bloom
-  if (_bloomPass) {
-    _bloomPass.enabled   = fx.bloom ?? false
-    _bloomPass.strength  = atm.bloomStrength  ?? 0.55
-    _bloomPass.radius    = atm.bloomRadius    ?? 0.55
-    _bloomPass.threshold = atm.bloomThreshold ?? 0.70
-  }
-
-  // Outlines — collect all scene objects for outline pass
-  if (_outlinePass) {
-    _outlinePass.enabled = (fx.outlines ?? false) && _perfTier === 'high'
-    if (_outlinePass.enabled) {
+  // ── Outlines (Blueprint / Pop-Art) — real pass in the final composer ──
+  const outline = _refs?.outlinePass
+  if (outline) {
+    outline.enabled = (fx.outlines ?? false) && _perfTier === 'high'
+    if (outline.enabled) {
       const targets = []
       const scenes  = [_refs.wheelScene, _refs.standScene, _refs.boothScene, _refs.robotScene]
       for (const cabin of (_refs.cabinGroups ?? [])) scenes.push(cabin)
       for (const s of scenes) { if (s) s.traverse(c => { if (c.isMesh) targets.push(c) }) }
-      _outlinePass.selectedObjects = targets
-      _outlinePass.visibleEdgeColor.set(
-        vibeName === 'pop_art' ? '#111111' : '#4488ff'
-      )
+      outline.selectedObjects = targets
+      const edge = vibeName === 'pop_art' ? '#111111' : '#4488ff'
+      outline.visibleEdgeColor.set(edge)
+      outline.hiddenEdgeColor.set(edge)
     }
   }
 
-  // Scanlines
-  if (_scanPass) {
-    _scanPass.enabled = (fx.scanlines ?? false) && _perfTier !== 'low'
+  // ── Scanlines (Midnight Arcade) — real pass in the final composer ──
+  const scan = _refs?.scanPass
+  if (scan) {
+    scan.enabled = (fx.scanlines ?? false) && _perfTier !== 'low'
   }
 
   // Aurora overlay — show/hide and set opacity
@@ -1276,9 +1268,12 @@ export function initVibes(sceneRefs) {
   _refs.scene.add(robotLight)
   _refs.robotLight = robotLight
 
-  if (_perfTier !== 'low') {
-    _setupComposer()
-  }
+  // NOTE: the vibe post-FX (outline + scanline) now live in the single
+  // finalComposer built by postprocessing.js and are driven via
+  // _refs.outlinePass / _refs.scanPass in _configurePostFX(). We no longer
+  // build a second, never-rendered composer here. _setupComposer() and its
+  // ScanlineShader are kept below for reference only.
+  // if (_perfTier !== 'low') _setupComposer()
 }
 /**
  * Immediately apply a vibe without transition (use for initial load).
@@ -1316,7 +1311,7 @@ export const getComposer = () => _composer
  */
 export function updateVibes(delta) {
   _rain?.update(delta)
-  if (_scanPass) _scanPass.uniforms.time.value += delta
+  if (_refs?.scanPass) _refs.scanPass.uniforms.time.value += delta
   if (_auroraOverlay?.visible && _auroraMat)
     _auroraMat.uniforms.time.value += delta
   if (_refs?.camera) {

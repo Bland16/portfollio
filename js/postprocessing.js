@@ -10,11 +10,41 @@ import { RenderPass }      from 'three/addons/postprocessing/RenderPass.js'
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass }      from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass }      from 'three/addons/postprocessing/ShaderPass.js'
+import { OutlinePass }     from 'three/addons/postprocessing/OutlinePass.js'
 
 // Bloom layer — only objects on this layer get bloom
 export const BLOOM_LAYER = 1
 export const bloomLayer  = new THREE.Layers()
 bloomLayer.set(BLOOM_LAYER)
+
+// ── Scanline / CRT shader (Midnight Arcade) ──────────────────
+// Moved here from vibes.js so it lives on the composer that actually
+// renders. Scrolling scanlines + soft vignette + subtle RGB fringe.
+const ScanlineShader = {
+  uniforms: {
+    tDiffuse: { value: null },
+    time:     { value: 0 },
+  },
+  vertexShader: /* glsl */`
+    varying vec2 vUv;
+    void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }
+  `,
+  fragmentShader: /* glsl */`
+    uniform sampler2D tDiffuse;
+    uniform float     time;
+    varying vec2      vUv;
+    void main() {
+      vec4 col = texture2D(tDiffuse, vUv);
+      float line = sin(vUv.y * 600.0 - time * 3.0) * 0.035;
+      col.rgb    = max(vec3(0.0), col.rgb - line);
+      float d    = distance(vUv, vec2(0.5));
+      col.rgb   *= 1.0 - d * 0.45;
+      col.r      = texture2D(tDiffuse, vUv + vec2(0.0015, 0.0)).r;
+      col.b      = texture2D(tDiffuse, vUv - vec2(0.0015, 0.0)).b;
+      gl_FragColor = col;
+    }
+  `,
+}
 
 export function setupPostProcessing({ renderer, scene, camera }) {
   const w = window.innerWidth
@@ -76,7 +106,26 @@ export function setupPostProcessing({ renderer, scene, camera }) {
   const finalComposer = new EffectComposer(renderer, finalRenderTarget)
   finalComposer.addPass(new RenderPass(scene, camera))
   finalComposer.addPass(mixPass)
+
+  // ── VIBE FX PASSES (off by default; vibes.js enables per theme) ──
+  // Outline (Blueprint / Pop-Art). Before OutputPass so the edge lines
+  // are tone-mapped with the rest of the frame.
+  const outlinePass = new OutlinePass(new THREE.Vector2(w, h), scene, camera)
+  outlinePass.edgeStrength  = 3.5
+  outlinePass.edgeThickness = 1.5
+  outlinePass.visibleEdgeColor.set('#4488ff')
+  outlinePass.hiddenEdgeColor.set('#224488')
+  outlinePass.enabled = false
+  finalComposer.addPass(outlinePass)
+
   finalComposer.addPass(new OutputPass())
+
+  // Scanline / CRT (Midnight Arcade). After OutputPass so the CRT look
+  // sits in display space. EffectComposer auto-renders the last ENABLED
+  // pass to screen, so toggling this on/off needs no loop changes.
+  const scanPass = new ShaderPass(ScanlineShader)
+  scanPass.enabled = false
+  finalComposer.addPass(scanPass)
 
   // ── DARK MATERIAL for non-bloomed objects ─────────────────
   const darkMaterial = new THREE.MeshBasicMaterial({ color: 'black' })
@@ -114,7 +163,7 @@ export function setupPostProcessing({ renderer, scene, camera }) {
 
   window.addEventListener('resize', onResize)
 
-return { render, bloomComposer, finalComposer, bloomLayer, bloomPass, mixPass }
+return { render, bloomComposer, finalComposer, bloomLayer, bloomPass, mixPass, outlinePass, scanPass }
 }
 
 // ── ENABLE BLOOM ON A MESH ────────────────────────────────

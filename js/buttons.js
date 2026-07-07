@@ -11,7 +11,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { MATERIALS } from './config.js'
 import {
   handleRobotClick,
-  handleSkillsClick,
+  handleMusicToggle,
   handleVibeCycle,
   handlePDFClick,
   initButtonCallbacks,
@@ -234,7 +234,7 @@ export function initButtons({
       <button class="btn-keycap" id="html-btn-robot" data-tooltip="Robot">🤖</button>
     </div>
     <div class="btn-housing">
-      <button class="btn-keycap" id="html-btn-skills" data-tooltip="Guestbook">✍️</button>
+      <button class="btn-keycap" id="html-btn-music" data-tooltip="Play music">🔇</button>
     </div>
     <div class="btn-housing">
       <button class="btn-keycap vibe-keycap" id="html-btn-vibe" data-tooltip="Vibe" data-vibe="${VIBE_NAMES[currentVibeIndex]}">
@@ -256,8 +256,8 @@ export function initButtons({
     if (typeof handleRobotClick === 'function') handleRobotClick()
   })
 
-  document.getElementById('html-btn-skills').addEventListener('click', () => {
-    if (typeof handleSkillsClick === 'function') handleSkillsClick()
+  document.getElementById('html-btn-music').addEventListener('click', () => {
+    if (typeof handleMusicToggle === 'function') handleMusicToggle()
   })
 
   document.getElementById('html-btn-pdf').addEventListener('click', () => {

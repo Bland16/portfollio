@@ -13,7 +13,10 @@ import {
   isTransitioning
 } from './vibes.js'
 
-import { openGuestbook } from './guestbook.js'
+// NOTE: guestbook.js is intentionally left in the tree but no longer
+// wired to any button. To bring it back, re-import openGuestbook here
+// and call it from a handler (see git history for the old wiring).
+import { toggleMusic, setMusicVibe } from './music.js'
 
 
 // ─────────────────────────────────────────────────────────────
@@ -62,15 +65,23 @@ export function handleRobotClick() {
 
 
 // ─────────────────────────────────────────────────────────────
-// SKILLS GALLERY
-// Previously this slot was the cabin/ferris-wheel nav button.
-// ESC already handles exiting cabins, so this button now opens
-// the Skills Gallery overlay instead.
+// MUSIC TOGGLE — WIRED
+// This slot previously opened the guestbook. It now toggles the
+// generative background music (music.js). The button's icon/tooltip
+// are updated here to reflect on/off state.
 // ─────────────────────────────────────────────────────────────
 
-export function handleSkillsClick() {
-  openGuestbook()
+export async function handleMusicToggle() {
+  const on  = await toggleMusic()
+  const btn = document.getElementById('html-btn-music')
+  if (btn) {
+    btn.textContent = on ? '🎵' : '🔇'
+    btn.setAttribute('data-tooltip', on ? 'Mute music' : 'Play music')
+  }
 }
+
+// Back-compat alias — buttons_LEGACY.js (dead/reference) imports this name.
+export { handleMusicToggle as handleSkillsClick }
 
 
 // ─────────────────────────────────────────────────────────────
@@ -85,6 +96,7 @@ export function handleVibeCycle() {
   const idx     = VIBE_KEYS.indexOf(current)
   const next    = VIBE_KEYS[(idx + 1) % VIBE_KEYS.length]
   triggerVibeTransition(next)
+  setMusicVibe(next)              // re-tune background music to the new vibe (no-op if music is off)
   _cb.onVibeChange?.(next)
   return true
 }
