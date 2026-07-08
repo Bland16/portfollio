@@ -147,10 +147,23 @@ export function setupPostProcessing({ renderer, scene, camera }) {
 
   // ── RENDER FUNCTION ───────────────────────────────────────
   function render() {
+    // Swap non-bloomed objects to black for the bloom pass, then ALWAYS
+    // swap them back — even if the bloom render throws. If this restore is
+    // ever skipped, the stored "original" material becomes the black one on
+    // the next frame and the object is stuck invisible forever.
     scene.traverse(darkenNonBloomed)
-    bloomComposer.render()
-    scene.traverse(restoreMaterials)
-    finalComposer.render()
+    try {
+      bloomComposer.render()
+    } finally {
+      scene.traverse(restoreMaterials)
+    }
+    // Guard the final pass too — an OutlinePass/ShaderPass error must not
+    // kill the animation loop or leave scene state half-applied.
+    try {
+      finalComposer.render()
+    } catch (err) {
+      console.error('[postprocessing] finalComposer.render() threw:', err)
+    }
   }
 
   // ── RESIZE ────────────────────────────────────────────────

@@ -1027,14 +1027,18 @@ function _configurePostFX(vibeName) {
   if (outline) {
     outline.enabled = (fx.outlines ?? false) && _perfTier === 'high'
     if (outline.enabled) {
-      const targets = []
-      const scenes  = [_refs.wheelScene, _refs.standScene, _refs.boothScene, _refs.robotScene]
-      for (const cabin of (_refs.cabinGroups ?? [])) scenes.push(cabin)
-      for (const s of scenes) { if (s) s.traverse(c => { if (c.isMesh) targets.push(c) }) }
-      outline.selectedObjects = targets
+      // Select the whole scene root, NOT a hand-built mesh list. OutlinePass
+      // hides every non-selected mesh each frame to build its mask; a partial
+      // list meant the meshes it missed (Sir, the cabins — the rig/clones
+      // produce different objects than our refs) got hidden and stranded
+      // invisible. With the scene root selected, no mesh is ever "non-
+      // selected", so the pass can never hide anything.
+      outline.selectedObjects = [_refs.scene]
       const edge = vibeName === 'pop_art' ? '#111111' : '#4488ff'
       outline.visibleEdgeColor.set(edge)
       outline.hiddenEdgeColor.set(edge)
+    } else {
+      outline.selectedObjects = []
     }
   }
 
