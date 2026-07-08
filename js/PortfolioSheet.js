@@ -2140,6 +2140,13 @@ async function _exportPDFSections({ indices, selectedSkills, mode = 'software' }
   const { jsPDF } = window.jspdf
 
   const doc    = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+  // Register the flagship type family (Staatliches + Big Shoulders) on THIS doc
+  // up front. It's otherwise only loaded inside _drawFlagshipSpread, so the
+  // pages that render before the first flagship spread — cover (name), About Me
+  // (title), TOC (Contents title) — would fall back to Helvetica even though
+  // they call _flagshipFont. Body copy stays Helvetica; only the elements that
+  // explicitly call _flagshipFont pick this up.
+  await _loadFlagshipFonts(doc)
   const PW     = 210
   const PH     = 297
   const MARGIN = 20
@@ -2166,12 +2173,19 @@ async function _exportPDFSections({ indices, selectedSkills, mode = 'software' }
   // ── Shared helpers ────────────────────────────────────────────────────────
   const _bg = () => { doc.setFillColor(243, 243, 245); doc.rect(0, 0, PW, PH, 'F') }   // was cream [250,248,244] — now light gray
 
-  const _pageNum = () => {
+  const _pageNum = (isFlagship = false) => {
     const label = `— ${pageNum} —`
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(8)
     doc.setTextColor(...TC)
-    doc.text(label, (PW - doc.getTextWidth(label)) / 2, PH - 8)
+    // Flagship pages carry a full-page frame whose bottom stroke lands at
+    // ~289mm — the same y (and the same colour) the footer used, so the number
+    // merged straight into the border. Drop it into the gutter just below the
+    // frame on those pages; the frame's bottom stroke ends ~290.1mm and the
+    // paper edge is 297mm, so 293.5mm centres it clear of both. The number is
+    // horizontally centred, so it never meets the bottom-right Lessons sticker.
+    const footY = isFlagship ? PH - 3.5 : PH - 8
+    doc.text(label, (PW - doc.getTextWidth(label)) / 2, footY)
   }
 
   const _sectionHeader = (label, y) => {
@@ -2250,6 +2264,37 @@ async function _exportPDFSections({ indices, selectedSkills, mode = 'software' }
       y += 7
     })
   }
+
+  // Website / online portfolio — cover-only, read from COVER.website so it
+  // never leaks onto the live About Me tab (which only knows contact items).
+  // Rendered in the same 'Label  value' style as the rows above; the scheme
+  // and any trailing slash are stripped for a clean display string.
+  const websiteUrl = _cfg.COVER?.website
+  if (websiteUrl) {
+    const label   = 'Website'
+    const display = websiteUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '')
+    const sep     = '  '
+
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(9)
+    doc.setTextColor(...TC)
+    const iconW = doc.getTextWidth(label + sep)
+
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(60, 60, 60)
+    const displayW = doc.getTextWidth(display)
+
+    const startX = (PW - iconW - displayW) / 2
+
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(...TC)
+    doc.text(label + sep, startX, y)
+
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(60, 60, 60)
+    doc.text(display, startX + iconW, y)
+    y += 7
+  }
   y += 6
 
   // Skills
@@ -2271,10 +2316,12 @@ async function _exportPDFSections({ indices, selectedSkills, mode = 'software' }
     doc.text(hdrLabel, (PW - doc.getTextWidth(hdrLabel)) / 2, y)
     y += 8
 
-    doc.setFont('helvetica', 'normal')
+    // Chip labels use the flagship skill-pill font (Big Shoulders Black). Set
+    // it before measuring so chip widths match the rendered text.
+    _flagshipFont(doc, 'headBlack')
     doc.setFontSize(8.5)
     const chipPadX = 5, chipPadY = 2.5, chipH = 7, chipGap = 5, rowGap = 5
-    const chipWidths = skillsToShow.map(l => doc.getTextWidth(l) + chipPadX * 2)
+    const chipWidths = skillsToShow.map(l => doc.getTextWidth(l.toUpperCase()) + chipPadX * 2)
     const maxRowW = CW - 20
     const rows = []
     let row = [], rowW = 0
@@ -2282,7 +2329,7 @@ async function _exportPDFSections({ indices, selectedSkills, mode = 'software' }
       if (rowW + w + (row.length ? chipGap : 0) > maxRowW && row.length) {
         rows.push(row); row = []; rowW = 0
       }
-      row.push({ label: skillsToShow[idx], w })
+      row.push({ label: skillsToShow[idx].toUpperCase(), w })
       rowW += w + (row.length > 1 ? chipGap : 0)
     })
     if (row.length) rows.push(row)
@@ -2491,7 +2538,7 @@ async function _exportPDFSections({ indices, selectedSkills, mode = 'software' }
     for (const e of flagshipItems) {
       doc.addPage(); pageNum++
       await _drawFlagshipSpread(doc, e.item, mode)
-      _pageNum()
+      _pageNum(true)
     }
 
     // ── Per-section pages (regular items only) ─────────────────────────────
@@ -2783,8 +2830,8 @@ async function _exportPDFSections({ indices, selectedSkills, mode = 'software' }
     catSkills.forEach(([slug, skill]) => {
       const count    = skillProjectCount[slug] || 0
       const tagLabel = `${skill.label}  (${count})`
-      doc.setFont('helvetica', 'bold')
-      const nameW = doc.getTextWidth(skill.label)
+      _flagshipFont(doc, 'headBlack')
+      const nameW = doc.getTextWidth(skill.label.toUpperCase())
       doc.setFont('helvetica', 'normal')
       const countW = doc.getTextWidth(`  (${count})`)
       const tagW   = nameW + countW + 10
@@ -2803,9 +2850,9 @@ async function _exportPDFSections({ indices, selectedSkills, mode = 'software' }
       // Skill name bold, count normal — both darkened only enough to stay
       // legible against the chip's colored fill (was tuned for the old
       // plain background)
-      doc.setFont('helvetica', 'bold')
+      _flagshipFont(doc, 'headBlack')
       doc.setTextColor(255, 255, 255)
-      doc.text(skill.label, tagX + 5, skillsY)
+      doc.text(skill.label.toUpperCase(), tagX + 5, skillsY)
       doc.setFont('helvetica', 'normal')
       doc.setTextColor(210, 210, 210)
       doc.text(`  (${count})`, tagX + 5 + nameW, skillsY)

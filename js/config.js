@@ -21,6 +21,7 @@ export const SEAT_Y = 0.3 * MODEL_SCALE
 export const COVER = {
   name:    'Sarah Bland',                        // ← replace
   tagline: 'Engineer · Designer · Builder',   // ← your tagline
+  website: 'https://sarah-bland.netlify.app',  // ← your site URL; shown on the PDF cover as "Website  <url>". Leave '' to omit.
 }
 
 // ── CABIN DEFINITIONS ───────────────────────────────────────
@@ -995,7 +996,7 @@ export const SKILLS = {
   'blender':          { label: 'Blender',              category: 'design',      level: 4 },
   'cad':              { label: '3D CAD',               category: 'design',      level: 5 },
   'ui-design':        { label: 'UI Design',            category: 'design',      level: 3 },
-  'adobe-illustrator':            { label: 'adobe-illustrator Illustrator ',   category: 'design',      level: 4 },
+  'adobe-illustrator':            { label: 'Adobe Illustrator ',   category: 'design',      level: 4 },
 
   // ── Fabrication & Making  →  bullseye targets ───────────
   '3d-printing':      { label: '3D Printing',          category: 'fabrication', level: 4 },
