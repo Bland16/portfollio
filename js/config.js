@@ -484,6 +484,8 @@ export const CABINS = [
         {
           src: 'photos/arcade-3.jpg',
           date: '04/9/2026',
+          pdfSkipImage: true,
+
         },
       ],
       technicalDoc: {
