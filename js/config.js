@@ -394,7 +394,7 @@ export const CABINS = [
         'fusion-360',
         'problem-solving',
         'laser-cutting',
-        'adobe'
+        'adobe-illustrator'
       ],
       pdfExport: {
         hardware: 'flagship',
@@ -456,7 +456,7 @@ export const CABINS = [
         'led-matrix',
         'soldering',
         'laser-cutting',
-        'adobe',
+        'adobe-illustrator',
         'machine-learning',
         'prompt-engineering',
         'teamwork',
@@ -516,7 +516,7 @@ export const CABINS = [
         'teamwork',
         'problem-solving',
         'communication',
-        'adobe',
+        'adobe-illustrator',
         'laser-cutting',
       ],
       pdfExport: {
@@ -627,7 +627,7 @@ export const CABINS = [
       skills: [
         'woodworking',
         'laser-cutting',
-        'adobe',
+        'adobe-illustrator',
         'hand-tools',
         'teamwork',
         'communication',
@@ -693,7 +693,7 @@ export const CABINS = [
         "description": "I built this lock box as a smarter alternative to my college's lost and found system for low-to-medium value items. Rather than relying on staff to manually match owners to items, the box integrates directly with the school's existing ID infrastructure. When someone is confirmed as the owner of a lost item, I designed the system to remotely authorize their student ID to unlock the box and retrieve it on their own time.\n\nThe system runs C++ firmware I wrote for an Arduino Nano, which controls a 5V solenoid lock through a MOSFET switching circuit and communicates with a 13.56MHz RC522 RFID reader over SPI. I handled the card authorization logic and hardware control timing entirely on-device. The custom electronics I wired include flyback protection, gate pull-down resistors, and multi-voltage power distribution (5V/3.3V) for reliable high-current switching.\n\nI CAD modeled and 3D-printed a thermal housing for the solenoid to ensure precise actuation alignment and protect nearby components from heat. I also fabricated the enclosure itself—a 19\" × 14\" × 5\" wooden box—using a table saw, adding full cable management and strain relief for a production-quality finish.",
         "images": [{"src": "photos/rfid-0.jpg", "date": '11/21/2025'},{"src": "photos/rfid-1.jpg", "date": '11/21/2025'},{"src": "photos/rfid-2.jpg", "date": '11/18/2025'},{"src": "photos/rfid-3.jpg", "date": '11/19/2025'}],
         "rotationY": -1,
-        "skills": ['cpp', 'arduino', 'circuits', 'rfid-nfc', 'soldering', 'woodworking', '3d-printing', 'fusion-360', 'problem-solving', 'laser-cutting', 'adobe']
+        "skills": ['cpp', 'arduino', 'circuits', 'rfid-nfc', 'soldering', 'woodworking', '3d-printing', 'fusion-360', 'problem-solving', 'laser-cutting', 'adobe-illustrator']
       },
       {
         "glb": "models/object-project-math.glb",
@@ -705,7 +705,7 @@ export const CABINS = [
         "description": "I developed a portable counting game designed for children with combined physical and cognitive impairments, purposefully sizing it to fit directly on a wheelchair tray for independent use.\n\nI designed the device to run on a rechargeable battery while retaining plug-in capabilities to ensure uninterrupted sessions. I reduced the interaction to two large buttons, making it accessible to children with limited fine motor control, and added a glass light diffuser above the indicator to soften visual feedback.\n\nI soldered and assembled the internal circuitry (a Matrix Portal connected to a HUB75 and mobile battery) and designed the logic controlling the code behind the counting game.\n\nI built this in conjunction with Garrett Mackenzie for our Physical Computing class at Boston College.",
         "images": [{"src": "photos/math-game-1.jpg", "date": '04/29/2026'}],
         "rotationY": 1.35,
-        "skills": ['circuitpython', 'led-matrix', 'soldering', 'teamwork', 'problem-solving',  'communication','laser-cutting', 'adobe']
+        "skills": ['circuitpython', 'led-matrix', 'soldering', 'teamwork', 'problem-solving',  'communication','laser-cutting', 'adobe-illustrator']
       },
       {
         "glb": "models/object-project-tapn.glb",
@@ -785,7 +785,7 @@ export const CABINS = [
           "description": "As an officer for MakeBC, Boston College's premier make and design club, I help scale our club and execute event management and preparation. For instance, this year, I built metal pumpkin trophies for our Punkin' Chunkin' event, organized inventory management for our annual Make-A-Thon, and grew our member base by over 30%. Additionally, I provided tool assistance, photography, and general set-up/clean-up for our annual programming. As a club member, I (successfully) completed an egg drop off a 7 story building, launched a pumpkin 40 some odd feet, and won second place in our independently judged 24-hour Make-A-Thon.",
           "images": [{"src": "photos/makebc-1.jpg", "date": '12/02/2025'},{"src": "photos/makebc-2.jpg", "date": '11/22/2025'}],
           "rotationY": -1.8,
-          "skills": ['teamwork', 'problem-solving', 'event-planning','communication', 'laser-cutting', 'adobe']
+          "skills": ['teamwork', 'problem-solving', 'event-planning','communication', 'laser-cutting', 'adobe-illustrator']
         },
         {
                 
@@ -993,7 +993,7 @@ export const SKILLS = {
   'blender':          { label: 'Blender',              category: 'design',      level: 4 },
   'cad':              { label: '3D CAD',               category: 'design',      level: 5 },
   'ui-design':        { label: 'UI Design',            category: 'design',      level: 3 },
-  'adobe':            { label: 'Adobe Illustrator ',   category: 'design',      level: 4 },
+  'adobe-illustrator':            { label: 'adobe-illustrator Illustrator ',   category: 'design',      level: 4 },
 
   // ── Fabrication & Making  →  bullseye targets ───────────
   '3d-printing':      { label: '3D Printing',          category: 'fabrication', level: 4 },
